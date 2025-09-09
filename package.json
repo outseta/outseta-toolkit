@@ -23,7 +23,8 @@
     "type-check": "tsc --noEmit",
     "serve": "npm run build && node server.js",
     "semantic-release": "semantic-release",
-    "semantic-release:dry-run": "semantic-release --dry-run"
+    "semantic-release:dry-run": "semantic-release --dry-run",
+    "prerelease": "semantic-release --dry-run"
   },
   "keywords": [
     "outseta",

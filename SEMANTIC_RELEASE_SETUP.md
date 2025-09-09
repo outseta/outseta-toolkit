@@ -19,6 +19,7 @@
 
 - Added repository URL
 - Added semantic-release scripts
+- Added pre-release testing script
 
 ## 🚨 **Next Steps Required:**
 
@@ -50,6 +51,15 @@ In your GitHub repository settings, add these secrets:
 
 ## 📝 **How It Works:**
 
+### **Trunk-Based Development**
+
+This project uses trunk-based development with automatic pre-releases for all pull requests:
+
+- **All development** happens on feature branches
+- **Pull requests** automatically create pre-releases for testing
+- **Merging to main** triggers production releases
+- **Pre-release branches** are automatically managed by semantic-release
+
 ### **Commit Message Format**
 
 Use conventional commits for automatic versioning:
@@ -69,23 +79,28 @@ BREAKING CHANGE: The withProperty function now requires options object"
 
 ### **Automatic Process**
 
-1. **Push to main** → Triggers GitHub Action
+1. **Create PR** → Triggers GitHub Action
 2. **Analyze commits** → Determines version bump
-3. **Update version** → Bumps package.json
-4. **Generate changelog** → Updates CHANGELOG.md
-5. **Publish to npm** → Publishes new version
-6. **Create GitHub release** → Tags and release notes
-7. **Commit changes** → Commits version files back to repo
+3. **Create pre-release** → Publishes pre-release version
+4. **Merge to main** → Triggers production release
+5. **Update version** → Bumps package.json
+6. **Generate changelog** → Updates CHANGELOG.md
+7. **Publish to npm** → Publishes new version
+8. **Create GitHub release** → Tags and release notes
+9. **Commit changes** → Commits version files back to repo
 
 ### **Branches**
 
 - **main**: Production releases (1.0.0, 1.1.0, etc.)
-- **beta**: Pre-releases (1.1.0-beta.1, 1.1.0-beta.2, etc.)
+- **Any other branch**: Pre-releases (1.1.0-feature-auth.1, 1.1.0-hotfix-bug.1, etc.)
 
 ## 🧪 **Testing Locally**
 
 ```bash
-# Test without publishing
+# Test pre-release without publishing
+npm run prerelease
+
+# Test semantic-release dry-run
 npm run semantic-release:dry-run
 
 # Run actual release (only works with real repo)
@@ -96,6 +111,7 @@ npm run semantic-release
 
 - `npm run semantic-release` - Run semantic release
 - `npm run semantic-release:dry-run` - Test without publishing
+- `npm run prerelease` - Test pre-release locally
 - `npm run build` - Build the package
 - `npm run type-check` - TypeScript validation
 
@@ -103,6 +119,7 @@ npm run semantic-release
 
 Once you create the GitHub repository and set up the secrets, semantic-release will automatically:
 
+- Create pre-releases for every PR
 - Version your package based on commit messages
 - Publish to npm
 - Create GitHub releases
