@@ -2,7 +2,11 @@
   "branches": [
     "main",
     {
-      "name": "*",
+      "name": "semantic-*",
+      "prerelease": true
+    },
+    {
+      "name": "test-*",
       "prerelease": true
     }
   ],
