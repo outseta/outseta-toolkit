@@ -20,14 +20,5 @@
       }
     ]
   ],
-  "preset": "conventionalcommits",
-  "release": {
-    "branches": [
-      "main",
-      {
-        "name": "beta",
-        "prerelease": true
-      }
-    ]
-  }
+  "preset": "conventionalcommits"
 }
