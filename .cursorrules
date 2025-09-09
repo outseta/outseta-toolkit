@@ -1,0 +1,95 @@
+# Outseta Toolkit - Cursor Rules
+
+## Tone of Voice
+
+### Writing Style
+
+- **Direct and factual**: State what the code does, not how amazing it is
+- **Technical precision**: Use accurate technical terms without marketing fluff
+- **Concise**: Get to the point quickly, avoid verbose explanations
+- **Professional**: Maintain a serious, developer-focused tone
+
+### Language Guidelines
+
+**✅ DO:**
+
+- "Provides authentication state management"
+- "Handles custom property synchronization"
+- "Type definitions included"
+- "Supports dot notation for nested properties"
+- "Debounced API calls prevent rapid requests"
+
+**❌ AVOID:**
+
+- "Powerful", "seamless", "comprehensive", "excellent"
+- "Built with ❤️", "amazing", "cutting-edge"
+- "Effortlessly", "revolutionary", "game-changing"
+- Over-promising or marketing language
+- Excessive adjectives and superlatives
+
+### Emoji Usage
+
+- **Visual Hierarchy**: Use emojis to categorize and prioritize information
+- **Consistent Patterns**: Follow established emoji patterns for different content types
+
+**Emoji Guidelines:**
+
+- 🚨 **REQUIRES** - Critical setup requirements (warning light for high attention)
+- ℹ️ **NOTE** - Informational notes and helpful tips (information icon - neutral/informative)
+- 🔧 📦 📝 ⚡ 🔄 ❗ - Feature categorization (tools, packages, documentation, performance, integration, error)
+- **Avoid**: Emojis at sentence endings for decoration
+- **Purpose**: Visual organization and content categorization
+
+### Code Documentation
+
+- Comment code functionally: "Syncs custom properties with Outseta API"
+- Avoid comments like: "Beautifully handles user sync"
+- Focus on what, why, and how - not subjective quality
+
+### README Structure
+
+- Lead with what the tool does, not marketing claims
+- Features list should be factual capabilities
+- Examples should be practical and realistic
+- Keep installation instructions straightforward
+
+### Function/Variable Naming
+
+- Descriptive and clear: `updateUserProperty`, `showForAuthStatus`
+- Avoid cute names or marketing terms
+- Follow TypeScript/JavaScript conventions consistently
+
+### Terminology
+
+- **UseProperties**: Use "custom property" or "account custom property" for custom properties and "property" or "account property" for built-in user properties.
+- **Outseta Alignment**: Use terminology that matches Outseta's official documentation
+- **Consistency**: Maintain consistent terminology across code, comments, and documentation
+
+## Examples
+
+**Good README intro:**
+
+```
+A toolkit for Outseta integration with Framer. Provides authentication state management and component override functions.
+```
+
+**Poor README intro:**
+
+```
+🚀 The ultimate, game-changing toolkit that seamlessly revolutionizes your Outseta experience with powerful, cutting-edge features!
+```
+
+**Good feature description:**
+
+```
+- 🔧 **Framer Overrides**: Functions for authentication, visibility, and dynamic content
+- ℹ️ **NOTE:** The custom property must be configured in Outseta
+- 🚨 **REQUIRES** a person custom property with system name: Bookmarks
+```
+
+**Poor feature description:**
+
+```
+- **🔥 Amazing TypeScript**: Incredible type definitions for an excellent developer experience! ✨🎉
+- **Custom Properties**: Support for any custom property with comparison options 📝
+```

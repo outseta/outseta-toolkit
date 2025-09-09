@@ -1,0 +1,55 @@
+{
+  "name": "@outseta/toolkit",
+  "version": "0.1.0",
+  "description": "Outseta's toolkit for visual website builders",
+  "type": "module",
+  "exports": {
+    "./framer/overrides": {
+      "import": "./dist/framer/overrides.js",
+      "types": "./dist/framer/overrides/index.d.ts"
+    },
+    "./framer/test": {
+      "import": "./dist/framer/test.js",
+      "types": "./dist/framer/test/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build && tsc",
+    "dev": "vite build --watch",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit",
+    "serve": "npm run build && node server.js"
+  },
+  "keywords": [
+    "outseta",
+    "toolkit",
+    "authentication",
+    "react",
+    "hooks",
+    "zustand",
+    "framer",
+    "overrides",
+    "auth",
+    "saas"
+  ],
+  "author": "Outseta",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "zustand": "^4.4.7"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.1",
+    "@types/react": "^18.2.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "express": "^4.18.0",
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0"
+  }
+}
