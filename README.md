@@ -26,7 +26,7 @@ import {
   showForAuthStatus,
   withProperty,
   withImageProperty,
-} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@latest/dist/framer/overrides.js";
+} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0/dist/framer/overrides.js";
 ```
 
 ## Quick Start
@@ -48,7 +48,7 @@ import {
   triggerPopup,
   triggerAction,
   toggleProperty,
-} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@latest/dist/framer/overrides.js";
+} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0/dist/framer/overrides.js";
 
 // Authentication triggers
 export function triggerLoginPopup(Component): ComponentType {
@@ -119,7 +119,7 @@ import { type ComponentType } from "react";
 import {
   showForUserProperty,
   showForPayloadProperty,
-} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@latest/dist/framer/overrides.js";
+} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0/dist/framer/overrides.js";
 
 ////
 // Payload versions, faster than the user property version but will not update in real-time.
@@ -181,7 +181,7 @@ import {
   withUserProperty,
   showForUserProperty,
   toggleUserProperty,
-} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@latest/dist/framer/overrides.js";
+} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0/dist/framer/overrides.js";
 
 //////
 // 🚨 Requires a person custom property with system name: CompletedLessons
@@ -225,7 +225,7 @@ import {
   withUserProperty,
   showForProperty,
   toggleProperty,
-} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@latest/dist/framer/overrides.js";
+} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0/dist/framer/overrides.js";
 
 //////
 // 🚨 Requires a person custom property with system name: Bookmarks
