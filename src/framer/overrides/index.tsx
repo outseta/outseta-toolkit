@@ -43,6 +43,16 @@ export type ShowForPayloadPropertyOptions = ShowForPropertyOptions & {
   value: any;
 };
 
+export type HideForPayloadPropertyOptions = ShowForPropertyOptions & {
+  name: string;
+  value: any;
+};
+
+export type HideForUserPayloadPropertyOptions = ShowForPropertyOptions & {
+  name: string;
+  value: any;
+};
+
 // Parametric Override Types
 export type ParametricOverrideFunction<T, P = any> = (
   Component: ComponentType<P>,
@@ -62,6 +72,10 @@ export type WithPayloadPropertyFunction =
   ParametricOverrideFunction<WithPayloadPropertyOptions>;
 export type ShowForPayloadPropertyFunction =
   ParametricOverrideFunction<ShowForPayloadPropertyOptions>;
+export type HideForPayloadPropertyFunction =
+  ParametricOverrideFunction<HideForPayloadPropertyOptions>;
+export type HideForUserPayloadPropertyFunction =
+  ParametricOverrideFunction<HideForUserPayloadPropertyOptions>;
 
 const log = outsetaLog("framer.overrides");
 
@@ -373,6 +387,109 @@ export function showForPayloadProperty(
       }
 
       log(logPrefix, "Match found, showing component");
+      return <Component ref={ref} {...props} />;
+    } catch (error) {
+      if (error instanceof Error) {
+        log(logPrefix, "Hiding component", error.message);
+      } else {
+        log(logPrefix, "Hiding component", error);
+      }
+      return null;
+    }
+  });
+}
+
+/**
+ * Hides component based on payload property comparison
+ * @param Component - The component to wrap
+ * @param options - Configuration
+ * @param options.name - Payload property name to check
+ * @param options.value - Value to compare against (can be "props.propertyName")
+ * @param options.compare - Comparison type: "equal" or "array-includes"
+ * @param options.flags - Additional flags like ["ignore-case"]
+ */
+export function hideForPayloadProperty(
+  Component: React.ComponentType<any>,
+  {
+    name: propertyName,
+    value,
+    compare: compareType = "equal",
+    flags = [],
+  }: HideForPayloadPropertyOptions
+): React.ComponentType<any> {
+  return forwardRef((props, ref) => {
+    const logPrefix = `hideForPayloadProperty ${propertyName} -|`;
+
+    try {
+      const payload = authStore((state) => state.payload);
+
+      if (!payload) {
+        throw new Error("Authentication required");
+      }
+
+      const propertyValue = getNestedProperty(payload, propertyName);
+      const resolvedValue = resolveValue(value, props);
+
+      log(logPrefix, { propertyValue, resolvedValue, compareType });
+
+      if (compare(propertyValue, resolvedValue, compareType, flags)) {
+        throw new Error("Condition met - hiding component");
+      }
+
+      log(logPrefix, "Condition not met, showing component");
+      return <Component ref={ref} {...props} />;
+    } catch (error) {
+      if (error instanceof Error) {
+        log(logPrefix, "Hiding component", error.message);
+      } else {
+        log(logPrefix, "Hiding component", error);
+      }
+      return null;
+    }
+  });
+}
+
+/**
+ * Hides component based on user property comparison
+ * @param Component - The component to wrap
+ * @param options - Configuration
+ * @param options.name - Property name to check
+ * @param options.value - Value to compare against (can be "props.propertyName")
+ * @param options.compare - Comparison type: "equal" or "array-includes"
+ * @param options.flags - Additional flags like ["ignore-case"]
+ */
+export function hideForUserPayloadProperty(
+  Component: React.ComponentType<any>,
+  {
+    name: propertyName,
+    value,
+    compare: compareType = "equal",
+    flags = [],
+  }: HideForUserPayloadPropertyOptions
+): React.ComponentType<any> {
+  return forwardRef((props, ref) => {
+    const logPrefix = `hideForUserPayloadProperty ${propertyName} -|`;
+
+    try {
+      const user = authStore((state) => state.user);
+
+      if (!user) {
+        throw new Error("Authentication required");
+      }
+      const propertyValue = getNestedProperty(user, propertyName);
+      const resolvedValue = resolveValue(value, props);
+
+      log(logPrefix, {
+        propertyValue,
+        resolvedValue,
+        compareType,
+      });
+
+      if (compare(propertyValue, resolvedValue, compareType, flags)) {
+        throw new Error("Condition met - hiding component");
+      }
+
+      log(logPrefix, "Condition not met, showing component");
       return <Component ref={ref} {...props} />;
     } catch (error) {
       if (error instanceof Error) {

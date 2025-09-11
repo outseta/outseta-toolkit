@@ -137,9 +137,18 @@ import {
 // The only option atm for add-ons.
 ///
 
-// 🚨 Replace OW4pRYWg with your plan uid, and duplicate for additional plan uids
+// 🚨 Replace OW4pRYWg with your add-on uid, and duplicate for additional add-on uids
 export function showForAddOnInPayload_OW4pRYWg(Component): ComponentType {
   return showForPayloadProperty(Component, {
+    name: "outseta:addOnUids",
+    value: "OW4pRYWg",
+    compare: "array-includes", // Compare as array
+  });
+}
+
+// 🚨 Replace OW4pRYWg with your add-on uid, and duplicate for additional add-on uids
+export function hideForAddOnInPayload_OW4pRYWg(Component): ComponentType {
+  return hideForPayloadProperty(Component, {
     name: "outseta:addOnUids",
     value: "OW4pRYWg",
     compare: "array-includes", // Compare as array
@@ -149,6 +158,15 @@ export function showForAddOnInPayload_OW4pRYWg(Component): ComponentType {
 // 🚨 Replace OW45KRmg with your plan uid, and duplicate for additional plan uids
 export function showForPlanInPayload_OW45KRmg(Component): ComponentType {
   return showForPayloadProperty(Component, {
+    name: "outseta:planUid",
+    value: "OW45KRmg",
+    compare: "equal-string", // Compare as string
+  });
+}
+
+// 🚨 Replace OW45KRmg with your plan uid, and duplicate for additional plan uids
+export function hideForPlanInPayload_OW45KRmg(Component): ComponentType {
+  return hideForPayloadProperty(Component, {
     name: "outseta:planUid",
     value: "OW45KRmg",
     compare: "equal-string", // Compare as string
@@ -168,6 +186,15 @@ export function showForPlan_OW45KRmg(Component): ComponentType {
   });
 }
 
+// 🚨 Replace OW45KRmg with your plan uid, and duplicate for additional plan uids
+export function hideForPlan_OW45KRmg(Component): ComponentType {
+  return hideForUserProperty(Component, {
+    name: "Account.CurrentSubscription.Plan.Uid",
+    value: "OW45KRmg",
+    compare: "equal-string", // Compare as string
+  });
+}
+
 // 🚨 Replace Basic with your plan name, and duplicate for additional plan names
 export function showForPlan_Pro(Component): ComponentType {
   return showForUserProperty(Component, {
@@ -175,6 +202,15 @@ export function showForPlan_Pro(Component): ComponentType {
     value: "Pro",
     compare: "equal-string", // Compare as string
     flags: ["ignore-case"], // Ignore case when comparing names
+  });
+}
+
+// 🚨 Replace OW45KRmg with your plan uid, and duplicate for additional plan uids
+export function hideForPlan_OW45KRmg(Component): ComponentType {
+  return hideForUserProperty(Component, {
+    name: "Account.CurrentSubscription.Plan.Uid",
+    value: "OW45KRmg",
+    compare: "equal-string", // Compare as string
   });
 }
 ```
@@ -210,6 +246,15 @@ export function showForLessonCompleted(Component): ComponentType {
     name: "CompletedLessons",
     value: "props.slug",
     compare: "array-includes",
+  });
+}
+
+// Hide the component if the lesson is completed
+// 🚨 The Framer component must have a `slug` property.
+export function hideForLessonCompleted(Component): ComponentType {
+  return hideForUserProperty(Component, {
+    name: "CompletedLessons",
+    value: "props.slug",
   });
 }
 
@@ -249,11 +294,20 @@ export function withBookmarks(Component): ComponentType {
 
 // Show the component if the bookmark is in the list
 // 🚨 The Framer component must have a `slug` property.
-export function showForBookmark(Component): ComponentType {
+export function showForBookmarked(Component): ComponentType {
   return showForUserProperty(Component, {
     name: "Bookmarks",
     value: "props.slug",
     compare: "array-includes",
+  });
+}
+
+// Hide the component if the bookmark is in the list
+// 🚨 The Framer component must have a `slug` property.
+export function hideForBookmarked(Component): ComponentType {
+  return hideForUserProperty(Component, {
+    name: "Bookmarks",
+    value: "props.slug",
   });
 }
 
