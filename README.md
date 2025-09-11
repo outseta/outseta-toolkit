@@ -209,7 +209,7 @@ export function showForLessonCompleted(Component): ComponentType {
   return showForUserProperty(Component, {
     name: "CompletedLessons",
     value: "props.slug",
-    compare: "string-array-includes",
+    compare: "array-includes",
   });
 }
 
@@ -253,7 +253,7 @@ export function showForBookmark(Component): ComponentType {
   return showForUserProperty(Component, {
     name: "Bookmarks",
     value: "props.slug",
-    compare: "string-array-includes",
+    compare: "array-includes",
   });
 }
 
