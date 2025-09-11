@@ -35,6 +35,8 @@ export function compare(
       // If value is not string or array, return false
       return false;
     default:
-      return false;
+      throw new Error(
+        `Invalid compare type: "${type}". Valid types are: "equal", "array-includes"`
+      );
   }
 }
