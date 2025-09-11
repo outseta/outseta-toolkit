@@ -1,6 +1,6 @@
 {
   "name": "@outseta/toolkit",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Outseta's toolkit for visual website builders",
   "type": "module",
   "exports": {
