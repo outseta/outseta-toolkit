@@ -33,21 +33,17 @@ import {
 
 Provides override functions for integrating Outseta authentication and custom properties with Framer components. Handles authentication flows, conditional visibility, and dynamic content.
 
-### Basic Framer Overrides
+### Auth - Framer Overrides
 
-Copy/paste the following code into a code file in your Framer project named `Outseta.tsx`.
+Copy/paste the following code into a code file in your Framer project named `OutsetaAuth.tsx`.
 
 ```javascript
-// File: Outseta.tsx
+// File: OutsetaAuth.tsx
 import { type ComponentType } from "react";
 import {
-  withProperty,
-  withImageProperty,
-  showForAuthStatus,
-  showForProperty,
   triggerPopup,
   triggerAction,
-  toggleProperty,
+  showForAuthStatus,
 } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0/dist/framer/overrides.js";
 
 // Authentication triggers
@@ -75,7 +71,22 @@ export function showForAnonymous(Component): ComponentType {
 export function showForAuthenticated(Component): ComponentType {
   return showForAuthStatus(Component, "authenticated");
 }
+```
 
+### User - Framer Overrides
+
+Copy/paste the following code into a code file in your Framer project named `OutsetaUser.tsx`.
+
+```javascript
+// File: Outseta.tsx
+import { type ComponentType } from "react";
+import {
+  showForAuthStatus,
+  withUserProperty,
+  withUserImageProperty,
+} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0/dist/framer/overrides.js";
+
+// Visibility controls
 export function showWhenUserLoaded(Component): ComponentType {
   return showForAuthStatus(Component, "user-loaded");
 }
@@ -98,7 +109,7 @@ export function withEmail(Component): ComponentType {
 }
 
 export function withAvatar(Component): ComponentType {
-  return withImageProperty(Component, { name: "ProfileImageS3Url" });
+  return withUserImageProperty(Component, { name: "ProfileImageS3Url" });
 }
 
 // Account property display
@@ -107,14 +118,14 @@ export function withAccountName(Component): ComponentType {
 }
 ```
 
-### Plan/Add-On Overrides
+### Subscription - Framer Overrides
 
-Copy/paste the following code into a code file in your Framer project named `OutsetaPlans.tsx`.
+Copy/paste the following code into a code file in your Framer project named `OutsetaSubscription.tsx`.
 
 ℹ️ **NOTE:** Remember to replace the plan uids and names with your own, and duplicate the code for additional plan uids and names.
 
 ```javascript
-// File: OutsetaPlans.tsx
+// File: OutsetaSubscription.tsx
 import { type ComponentType } from "react";
 import {
   showForUserProperty,
@@ -126,21 +137,21 @@ import {
 // The only option atm for add-ons.
 ///
 
-// 🚨 Replace OW45KRmg with your plan uid, and duplicate for additional plan uids
-export function showForPlanInPayload_OW45KRmg(Component): ComponentType {
-  return showForPayloadProperty(Component, {
-    name: "outseta:planUid",
-    value: "OW45KRmg",
-    compare: "equal-string", // Compare as string
-  });
-}
-
 // 🚨 Replace OW4pRYWg with your plan uid, and duplicate for additional plan uids
 export function showForAddOnInPayload_OW4pRYWg(Component): ComponentType {
   return showForPayloadProperty(Component, {
     name: "outseta:addOnUids",
     value: "OW4pRYWg",
     compare: "array-includes", // Compare as array
+  });
+}
+
+// 🚨 Replace OW45KRmg with your plan uid, and duplicate for additional plan uids
+export function showForPlanInPayload_OW45KRmg(Component): ComponentType {
+  return showForPayloadProperty(Component, {
+    name: "outseta:planUid",
+    value: "OW45KRmg",
+    compare: "equal-string", // Compare as string
   });
 }
 
@@ -168,14 +179,14 @@ export function showForPlan_Pro(Component): ComponentType {
 }
 ```
 
-### Ready to use **Completed Lessons** Overrides
+### Completed Lessons - Framer Overrides
 
-Copy/paste the following code into a code file in your Framer project named `OutsetaCompletedLessons.tsx`.
+Copy/paste the following code into a code file in your Framer project named `OutsetaLessons.tsx`.
 
 ℹ️ **NOTE:** The `CompletedLessons` custom property is required to be configured Outseta for this to work.
 
 ```javascript
-// File: OutsetaCompletedLessons.tsx
+// File: OutsetaLessons.tsx
 import { type ComponentType } from "react";
 import {
   withUserProperty,
@@ -212,7 +223,7 @@ export function toggleCompletedLesson(Component): ComponentType {
 }
 ```
 
-### Ready to use **Bookmark** Overrides
+### Bookmarks - Framer Overrides
 
 Copy/paste the following code into a code file in your Framer project named `OutsetaBookmarks.tsx`.
 
