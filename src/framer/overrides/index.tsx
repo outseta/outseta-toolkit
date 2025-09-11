@@ -80,6 +80,19 @@ export type HideForUserPayloadPropertyFunction =
 const log = outsetaLog("framer.overrides");
 
 /**
+ * Detects if the current environment is Framer canvas mode
+ * @returns true if running in Framer canvas
+ */
+function isFramerCanvas(): boolean {
+  try {
+    return window.location.host.includes("framercanvas.com");
+  } catch (error) {
+    // If any detection method fails, assume we're not in Framer
+    return false;
+  }
+}
+
+/**
  * Creates a toggle action for any property
  * @param Component - The component to wrap
  * @param options - Configuration
@@ -504,6 +517,7 @@ export function hideForUserPayloadProperty(
 
 /**
  * Shows a component only when the authentication state matches the specified state
+ * When in Framer canvas or preview mode, treats "anonymous" status as true
  *
  * @param Component - The React component to conditionally render
  * @param validState - The authentication state that allows the component to show
@@ -519,12 +533,24 @@ export function showForAuthStatus(
     try {
       const status = authStore((state) => state.status);
       const user = authStore((state) => state.user);
+      const isFramerEnv = isFramerCanvas();
 
-      log(logPrefix, { status, validStatus });
+      log(logPrefix, { status, validStatus, isFramerEnv });
 
       let showComponent = status === validStatus;
+
+      // Special handling for "anonymous" status in Framer environment
+      if (validStatus === "anonymous" && isFramerEnv) {
+        showComponent = true;
+        log(
+          logPrefix,
+          "Framer environment detected, showing anonymous component"
+        );
+      }
+
       if (validStatus === "user-loaded") {
         showComponent = Boolean(user);
+        // Don't override user-loaded in Framer environment - keep normal behavior
       }
 
       if (!showComponent) {
@@ -561,17 +587,18 @@ export function triggerPopup(
 
     try {
       const status = authStore((state) => state.status);
+      const isFramerEnv = isFramerCanvas();
 
-      log(logPrefix, { status });
+      log(logPrefix, { status, isFramerEnv });
 
       // Handle visibility based on embed type
       if (embed === "register" || embed === "login") {
-        if (status !== "anonymous") {
-          throw new Error("Authentication required");
+        if (status !== "anonymous" && !isFramerEnv) {
+          throw new Error("Not anonymous");
         }
       } else if (embed === "profile") {
         if (status !== "authenticated") {
-          throw new Error("Authentication required");
+          throw new Error("Not authenticated");
         }
       }
 
