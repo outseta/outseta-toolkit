@@ -33,6 +33,6 @@ const updatedContent = readmeContent.replace(oldPattern, newUrl);
 writeFileSync(readmePath, updatedContent, "utf8");
 
 console.log(
-  `✅ Updated ${matchCount} jsdelivr URLs to use version v${minorVersion}`
+  `✅ Updated ${matchCount} jsDelivr URLs to use version v${minorVersion}`
 );
 console.log(`📝 README.md has been updated with the new URLs`);
