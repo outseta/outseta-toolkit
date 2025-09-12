@@ -6,11 +6,11 @@ Currently only provides Framer override functions for authentication, custom pro
 
 ## Features
 
-🔧 **Framer Overrides**: Functions for authentication, visibility, and dynamic content
-📦 **CDN/ESM Support**: Direct imports from CDN or npm
-📝 **TypeScript**: Full type definitions included
-❗ **Error Handling**: Optimistic updates with automatic rollback
-🔄 **Event Integration**: Automatic sync with Outseta events
+🔧 **Framer Overrides**: Functions for authentication, visibility, and dynamic content\
+📦 **CDN/ESM Support**: Direct imports from CDN or npm\
+📝 **TypeScript**: Full type definitions included\
+❗ **Error Handling**: Optimistic updates with automatic rollback\
+🔄 **Event Integration**: Automatic sync with Outseta events\
 ⚡ **Performance**: Debounced API calls and selective subscriptions
 
 ## Installation
