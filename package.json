@@ -21,7 +21,10 @@
     "dev": "vite build --watch",
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
-    "serve": "npm run build && node server.js"
+    "serve": "npm run build && node server.js",
+    "semantic-release": "semantic-release",
+    "semantic-release:dry-run": "semantic-release --dry-run",
+    "prerelease": "semantic-release --dry-run"
   },
   "keywords": [
     "outseta",
@@ -37,6 +40,10 @@
   ],
   "author": "Outseta",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/outseta/outseta-toolkit.git"
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "zustand": "^4.4.7"
@@ -45,11 +52,18 @@
     "react": ">=18.0.0"
   },
   "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.5",
     "@types/node": "^24.3.1",
     "@types/react": "^18.2.0",
     "@vitejs/plugin-react": "^4.2.0",
     "express": "^4.18.0",
+    "semantic-release": "^24.2.7",
     "typescript": "^5.0.0",
     "vite": "^5.0.0"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "^4.50.1"
   }
 }

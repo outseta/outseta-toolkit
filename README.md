@@ -507,64 +507,6 @@ export function withAccountLogo(Component) {
 }
 ```
 
-## Development
-
-```bash
-# Install dependencies
-npm install
-
-# Build the library
-npm run build
-
-# Development build with watch
-npm run dev
-
-# Type checking
-npm run type-check
-```
-
-### Testing with Local Server
-
-For testing the built files from external servers or applications:
-
-```bash
-# Build and start the local server
-npm run serve
-
-# Or manually build and serve
-npm run build
-node server.js
-```
-
-The setup provides:
-
-- Express server serving the `dist` files with CORS headers
-- Helpful endpoints:
-  - `GET /` - Server info and available endpoints
-  - `GET /api/files` - List all available files with usage examples
-- CORS-enabled for external testing
-
-**Example usage from external sites:**
-
-```javascript
-// Import from your local server
-import {
-  triggerAction,
-  triggerPopup,
-  withUserProperty,
-} from "http://localhost:3000/framer/overrides.js";
-```
-
-**For public testing, use ngrok:**
-
-```bash
-# In another terminal, expose locally
-ngrok http 3000
-
-# Then use the ngrok URL in your imports
-import { triggerAction, triggerPopup, withUserProperty } from "https://your-ngrok-url.ngrok-free.app/framer/overrides.js";
-```
-
 ## License
 
 MIT License - see [LICENSE](./LICENSE) for details.
