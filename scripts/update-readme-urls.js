@@ -25,7 +25,7 @@ const oldPattern = /@outseta\/toolkit@v\d+(?:\.\d+)?/g;
 const matches = readmeContent.match(oldPattern);
 const matchCount = matches ? matches.length : 0;
 
-// Update all jsdelivr URLs to use the correct minor version
+// Update all jsDelivr URLs to use the correct minor version
 const newUrl = `@outseta/toolkit@v${minorVersion}`;
 const updatedContent = readmeContent.replace(oldPattern, newUrl);
 
