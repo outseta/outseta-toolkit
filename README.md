@@ -26,7 +26,7 @@ import {
   showForAuthStatus,
   withProperty,
   withImageProperty,
-} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.1/dist/framer/overrides.js";
+} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.2/dist/framer/overrides.js";
 ```
 
 ## Quick Start
@@ -44,7 +44,7 @@ import {
   showForAuthStatus,
   withProperty,
   withUserImageProperty,
-} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.1/dist/framer/overrides.js";
+} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.2/dist/framer/overrides.js";
 
 // Visibility controls
 export function showForAnonymous(Component): ComponentType {
@@ -98,7 +98,7 @@ import { type ComponentType } from "react";
 import {
   showForProperty,
   hideForProperty,
-} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.1/dist/framer/overrides.js";
+} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.2/dist/framer/overrides.js";
 
 // 🚨 Replace OW4pRYWg with your add-on uid, and duplicate for additional add-on uids
 export function showForAddOn_OW4pRYWg(Component): ComponentType {
@@ -147,7 +147,7 @@ import { type ComponentType } from "react";
 import {
   triggerPopup,
   triggerAction,
-} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.1/dist/framer/overrides.js";
+} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.2/dist/framer/overrides.js";
 
 // Authentication triggers
 export function triggerLoginPopup(Component): ComponentType {
@@ -180,7 +180,7 @@ import {
   withProperty,
   showForProperty,
   toggleProperty,
-} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.1/dist/framer/overrides.js";
+} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.2/dist/framer/overrides.js";
 
 //////
 // 🚨 Requires a person custom property with system name: CompletedLessons
@@ -233,7 +233,7 @@ import {
   withProperty,
   showForProperty,
   toggleProperty,
-} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.1/dist/framer/overrides.js";
+} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.2/dist/framer/overrides.js";
 
 //////
 // 🚨 Requires a person custom property with system name: Bookmarks
