@@ -607,14 +607,14 @@ export function triggerPopup(
 
       switch (embed) {
         case "register":
-          if (status !== "anonymous" && !isFramerEnv) {
+          if (!isFramerEnv && status !== "anonymous") {
             throw new Error("Not anonymous");
           }
           dataAttributes["data-o-auth"] = "1";
           dataAttributes["data-widget-mode"] = "register";
           break;
         case "login":
-          if (status !== "anonymous" && !isFramerEnv) {
+          if (!isFramerEnv && status !== "anonymous") {
             throw new Error("Not anonymous");
           }
           dataAttributes["data-o-auth"] = "1";
