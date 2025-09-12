@@ -312,7 +312,7 @@ export function primaryVariantForProperty(
         propertyValue,
         resolvedValue,
         compareType,
-        [props.variant]: props.variant,
+        ["props.variant"]: props.variant,
       });
 
       if (compare(propertyValue, resolvedValue, compareType, flags)) {
