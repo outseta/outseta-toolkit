@@ -114,7 +114,7 @@ export function hideForAddOn_OW4pRYWg(Component): ComponentType {
   return hideForProperty(Component, {
     name: "CurrentAddOnUids",
     value: "OW4pRYWg",
-    compare: "array-includes", // Compare as array
+    compare: "array-includes",
   });
 }
 
@@ -123,7 +123,7 @@ export function showForPlan_OW45KRmg(Component): ComponentType {
   return showForProperty(Component, {
     name: "CurrentPlanUid",
     value: "OW45KRmg",
-    compare: "equal-string", // Compare as string
+    compare: "equal",
   });
 }
 
@@ -132,7 +132,7 @@ export function hideForPlan_OW45KRmg(Component): ComponentType {
   return hideForProperty(Component, {
     name: "CurrentPlanUid",
     value: "OW45KRmg",
-    compare: "equal-string", // Compare as string
+    compare: "equal",
   });
 }
 ```
@@ -381,7 +381,7 @@ Conditional visibility based on custom property comparison.
 
 - `name` - Property name (supports dot notation, prefix "Account." for account custom properties)
 - `value` - Value to compare, supports a static value and "props.propertyName" (e.g. "props.slug") to use a component's prop value
-- `compare` - Comparison type: `"equal"`, `"equal-string"`, `"string-array-includes"`
+- `compare` - Comparison type: `"equal"`, `"array-includes"`
 - `flags` - Array of flags: `["ignore-case"]`
 
 ```javascript
@@ -391,7 +391,7 @@ export function showForMembers_VIP(Component) {
   return showForProperty(Component, {
     name: "Account.CurrentSubscription.Plan.Name",
     value: "VIP",
-    compare: "equal-string",
+    compare: "equal",
     flags: ["ignore-case"],
   });
 }
@@ -400,7 +400,7 @@ export function showForLesson_Completed(Component) {
   return showForProperty(Component, {
     name: "CompletedLessons", // 🚨 Requires a person custom property with system name: CompletedLessons
     value: "props.slug", // 🚨 The Framer component must have a `slug` property.
-    compare: "string-array-includes",
+    compare: "array-includes",
   });
 }
 
@@ -408,7 +408,6 @@ export function showForMascot_Cat(Component) {
   return showForProperty(Component, {
     name: "Account.Mascot", // 🚨 Requires an account custom property with system name: Mascot
     value: "Cat",
-    compare: "equal-string",
     flags: ["ignore-case"],
   });
 }
