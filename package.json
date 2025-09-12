@@ -21,7 +21,8 @@
     "dev": "vite build --watch",
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
-    "serve": "npm run build && node server.js"
+    "serve": "npm run build && node server.js",
+    "postversion": "node scripts/update-readme-urls.js"
   },
   "keywords": [
     "outseta",
