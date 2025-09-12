@@ -5,6 +5,17 @@ import { getNestedProperty } from "../../auth-store/utils";
 
 import { compare } from "./compare";
 
+type PropertyOptions = {
+  name: string;
+};
+
+type ComparePropertyOptions = {
+  name: string;
+  value: any;
+  compare?: "equal" | "array-includes";
+  flags?: "ignore-case"[];
+};
+
 const log = outsetaLog("framer.overrides");
 
 /**
@@ -114,12 +125,7 @@ export function showForUserProperty(
     value,
     compare: compareType = "equal",
     flags = [],
-  }: {
-    name: string;
-    value: any;
-    compare?: "equal" | "array-includes";
-    flags?: "ignore-case"[];
-  }
+  }: ComparePropertyOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `showForUserProperty ${propertyName} -|`;
@@ -164,7 +170,7 @@ export function showForUserProperty(
  */
 export function withUserProperty(
   Component: React.ComponentType<any>,
-  { name: propertyName }: { name: string }
+  { name: propertyName }: PropertyOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `withUserProperty ${propertyName} -|`;
@@ -203,7 +209,7 @@ export function withUserProperty(
  */
 export function withUserImageProperty(
   Component: React.ComponentType<any>,
-  { name: propertyName }: { name: string }
+  { name: propertyName }: PropertyOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `withUserImageProperty ${propertyName} -|`;
@@ -263,7 +269,7 @@ export function withUserImageProperty(
  */
 export function withPayloadProperty(
   Component: React.ComponentType<any>,
-  { name: propertyName }: { name: string }
+  { name: propertyName }: PropertyOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `withPayloadProperty ${propertyName} -|`;
@@ -310,12 +316,7 @@ export function showForPayloadProperty(
     value,
     compare: compareType = "equal",
     flags = [],
-  }: {
-    name: string;
-    value: any;
-    compare?: "equal" | "array-includes";
-    flags?: "ignore-case"[];
-  }
+  }: ComparePropertyOptions
 ): React.ComponentType<any> {
   // Create comparison function based on compare type
   return forwardRef((props, ref) => {
@@ -366,12 +367,7 @@ export function hideForPayloadProperty(
     value,
     compare: compareType = "equal",
     flags = [],
-  }: {
-    name: string;
-    value: any;
-    compare?: "equal" | "array-includes";
-    flags?: "ignore-case"[];
-  }
+  }: ComparePropertyOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `hideForPayloadProperty ${propertyName} -|`;
@@ -421,12 +417,7 @@ export function hideForUserPayloadProperty(
     value,
     compare: compareType = "equal",
     flags = [],
-  }: {
-    name: string;
-    value: any;
-    compare?: "equal" | "array-includes";
-    flags?: "ignore-case"[];
-  }
+  }: ComparePropertyOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `hideForUserPayloadProperty ${propertyName} -|`;
