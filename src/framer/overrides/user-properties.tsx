@@ -1,0 +1,292 @@
+import React, { forwardRef } from "react";
+import { authStore, getNestedProperty } from "../../auth-store";
+import { compare } from "./utils";
+import {
+  log,
+  resolveValue,
+  type PropertyOptions,
+  type ComparePropertyOptions,
+} from "./utils";
+
+/**
+ * Creates a toggle action for any property
+ * @param Component - The component to wrap
+ * @param options - Configuration
+ * @param options.name - Property name
+ * @param options.value - Value to toggle (can be "props.propertyName")
+ */
+export function toggleUserProperty(
+  Component: React.ComponentType<any>,
+  { name: propertyName, value: toggleValue }: { name: string; value: string }
+): React.ComponentType<any> {
+  return forwardRef((props, ref) => {
+    const logPrefix = `toggleUserProperty ${propertyName} -|`;
+    try {
+      const user = authStore((state) => state.user);
+      const updateUserProperty = authStore((state) => state.updateUserProperty);
+
+      if (!user) {
+        throw new Error("User loaded required");
+      }
+
+      // Resolve toggle value from props if needed
+      let resolvedToggleValue = resolveValue(toggleValue, props);
+
+      const propertyValue = getNestedProperty(user, propertyName) || "";
+      const propertyValueAsArray =
+        typeof propertyValue === "string"
+          ? propertyValue.split(",").map((item) => item.trim())
+          : [];
+
+      const handleClick = async (event: React.MouseEvent) => {
+        event.preventDefault();
+
+        log(logPrefix, { propertyName, resolvedToggleValue });
+
+        const newPropertyValueAsArray = [
+          // Filter out the toggle value and empty values
+          ...propertyValueAsArray.filter(
+            (item) => item !== resolvedToggleValue && item.trim() !== ""
+          ),
+          // Add toggle value at the end if not included in current value
+          ...(propertyValueAsArray.includes(resolvedToggleValue)
+            ? []
+            : [resolvedToggleValue]),
+        ].filter((item) => item.trim() !== ""); // Final filter to remove any empty values
+
+        await updateUserProperty(
+          propertyName,
+          newPropertyValueAsArray.join(", ")
+        );
+
+        // Call original onClick if provided
+        if (props.onClick) {
+          props.onClick(event);
+        }
+      };
+
+      const active = propertyValueAsArray.includes(resolvedToggleValue);
+
+      return (
+        <Component
+          ref={ref}
+          {...props}
+          variant={active ? props.variant : undefined}
+          onClick={handleClick}
+        />
+      );
+    } catch (error) {
+      if (error instanceof Error) {
+        log(logPrefix, "Hiding component", error.message);
+      } else {
+        log(logPrefix, "Hiding component", error);
+      }
+      return null;
+    }
+  });
+}
+
+/**
+ * Shows component based on property comparison
+ * @param Component - The component to wrap
+ * @param options - Configuration
+ * @param options.name - Property name to check
+ * @param options.value - Value to compare against (can be "props.propertyName")
+ * @param options.compare - Comparison type: "equal" or "array-includes"
+ * @param options.flags - Additional flags like ["ignore-case"]
+ */
+export function showForUserProperty(
+  Component: React.ComponentType<any>,
+  {
+    name: propertyName,
+    value,
+    compare: compareType = "equal",
+    flags = [],
+  }: ComparePropertyOptions
+): React.ComponentType<any> {
+  return forwardRef((props, ref) => {
+    const logPrefix = `showForUserProperty ${propertyName} -|`;
+
+    try {
+      const user = authStore((state) => state.user);
+
+      if (!user) {
+        throw new Error("User loaded required");
+      }
+      const propertyValue = getNestedProperty(user, propertyName);
+      const resolvedValue = resolveValue(value, props);
+
+      log(logPrefix, {
+        propertyValue,
+        resolvedValue,
+        compareType,
+      });
+
+      if (!compare(propertyValue, resolvedValue, compareType, flags)) {
+        throw new Error("Match not found - hiding component");
+      }
+
+      log(logPrefix, "Match found - showing component");
+      return <Component ref={ref} {...props} />;
+    } catch (error) {
+      if (error instanceof Error) {
+        log(logPrefix, "Hiding component", error.message);
+      } else {
+        log(logPrefix, "Hiding component", error);
+      }
+      return null;
+    }
+  });
+}
+
+/**
+ * Sets component text to a user property value
+ * @param Component - The component to wrap
+ * @param options - Configuration
+ * @param options.name - Property name to display
+ */
+export function withUserProperty(
+  Component: React.ComponentType<any>,
+  { name: propertyName }: PropertyOptions
+): React.ComponentType<any> {
+  return forwardRef((props, ref) => {
+    const logPrefix = `withUserProperty ${propertyName} -|`;
+
+    try {
+      const user = authStore((state) => state.user);
+
+      if (!user) {
+        throw new Error("User loaded required");
+      }
+
+      let propertyValue = getNestedProperty(user, propertyName);
+
+      if (typeof propertyValue !== "string") {
+        throw new Error("Not a string");
+      }
+
+      log(logPrefix, { propertyValue });
+      return <Component ref={ref} {...props} text={propertyValue} />;
+    } catch (error) {
+      if (error instanceof Error) {
+        log(logPrefix, "Hiding component", error.message);
+      } else {
+        log(logPrefix, "Hiding component", error);
+      }
+      return null;
+    }
+  });
+}
+
+/**
+ * Sets component background image to a user property value
+ * @param Component - The component to wrap
+ * @param options - Configuration
+ * @param options.name - Property name containing image URL
+ */
+export function withUserImageProperty(
+  Component: React.ComponentType<any>,
+  { name: propertyName }: PropertyOptions
+): React.ComponentType<any> {
+  return forwardRef((props, ref) => {
+    const logPrefix = `withUserImageProperty ${propertyName} -|`;
+
+    try {
+      const user = authStore((state) => state.user);
+
+      if (!user) {
+        throw new Error("User loaded required");
+      }
+
+      const imageSrc = getNestedProperty(user, propertyName) as string;
+
+      log(logPrefix, { imageSrc });
+
+      if (!imageSrc) {
+        // If no image from user property, use component's default or hide
+        if (props.background?.src) {
+          // Component has image set, use as fallback
+          log(logPrefix, "No user image, using component fallback");
+          return <Component ref={ref} {...props} />;
+        } else {
+          // Component has no image set, hide
+          log(logPrefix, "No user image and no component fallback, hiding");
+          return null;
+        }
+      }
+
+      log(logPrefix, "Setting image from user property");
+      return (
+        <Component
+          ref={ref}
+          {...props}
+          background={{
+            ...props.background,
+            src: imageSrc,
+            srcSet: undefined,
+          }}
+        />
+      );
+    } catch (error) {
+      if (error instanceof Error) {
+        log(logPrefix, "Hiding component", error.message);
+      } else {
+        log(logPrefix, "Hiding component", error);
+      }
+      return null;
+    }
+  });
+}
+
+/**
+ * Hides component based on user property comparison
+ * @param Component - The component to wrap
+ * @param options - Configuration
+ * @param options.name - Property name to check
+ * @param options.value - Value to compare against (can be "props.propertyName")
+ * @param options.compare - Comparison type: "equal" or "array-includes"
+ * @param options.flags - Additional flags like ["ignore-case"]
+ */
+export function hideForUserPayloadProperty(
+  Component: React.ComponentType<any>,
+  {
+    name: propertyName,
+    value,
+    compare: compareType = "equal",
+    flags = [],
+  }: ComparePropertyOptions
+): React.ComponentType<any> {
+  return forwardRef((props, ref) => {
+    const logPrefix = `hideForUserPayloadProperty ${propertyName} -|`;
+
+    try {
+      const user = authStore((state) => state.user);
+
+      if (!user) {
+        throw new Error("User loaded required");
+      }
+      const propertyValue = getNestedProperty(user, propertyName);
+      const resolvedValue = resolveValue(value, props);
+
+      log(logPrefix, {
+        propertyValue,
+        resolvedValue,
+        compareType,
+      });
+
+      if (compare(propertyValue, resolvedValue, compareType, flags)) {
+        throw new Error("Match found - hiding component");
+      }
+
+      log(logPrefix, "Match not found - showing component");
+      return <Component ref={ref} {...props} />;
+    } catch (error) {
+      if (error instanceof Error) {
+        log(logPrefix, "Hiding component", error.message);
+      } else {
+        log(logPrefix, "Hiding component", error);
+      }
+      return null;
+    }
+  });
+}

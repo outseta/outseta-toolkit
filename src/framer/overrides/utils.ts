@@ -1,3 +1,18 @@
+import { outsetaLog } from "../../outseta";
+
+export type PropertyOptions = {
+  name: string;
+};
+
+export type ComparePropertyOptions = {
+  name: string;
+  value: any;
+  compare?: "equal" | "array-includes";
+  flags?: "ignore-case"[];
+};
+
+export const log = outsetaLog("framer.overrides");
+
 function arrayIncludes(array: any[], value: any, flags?: "ignore-case"[]) {
   if (flags?.includes("ignore-case")) {
     return array.some((item: any) => {
@@ -39,4 +54,17 @@ export function compare(
         `Invalid compare type: "${type}". Valid types are: "equal", "array-includes"`
       );
   }
+}
+
+/**
+ * Resolves a value from props if it starts with "props."
+ * @param value - The value to resolve
+ * @param props - The component props
+ * @returns The resolved value
+ */
+export function resolveValue(value: any, props: any) {
+  if (typeof value === "string" && value.startsWith("props.")) {
+    return props[value.replace("props.", "")];
+  }
+  return value;
 }
