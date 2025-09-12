@@ -110,7 +110,7 @@ export function toggleUserProperty(
       const updateUserProperty = authStore((state) => state.updateUserProperty);
 
       if (!user) {
-        throw new Error("Authentication required");
+        throw new Error("User loaded required");
       }
 
       // Resolve toggle value from props if needed
@@ -195,7 +195,7 @@ export function showForUserProperty(
       const user = authStore((state) => state.user);
 
       if (!user) {
-        throw new Error("Authentication required");
+        throw new Error("User loaded required");
       }
       const propertyValue = getNestedProperty(user, propertyName);
       const resolvedValue = resolveValue(value, props);
@@ -207,10 +207,10 @@ export function showForUserProperty(
       });
 
       if (!compare(propertyValue, resolvedValue, compareType, flags)) {
-        throw new Error("Condition not met");
+        throw new Error("Match not found - hiding component");
       }
 
-      log(logPrefix, "Match found, showing component");
+      log(logPrefix, "Match found - showing component");
       return <Component ref={ref} {...props} />;
     } catch (error) {
       if (error instanceof Error) {
@@ -240,7 +240,7 @@ export function withUserProperty(
       const user = authStore((state) => state.user);
 
       if (!user) {
-        throw new Error("Authentication required");
+        throw new Error("User loaded required");
       }
 
       let propertyValue = getNestedProperty(user, propertyName);
@@ -279,7 +279,7 @@ export function withUserImageProperty(
       const user = authStore((state) => state.user);
 
       if (!user) {
-        throw new Error("Authentication required");
+        throw new Error("User loaded required");
       }
 
       const imageSrc = getNestedProperty(user, propertyName) as string;
@@ -396,10 +396,10 @@ export function showForPayloadProperty(
       log(logPrefix, { propertyValue, resolvedValue, compareType });
 
       if (!compare(propertyValue, resolvedValue, compareType, flags)) {
-        throw new Error("Condition not met");
+        throw new Error("Match not found - hiding component");
       }
 
-      log(logPrefix, "Match found, showing component");
+      log(logPrefix, "Match found - showing component");
       return <Component ref={ref} {...props} />;
     } catch (error) {
       if (error instanceof Error) {
@@ -446,10 +446,10 @@ export function hideForPayloadProperty(
       log(logPrefix, { propertyValue, resolvedValue, compareType });
 
       if (compare(propertyValue, resolvedValue, compareType, flags)) {
-        throw new Error("Condition met - hiding component");
+        throw new Error("Match found - hiding component");
       }
 
-      log(logPrefix, "Condition not met, showing component");
+      log(logPrefix, "Match not found - showing component");
       return <Component ref={ref} {...props} />;
     } catch (error) {
       if (error instanceof Error) {
@@ -487,7 +487,7 @@ export function hideForUserPayloadProperty(
       const user = authStore((state) => state.user);
 
       if (!user) {
-        throw new Error("Authentication required");
+        throw new Error("User loaded required");
       }
       const propertyValue = getNestedProperty(user, propertyName);
       const resolvedValue = resolveValue(value, props);
@@ -499,10 +499,10 @@ export function hideForUserPayloadProperty(
       });
 
       if (compare(propertyValue, resolvedValue, compareType, flags)) {
-        throw new Error("Condition met - hiding component");
+        throw new Error("Match found - hiding component");
       }
 
-      log(logPrefix, "Condition not met, showing component");
+      log(logPrefix, "Match not found - showing component");
       return <Component ref={ref} {...props} />;
     } catch (error) {
       if (error instanceof Error) {
@@ -537,24 +537,33 @@ export function showForAuthStatus(
 
       log(logPrefix, { status, validStatus, isFramerEnv });
 
-      let showComponent = status === validStatus;
+      switch (validStatus) {
+        case "user-loaded":
+          if (!user) {
+            throw new Error("User not loaded");
+          }
+          break;
 
-      // Special handling for "anonymous" status in Framer environment
-      if (validStatus === "anonymous" && isFramerEnv) {
-        showComponent = true;
-        log(
-          logPrefix,
-          "Framer environment detected, showing anonymous component"
-        );
-      }
+        case "anonymous":
+          if (!isFramerEnv && status !== "anonymous") {
+            throw new Error("Not in anonymous state");
+          }
+          break;
 
-      if (validStatus === "user-loaded") {
-        showComponent = Boolean(user);
-        // Don't override user-loaded in Framer environment - keep normal behavior
-      }
+        case "authenticated":
+          if (status !== "authenticated") {
+            throw new Error("Not in authenticated state");
+          }
+          break;
 
-      if (!showComponent) {
-        throw new Error("Condition not met");
+        case "pending":
+          if (status !== "pending") {
+            throw new Error("Not in pending state");
+          }
+          break;
+
+        default:
+          throw new Error("Invalid status");
       }
 
       log(logPrefix, "Status match, showing component");
@@ -591,17 +600,6 @@ export function triggerPopup(
 
       log(logPrefix, { status, isFramerEnv });
 
-      // Handle visibility based on embed type
-      if (embed === "register" || embed === "login") {
-        if (status !== "anonymous" && !isFramerEnv) {
-          throw new Error("Not anonymous");
-        }
-      } else if (embed === "profile") {
-        if (status !== "authenticated") {
-          throw new Error("Not authenticated");
-        }
-      }
-
       // Set appropriate data attributes based on embed type
       const dataAttributes: Record<string, string> = {
         "data-mode": "popup",
@@ -609,23 +607,30 @@ export function triggerPopup(
 
       switch (embed) {
         case "register":
+          if (status !== "anonymous" && !isFramerEnv) {
+            throw new Error("Not anonymous");
+          }
           dataAttributes["data-o-auth"] = "1";
           dataAttributes["data-widget-mode"] = "register";
           break;
         case "login":
+          if (status !== "anonymous" && !isFramerEnv) {
+            throw new Error("Not anonymous");
+          }
           dataAttributes["data-o-auth"] = "1";
           dataAttributes["data-widget-mode"] = "login";
           break;
         case "profile":
+          if (status !== "authenticated") {
+            throw new Error("Not authenticated");
+          }
           dataAttributes["data-o-profile"] = "1";
           break;
         default:
-          throw new Error("Invalid configuration");
+          throw new Error("Invalid embed type");
       }
 
-      log(logPrefix, "Setting Outseta data attributes", {
-        dataAttributes,
-      });
+      log(logPrefix, "Setting Outseta data attributes", { dataAttributes });
       return <Component ref={ref} {...props} {...dataAttributes} />;
     } catch (error) {
       if (error instanceof Error) {
@@ -658,28 +663,22 @@ export function triggerAction(
 
       log(logPrefix, { status });
 
-      // Handle visibility based on action type
-      if (action === "logout") {
-        if (status !== "authenticated") {
-          throw new Error("Authentication required");
-        }
-      }
-
       // Set appropriate data attributes based on action type
       const dataAttributes: Record<string, string> = {};
 
       switch (action) {
         case "logout":
+          if (status !== "authenticated") {
+            throw new Error("Not authenticated");
+          }
           dataAttributes["data-o-logout-link"] = "1";
           break;
 
         default:
-          throw new Error("Invalid configuration");
+          throw new Error("Invalid action type");
       }
 
-      log(logPrefix, "Setting Outseta data attributes", {
-        dataAttributes,
-      });
+      log(logPrefix, "Setting Outseta data attributes", { dataAttributes });
       return <Component ref={ref} {...props} {...dataAttributes} />;
     } catch (error) {
       if (error instanceof Error) {
