@@ -316,7 +316,7 @@ export function primaryVariantForProperty(
       });
 
       if (compare(propertyValue, resolvedValue, compareType, flags)) {
-        log(logPrefix, "Match found - setting variant to primary variant");
+        log(logPrefix, "Match found - defaulting to primary variant");
         return <Component ref={ref} {...props} variant={undefined} />;
       } else {
         log(logPrefix, "Match not found - using props.variant");
