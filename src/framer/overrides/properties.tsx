@@ -19,6 +19,42 @@ type ComparePropertyOptions = {
 const log = outsetaLog("framer.overrides");
 
 /**
+ * Maps property names to their source (user or payload)
+ * @param propertyName - The property name to check
+ * @returns The mapped property name and source
+ */
+function mapPropertyToSource(propertyName: string): {
+  mappedName: string;
+  source: "user" | "payload";
+} {
+  switch (propertyName) {
+    case "CurrentPlanUid":
+      return { mappedName: "outseta:planUid", source: "payload" };
+    case "CurrentAddOnUids":
+      return { mappedName: "outseta:addOnUids", source: "payload" };
+    default:
+      return { mappedName: propertyName, source: "user" };
+  }
+}
+
+/**
+ * Gets a property value from either user or payload based on the property name
+ * @param propertyName - The property name to get
+ * @param user - The user object
+ * @param payload - The payload object
+ * @returns The property value
+ */
+function getPropertyValue(propertyName: string, user: any, payload: any): any {
+  const { mappedName, source } = mapPropertyToSource(propertyName);
+
+  if (source === "payload") {
+    return payload?.[mappedName];
+  } else {
+    return getNestedProperty(user, mappedName);
+  }
+}
+
+/**
  * Resolves a value from props if it starts with "props."
  * @param value - The value to resolve
  * @param props - The component props
@@ -46,12 +82,13 @@ export function withProperty(
 
     try {
       const user = authStore((state) => state.user);
+      const payload = authStore((state) => state.payload);
 
       if (!user) {
         throw new Error("User loaded required");
       }
 
-      let propertyValue = getNestedProperty(user, propertyName);
+      let propertyValue = getPropertyValue(propertyName, user, payload);
 
       if (typeof propertyValue !== "string") {
         throw new Error("Not a string");
@@ -153,11 +190,12 @@ export function showForProperty(
 
     try {
       const user = authStore((state) => state.user);
+      const payload = authStore((state) => state.payload);
 
       if (!user) {
         throw new Error("User loaded required");
       }
-      const propertyValue = getNestedProperty(user, propertyName);
+      const propertyValue = getPropertyValue(propertyName, user, payload);
       const resolvedValue = resolveValue(value, props);
 
       log(logPrefix, {
@@ -206,11 +244,12 @@ export function hideForProperty(
 
     try {
       const user = authStore((state) => state.user);
+      const payload = authStore((state) => state.payload);
 
       if (!user) {
         throw new Error("User loaded required");
       }
-      const propertyValue = getNestedProperty(user, propertyName);
+      const propertyValue = getPropertyValue(propertyName, user, payload);
       const resolvedValue = resolveValue(value, props);
 
       log(logPrefix, {
