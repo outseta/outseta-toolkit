@@ -4,14 +4,19 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
+  test: {
+    globals: true,
+    environment: "jsdom",
+    setupFiles: ["./src/test/setup.ts"],
+  },
   build: {
     lib: {
       entry: {
-        "framer/overrides": resolve(
+        "framer/overrides": resolve(__dirname, "src/framer/overrides.tsx"),
+        "framer/hello-world": resolve(
           __dirname,
-          "src/framer/overrides/index.tsx"
+          "src/framer/overrides-hello-world.tsx"
         ),
-        "framer/test": resolve(__dirname, "src/framer/overrides/test.tsx"),
       },
       formats: ["es"],
     },

@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { getOutseta, outsetaLog } from "../outseta";
-import { setNestedProperty, debounce } from "./utils";
+import { setNestedProperty, getNestedProperty, debounce } from "./utils";
+
+export { getNestedProperty };
 
 // Type for the original Outseta user object (nested structure)
 export type OutsetaUser = any;
