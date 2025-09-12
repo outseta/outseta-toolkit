@@ -315,20 +315,18 @@ export function primaryVariantForProperty(
         ["props.variant"]: props.variant,
       });
 
-      if (compare(propertyValue, resolvedValue, compareType, flags)) {
-        log(logPrefix, "Match found - defaulting to primary variant");
-        return <Component ref={ref} {...props} variant={undefined} />;
-      } else {
-        log(logPrefix, "Match not found - using props.variant");
-        return <Component ref={ref} {...props} variant={props.variant} />;
+      if (!compare(propertyValue, resolvedValue, compareType, flags)) {
+        throw new Error("Match not found");
       }
+      log(logPrefix, "Match found - defaulting to primary variant");
+      return <Component ref={ref} {...props} variant={undefined} />;
     } catch (error) {
       if (error instanceof Error) {
-        log(logPrefix, "Hiding component", error.message);
+        log(logPrefix, "Keeping current variant", error.message);
       } else {
-        log(logPrefix, "Hiding component", error);
+        log(logPrefix, "Keeping current variant", error);
       }
-      return null;
+      return <Component ref={ref} {...props} />;
     }
   });
 }
