@@ -1,81 +1,20 @@
 import React, { forwardRef } from "react";
-import { ComponentType, RefAttributes } from "react";
 import { authStore, type AuthStatus } from "../../auth-store";
 import { outsetaLog } from "../../outseta";
 import { getNestedProperty } from "../../auth-store/utils";
 
 import { compare } from "./compare";
 
-// Override Function Types
-export type OverrideFunction<P = any> = (
-  Component: ComponentType<P>
-) => ComponentType<P & RefAttributes<any>>;
-
-export type TogglePropertyButtonOptions = {
+type PropertyOptions = {
   name: string;
-  value: string;
 };
 
-export type ShowForPropertyOptions = {
-  compare: "equal" | "array-includes";
+type ComparePropertyOptions = {
+  name: string;
+  value: any;
+  compare?: "equal" | "array-includes";
   flags?: "ignore-case"[];
 };
-
-export type ShowForUserPropertyOptions = ShowForPropertyOptions & {
-  name: string;
-  value: any;
-};
-
-export type WithPropertyOptions = {
-  name: string;
-};
-
-export type WithImagePropertyOptions = {
-  name: string;
-};
-
-export type WithPayloadPropertyOptions = {
-  name: string;
-};
-
-export type ShowForPayloadPropertyOptions = ShowForPropertyOptions & {
-  name: string;
-  value: any;
-};
-
-export type HideForPayloadPropertyOptions = ShowForPropertyOptions & {
-  name: string;
-  value: any;
-};
-
-export type HideForUserPayloadPropertyOptions = ShowForPropertyOptions & {
-  name: string;
-  value: any;
-};
-
-// Parametric Override Types
-export type ParametricOverrideFunction<T, P = any> = (
-  Component: ComponentType<P>,
-  options: T
-) => ComponentType<P & RefAttributes<any>>;
-
-// Specific Override Function Types
-export type AsTogglePropertyButtonFunction =
-  ParametricOverrideFunction<TogglePropertyButtonOptions>;
-export type ShowForPropertyFunction =
-  ParametricOverrideFunction<ShowForUserPropertyOptions>;
-export type WithPropertyFunction =
-  ParametricOverrideFunction<WithPropertyOptions>;
-export type WithImagePropertyFunction =
-  ParametricOverrideFunction<WithImagePropertyOptions>;
-export type WithPayloadPropertyFunction =
-  ParametricOverrideFunction<WithPayloadPropertyOptions>;
-export type ShowForPayloadPropertyFunction =
-  ParametricOverrideFunction<ShowForPayloadPropertyOptions>;
-export type HideForPayloadPropertyFunction =
-  ParametricOverrideFunction<HideForPayloadPropertyOptions>;
-export type HideForUserPayloadPropertyFunction =
-  ParametricOverrideFunction<HideForUserPayloadPropertyOptions>;
 
 const log = outsetaLog("framer.overrides");
 
@@ -101,7 +40,7 @@ function isFramerCanvas(): boolean {
  */
 export function toggleUserProperty(
   Component: React.ComponentType<any>,
-  { name: propertyName, value: toggleValue }: TogglePropertyButtonOptions
+  { name: propertyName, value: toggleValue }: { name: string; value: string }
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `toggleUserProperty ${propertyName} -|`;
@@ -186,7 +125,7 @@ export function showForUserProperty(
     value,
     compare: compareType = "equal",
     flags = [],
-  }: ShowForUserPropertyOptions
+  }: ComparePropertyOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `showForUserProperty ${propertyName} -|`;
@@ -231,7 +170,7 @@ export function showForUserProperty(
  */
 export function withUserProperty(
   Component: React.ComponentType<any>,
-  { name: propertyName }: WithPropertyOptions
+  { name: propertyName }: PropertyOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `withUserProperty ${propertyName} -|`;
@@ -270,7 +209,7 @@ export function withUserProperty(
  */
 export function withUserImageProperty(
   Component: React.ComponentType<any>,
-  { name: propertyName }: WithImagePropertyOptions
+  { name: propertyName }: PropertyOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `withUserImageProperty ${propertyName} -|`;
@@ -330,7 +269,7 @@ export function withUserImageProperty(
  */
 export function withPayloadProperty(
   Component: React.ComponentType<any>,
-  { name: propertyName }: WithPayloadPropertyOptions
+  { name: propertyName }: PropertyOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `withPayloadProperty ${propertyName} -|`;
@@ -377,7 +316,7 @@ export function showForPayloadProperty(
     value,
     compare: compareType = "equal",
     flags = [],
-  }: ShowForPayloadPropertyOptions
+  }: ComparePropertyOptions
 ): React.ComponentType<any> {
   // Create comparison function based on compare type
   return forwardRef((props, ref) => {
@@ -428,7 +367,7 @@ export function hideForPayloadProperty(
     value,
     compare: compareType = "equal",
     flags = [],
-  }: HideForPayloadPropertyOptions
+  }: ComparePropertyOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `hideForPayloadProperty ${propertyName} -|`;
@@ -478,7 +417,7 @@ export function hideForUserPayloadProperty(
     value,
     compare: compareType = "equal",
     flags = [],
-  }: HideForUserPayloadPropertyOptions
+  }: ComparePropertyOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `hideForUserPayloadProperty ${propertyName} -|`;
