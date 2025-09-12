@@ -80,6 +80,19 @@ export type HideForUserPayloadPropertyFunction =
 const log = outsetaLog("framer.overrides");
 
 /**
+ * Detects if the current environment is Framer canvas mode
+ * @returns true if running in Framer canvas
+ */
+function isFramerCanvas(): boolean {
+  try {
+    return window.location.host.includes("framercanvas.com");
+  } catch (error) {
+    // If any detection method fails, assume we're not in Framer
+    return false;
+  }
+}
+
+/**
  * Creates a toggle action for any property
  * @param Component - The component to wrap
  * @param options - Configuration
@@ -97,7 +110,7 @@ export function toggleUserProperty(
       const updateUserProperty = authStore((state) => state.updateUserProperty);
 
       if (!user) {
-        throw new Error("Authentication required");
+        throw new Error("User loaded required");
       }
 
       // Resolve toggle value from props if needed
@@ -182,7 +195,7 @@ export function showForUserProperty(
       const user = authStore((state) => state.user);
 
       if (!user) {
-        throw new Error("Authentication required");
+        throw new Error("User loaded required");
       }
       const propertyValue = getNestedProperty(user, propertyName);
       const resolvedValue = resolveValue(value, props);
@@ -194,10 +207,10 @@ export function showForUserProperty(
       });
 
       if (!compare(propertyValue, resolvedValue, compareType, flags)) {
-        throw new Error("Condition not met");
+        throw new Error("Match not found - hiding component");
       }
 
-      log(logPrefix, "Match found, showing component");
+      log(logPrefix, "Match found - showing component");
       return <Component ref={ref} {...props} />;
     } catch (error) {
       if (error instanceof Error) {
@@ -227,7 +240,7 @@ export function withUserProperty(
       const user = authStore((state) => state.user);
 
       if (!user) {
-        throw new Error("Authentication required");
+        throw new Error("User loaded required");
       }
 
       let propertyValue = getNestedProperty(user, propertyName);
@@ -266,7 +279,7 @@ export function withUserImageProperty(
       const user = authStore((state) => state.user);
 
       if (!user) {
-        throw new Error("Authentication required");
+        throw new Error("User loaded required");
       }
 
       const imageSrc = getNestedProperty(user, propertyName) as string;
@@ -383,10 +396,10 @@ export function showForPayloadProperty(
       log(logPrefix, { propertyValue, resolvedValue, compareType });
 
       if (!compare(propertyValue, resolvedValue, compareType, flags)) {
-        throw new Error("Condition not met");
+        throw new Error("Match not found - hiding component");
       }
 
-      log(logPrefix, "Match found, showing component");
+      log(logPrefix, "Match found - showing component");
       return <Component ref={ref} {...props} />;
     } catch (error) {
       if (error instanceof Error) {
@@ -433,10 +446,10 @@ export function hideForPayloadProperty(
       log(logPrefix, { propertyValue, resolvedValue, compareType });
 
       if (compare(propertyValue, resolvedValue, compareType, flags)) {
-        throw new Error("Condition met - hiding component");
+        throw new Error("Match found - hiding component");
       }
 
-      log(logPrefix, "Condition not met, showing component");
+      log(logPrefix, "Match not found - showing component");
       return <Component ref={ref} {...props} />;
     } catch (error) {
       if (error instanceof Error) {
@@ -474,7 +487,7 @@ export function hideForUserPayloadProperty(
       const user = authStore((state) => state.user);
 
       if (!user) {
-        throw new Error("Authentication required");
+        throw new Error("User loaded required");
       }
       const propertyValue = getNestedProperty(user, propertyName);
       const resolvedValue = resolveValue(value, props);
@@ -486,10 +499,10 @@ export function hideForUserPayloadProperty(
       });
 
       if (compare(propertyValue, resolvedValue, compareType, flags)) {
-        throw new Error("Condition met - hiding component");
+        throw new Error("Match found - hiding component");
       }
 
-      log(logPrefix, "Condition not met, showing component");
+      log(logPrefix, "Match not found - showing component");
       return <Component ref={ref} {...props} />;
     } catch (error) {
       if (error instanceof Error) {
@@ -504,6 +517,7 @@ export function hideForUserPayloadProperty(
 
 /**
  * Shows a component only when the authentication state matches the specified state
+ * When in Framer canvas or preview mode, treats "anonymous" status as true
  *
  * @param Component - The React component to conditionally render
  * @param validState - The authentication state that allows the component to show
@@ -519,16 +533,37 @@ export function showForAuthStatus(
     try {
       const status = authStore((state) => state.status);
       const user = authStore((state) => state.user);
+      const isFramerEnv = isFramerCanvas();
 
-      log(logPrefix, { status, validStatus });
+      log(logPrefix, { status, validStatus, isFramerEnv });
 
-      let showComponent = status === validStatus;
-      if (validStatus === "user-loaded") {
-        showComponent = Boolean(user);
-      }
+      switch (validStatus) {
+        case "user-loaded":
+          if (!user) {
+            throw new Error("User not loaded");
+          }
+          break;
 
-      if (!showComponent) {
-        throw new Error("Condition not met");
+        case "anonymous":
+          if (!isFramerEnv && status !== "anonymous") {
+            throw new Error("Not in anonymous state");
+          }
+          break;
+
+        case "authenticated":
+          if (status !== "authenticated") {
+            throw new Error("Not in authenticated state");
+          }
+          break;
+
+        case "pending":
+          if (status !== "pending") {
+            throw new Error("Not in pending state");
+          }
+          break;
+
+        default:
+          throw new Error("Invalid status");
       }
 
       log(logPrefix, "Status match, showing component");
@@ -561,19 +596,9 @@ export function triggerPopup(
 
     try {
       const status = authStore((state) => state.status);
+      const isFramerEnv = isFramerCanvas();
 
-      log(logPrefix, { status });
-
-      // Handle visibility based on embed type
-      if (embed === "register" || embed === "login") {
-        if (status !== "anonymous") {
-          throw new Error("Authentication required");
-        }
-      } else if (embed === "profile") {
-        if (status !== "authenticated") {
-          throw new Error("Authentication required");
-        }
-      }
+      log(logPrefix, { status, isFramerEnv });
 
       // Set appropriate data attributes based on embed type
       const dataAttributes: Record<string, string> = {
@@ -582,23 +607,30 @@ export function triggerPopup(
 
       switch (embed) {
         case "register":
+          if (!isFramerEnv && status !== "anonymous") {
+            throw new Error("Not anonymous");
+          }
           dataAttributes["data-o-auth"] = "1";
           dataAttributes["data-widget-mode"] = "register";
           break;
         case "login":
+          if (!isFramerEnv && status !== "anonymous") {
+            throw new Error("Not anonymous");
+          }
           dataAttributes["data-o-auth"] = "1";
           dataAttributes["data-widget-mode"] = "login";
           break;
         case "profile":
+          if (status !== "authenticated") {
+            throw new Error("Not authenticated");
+          }
           dataAttributes["data-o-profile"] = "1";
           break;
         default:
-          throw new Error("Invalid configuration");
+          throw new Error("Invalid embed type");
       }
 
-      log(logPrefix, "Setting Outseta data attributes", {
-        dataAttributes,
-      });
+      log(logPrefix, "Setting Outseta data attributes", { dataAttributes });
       return <Component ref={ref} {...props} {...dataAttributes} />;
     } catch (error) {
       if (error instanceof Error) {
@@ -631,28 +663,22 @@ export function triggerAction(
 
       log(logPrefix, { status });
 
-      // Handle visibility based on action type
-      if (action === "logout") {
-        if (status !== "authenticated") {
-          throw new Error("Authentication required");
-        }
-      }
-
       // Set appropriate data attributes based on action type
       const dataAttributes: Record<string, string> = {};
 
       switch (action) {
         case "logout":
+          if (status !== "authenticated") {
+            throw new Error("Not authenticated");
+          }
           dataAttributes["data-o-logout-link"] = "1";
           break;
 
         default:
-          throw new Error("Invalid configuration");
+          throw new Error("Invalid action type");
       }
 
-      log(logPrefix, "Setting Outseta data attributes", {
-        dataAttributes,
-      });
+      log(logPrefix, "Setting Outseta data attributes", { dataAttributes });
       return <Component ref={ref} {...props} {...dataAttributes} />;
     } catch (error) {
       if (error instanceof Error) {
