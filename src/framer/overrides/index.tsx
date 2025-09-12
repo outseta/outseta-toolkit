@@ -410,7 +410,7 @@ export function hideForPayloadProperty(
  * @param options.compare - Comparison type: "equal" or "array-includes"
  * @param options.flags - Additional flags like ["ignore-case"]
  */
-export function hideForUserPayloadProperty(
+export function hideForUserProperty(
   Component: React.ComponentType<any>,
   {
     name: propertyName,
@@ -420,7 +420,7 @@ export function hideForUserPayloadProperty(
   }: ComparePropertyOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `hideForUserPayloadProperty ${propertyName} -|`;
+    const logPrefix = `hideForUserProperty ${propertyName} -|`;
 
     try {
       const user = authStore((state) => state.user);
