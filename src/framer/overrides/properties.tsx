@@ -281,6 +281,57 @@ export function hideForProperty(
 }
 
 /**
+ * Sets component variant based on property comparison
+ * @param Component - The component to wrap
+ * @param options - Configuration
+ * @param options.name - Property name to check
+ * @param options.value - Value to compare against (can be "props.propertyName")
+ * @param options.compare - Comparison type: "equal" or "array-includes"
+ * @param options.flags - Additional flags like ["ignore-case"]
+ */
+export function primaryVariantForProperty(
+  Component: React.ComponentType<any>,
+  {
+    name: propertyName,
+    value,
+    compare: compareType = "equal",
+    flags = [],
+  }: ComparePropertyOptions
+): React.ComponentType<any> {
+  return forwardRef((props, ref) => {
+    const logPrefix = `variantForProperty ${propertyName} -|`;
+
+    try {
+      const user = authStore((state) => state.user);
+      const payload = authStore((state) => state.payload);
+
+      const propertyValue = getPropertyValue({ user, payload }, propertyName);
+      const resolvedValue = resolveValue(value, props);
+
+      log(logPrefix, {
+        propertyValue,
+        resolvedValue,
+        compareType,
+        ["props.variant"]: props.variant,
+      });
+
+      if (!compare(propertyValue, resolvedValue, compareType, flags)) {
+        throw new Error("Match not found");
+      }
+      log(logPrefix, "Match found - defaulting to primary variant");
+      return <Component ref={ref} {...props} variant={undefined} />;
+    } catch (error) {
+      if (error instanceof Error) {
+        log(logPrefix, "Keeping current variant", error.message);
+      } else {
+        log(logPrefix, "Keeping current variant", error);
+      }
+      return <Component ref={ref} {...props} />;
+    }
+  });
+}
+
+/**
  * Creates a toggle action for any property
  * @param Component - The component to wrap
  * @param options - Configuration

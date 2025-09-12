@@ -289,15 +289,15 @@ Converts any component into an Outseta popup trigger with automatic visibility r
 
 ```javascript
 // Use in Framer Overrides Code File
-export function triggerLoginPopup(Component) {
+export function triggerLoginPopup(Component): ComponentType {
   return triggerPopup(Component, "login");
 }
 
-export function triggerRegisterPopup(Component) {
+export function triggerRegisterPopup(Component): ComponentType {
   return triggerPopup(Component, "register");
 }
 
-export function triggerProfilePopup(Component) {
+export function triggerProfilePopup(Component): ComponentType {
   return triggerPopup(Component, "profile");
 }
 ```
@@ -312,7 +312,7 @@ Converts any component into an Outseta action trigger with automatic visibility 
 
 ```javascript
 // Use in Framer Overrides Code File
-export function triggerLogout(Component) {
+export function triggerLogout(Component): ComponentType {
   return triggerAction(Component, "logout");
 }
 ```
@@ -330,19 +330,19 @@ Shows component only when authentication status matches the specified state.
 
 ```javascript
 // Use in Framer Overrides Code File
-export function showForAuthenticated(Component) {
+export function showForAuthenticated(Component): ComponentType {
   return showForAuthStatus(Component, "authenticated");
 }
 
-export function showForAnonymous(Component) {
+export function showForAnonymous(Component): ComponentType {
   return showForAuthStatus(Component, "anonymous");
 }
 
-export function showForPending(Component) {
+export function showForPending(Component): ComponentType {
   return showForAuthStatus(Component, "pending");
 }
 
-export function showForUserLoaded(Component) {
+export function showForUserLoaded(Component): ComponentType {
   return showForAuthStatus(Component, "user-loaded");
 }
 ```
@@ -358,14 +358,14 @@ Creates a toggle button for any custom property with comma-separated array suppo
 
 ```javascript
 // Use in Framer Overrides Code File
-export function toggleBookmark(Component) {
+export function toggleBookmark(Component): ComponentType {
   return toggleProperty(Component, {
     name: "Bookmarks", // 🚨 Requires a person custom property with system name: Bookmarks
     value: "props.slug", // 🚨 The Framer component must have a `slug` property.
   });
 }
 
-export function toggleNewsletterPreference(Component) {
+export function toggleNewsletterPreference(Component): ComponentType {
   return toggleProperty(Component, {
     name: "Preferences", // 🚨 Requires a person custom property with system name: Preferences
     value: "newsletter",
@@ -387,7 +387,7 @@ Conditional visibility based on custom property comparison.
 ```javascript
 // Use in Framer Overrides Code File
 
-export function showForMembers_VIP(Component) {
+export function showForVIP(Component): ComponentType {
   return showForProperty(Component, {
     name: "Account.CurrentSubscription.Plan.Name",
     value: "VIP",
@@ -396,19 +396,59 @@ export function showForMembers_VIP(Component) {
   });
 }
 
-export function showForLesson_Completed(Component) {
+export function showForBookmarked(Component): ComponentType {
   return showForProperty(Component, {
-    name: "CompletedLessons", // 🚨 Requires a person custom property with system name: CompletedLessons
+    name: "Bookmarks", // 🚨 Requires a person custom property with system name: Bookmarks
     value: "props.slug", // 🚨 The Framer component must have a `slug` property.
     compare: "array-includes",
   });
 }
 
-export function showForMascot_Cat(Component) {
+export function showForMascot_Cat(Component): ComponentType {
   return showForProperty(Component, {
     name: "Account.Mascot", // 🚨 Requires an account custom property with system name: Mascot
     value: "Cat",
     flags: ["ignore-case"],
+  });
+}
+```
+
+##### `primaryVariantForProperty(Component, options)`
+
+Sets component variant based on property comparison.
+
+**Options:**
+
+- `name` - Property name (supports dot notation, prefix "Account." for account custom properties)
+- `value` - Value to compare against (can be "props.propertyName")
+- `compare` - Comparison type: "equal" or "array-includes"
+- `flags` - Additional flags like ["ignore-case"]
+
+```javascript
+// Use in Framer Overrides Code File
+
+export function primaryVariantForVIP(Component): ComponentType {
+  return primaryVariantForProperty(Component, {
+    name: "Account.CurrentSubscription.Plan.Name",
+    value: "VIP",
+    compare: "equal",
+    flags: ["ignore-case"],
+  });
+}
+
+export function primaryVariantForBookmarked(Component): ComponentType {
+  return primaryVariantForProperty(Component, {
+    name: "Bookmarks", // 🚨 Requires a person custom property with system name: Bookmarks
+    value: "props.slug", // 🚨 The Framer component must have a `slug` property.
+    compare: "array-includes",
+  });
+}
+
+export function primaryVariantForAddOn_OW4pRYWg(Component): ComponentType {
+  return primaryVariantForProperty(Component, {
+    name: "CurrentAddOnUids",
+    value: "OW4pRYWg",
+    compare: "array-includes",
   });
 }
 ```
@@ -423,21 +463,21 @@ Sets component text to any custom property value.
 
 ```javascript
 // Use in Framer Overrides Code File
-export function withFirstName(Component) {
+export function withFirstName(Component): ComponentType {
   return withProperty(Component, { name: "FirstName" });
 }
 
-export function withAccountName(Component) {
+export function withAccountName(Component): ComponentType {
   return withProperty(Component, { name: "Account.Name" });
 }
 
-export function coffeePreference(Component) {
+export function coffeePreference(Component): ComponentType {
   return withProperty(Component, {
     name: "CoffeePreference", // 🚨 Requires a person custom property with system name: CoffeePreference
   });
 }
 
-export function companyMascot(Component) {
+export function companyMascot(Component): ComponentType {
   return withProperty(Component, {
     name: "Account.Mascot", // 🚨 Requires an account custom property with system name: Mascot
   });
@@ -454,11 +494,11 @@ Sets component background image to any custom property containing an image URL.
 
 ```javascript
 // Use in Framer Overrides Code File
-export function withAvatar(Component) {
+export function withAvatar(Component): ComponentType {
   return withImageProperty(Component, { name: "MascotImageUrl" });
 }
 
-export function withAccountLogo(Component) {
+export function withAccountLogo(Component): ComponentType {
   return withImageProperty(Component, { name: "Account.LogoUrl" });
 }
 ```

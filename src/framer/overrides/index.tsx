@@ -8,4 +8,5 @@ export {
   withProperty,
   withImageProperty,
   hideForProperty,
+  primaryVariantForProperty,
 } from "./properties";
