@@ -39,12 +39,16 @@ function mapPropertyToSource(propertyName: string): {
 
 /**
  * Gets a property value from either user or payload based on the property name
+ * @param params - Object containing user and payload
+ * @param params.user - The user object
+ * @param params.payload - The payload object
  * @param propertyName - The property name to get
- * @param user - The user object
- * @param payload - The payload object
  * @returns The property value
  */
-function getPropertyValue(propertyName: string, user: any, payload: any): any {
+function getPropertyValue(
+  { user, payload }: { user: any; payload: any },
+  propertyName: string
+): any {
   const { mappedName, source } = mapPropertyToSource(propertyName);
 
   if (source === "payload") {
@@ -88,7 +92,7 @@ export function withProperty(
         throw new Error("User loaded required");
       }
 
-      let propertyValue = getPropertyValue(propertyName, user, payload);
+      let propertyValue = getPropertyValue({ user, payload }, propertyName);
 
       if (typeof propertyValue !== "string") {
         throw new Error("Not a string");
@@ -127,6 +131,7 @@ export function withImageProperty(
         throw new Error("User loaded required");
       }
 
+      // No image property in payload, so no need to use getPropertyValue
       const imageSrc = getNestedProperty(user, propertyName) as string;
 
       log(logPrefix, { imageSrc });
@@ -195,7 +200,7 @@ export function showForProperty(
       if (!user) {
         throw new Error("User loaded required");
       }
-      const propertyValue = getPropertyValue(propertyName, user, payload);
+      const propertyValue = getPropertyValue({ user, payload }, propertyName);
       const resolvedValue = resolveValue(value, props);
 
       log(logPrefix, {
@@ -249,7 +254,7 @@ export function hideForProperty(
       if (!user) {
         throw new Error("User loaded required");
       }
-      const propertyValue = getPropertyValue(propertyName, user, payload);
+      const propertyValue = getPropertyValue({ user, payload }, propertyName);
       const resolvedValue = resolveValue(value, props);
 
       log(logPrefix, {
@@ -297,8 +302,9 @@ export function toggleProperty(
       }
 
       // Resolve toggle value from props if needed
-      let resolvedToggleValue = resolveValue(toggleValue, props);
+      const resolvedToggleValue = resolveValue(toggleValue, props);
 
+      // No image property in payload, so no need to use getPropertyValue
       const propertyValue = getNestedProperty(user, propertyName) || "";
       const propertyValueAsArray =
         typeof propertyValue === "string"
@@ -308,7 +314,7 @@ export function toggleProperty(
       const handleClick = async (event: React.MouseEvent) => {
         event.preventDefault();
 
-        log(logPrefix, { propertyName, resolvedToggleValue });
+        log(logPrefix, { resolvedToggleValue });
 
         const newPropertyValueAsArray = [
           // Filter out the toggle value and empty values
