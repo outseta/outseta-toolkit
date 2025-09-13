@@ -38,7 +38,7 @@ Provides override functions for integrating Outseta authentication and custom pr
 Copy/paste the following code into a code file in your Framer project named `OutsetaUser.tsx`.
 
 ```javascript
-// File: Outseta.tsx
+// File: OutsetaUser.tsx
 import { type ComponentType } from "react";
 import {
   showForAuthStatus,
@@ -98,7 +98,16 @@ import { type ComponentType } from "react";
 import {
   showForProperty,
   hideForProperty,
+  primaryVariantForProperty,
 } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.2/dist/framer/overrides.js";
+
+export function primaryVariantForAddOn_OW4pRYWg(Component): ComponentType {
+  return primaryVariantForProperty(Component, {
+    name: "CurrentAddOnUids",
+    value: "OW4pRYWg",
+    compare: "array-includes",
+  });
+}
 
 // 🚨 Replace OW4pRYWg with your add-on uid, and duplicate for additional add-on uids
 export function showForAddOn_OW4pRYWg(Component): ComponentType {
@@ -179,6 +188,7 @@ import { type ComponentType } from "react";
 import {
   withProperty,
   showForProperty,
+  hideForProperty,
   toggleProperty,
 } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.2/dist/framer/overrides.js";
 
@@ -232,6 +242,7 @@ import { type ComponentType } from "react";
 import {
   withProperty,
   showForProperty,
+  hideForProperty,
   toggleProperty,
 } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.2/dist/framer/overrides.js";
 
