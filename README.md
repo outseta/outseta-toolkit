@@ -43,7 +43,7 @@ import { type ComponentType } from "react";
 import {
   showForAuthStatus,
   withProperty,
-  withUserImageProperty,
+  withImageProperty,
 } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.2/dist/framer/overrides.js";
 
 // Visibility controls
