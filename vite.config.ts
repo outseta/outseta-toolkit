@@ -24,6 +24,8 @@ export default defineConfig({
       output: {
         // Ensure entry file names match the expected structure
         entryFileNames: "[name].js",
+        // Ensure proper ES module format
+        format: "es",
       },
     },
     // Empty out the dist directory
@@ -32,9 +34,12 @@ export default defineConfig({
     target: "es2020",
     // Enable source maps for debugging
     sourcemap: true,
+    // Ensure proper module format
+    minify: false,
   },
   // Enable TypeScript support
   esbuild: {
     target: "es2020",
+    format: "esm",
   },
 });
