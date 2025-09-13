@@ -26,7 +26,7 @@ import {
   showForAuthStatus,
   withProperty,
   withImageProperty,
-} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.2/dist/framer/overrides.js";
+} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist/framer/overrides.js";
 ```
 
 ## Quick Start
@@ -44,7 +44,7 @@ import {
   showForAuthStatus,
   withProperty,
   withImageProperty,
-} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.2/dist/framer/overrides.js";
+} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist/framer/overrides.js";
 
 // Visibility controls
 export function showForAnonymous(Component): ComponentType {
@@ -99,7 +99,7 @@ import {
   showForProperty,
   hideForProperty,
   primaryVariantForProperty,
-} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.2/dist/framer/overrides.js";
+} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist/framer/overrides.js";
 
 export function primaryVariantForAddOn_OW4pRYWg(Component): ComponentType {
   return primaryVariantForProperty(Component, {
@@ -156,7 +156,7 @@ import { type ComponentType } from "react";
 import {
   triggerPopup,
   triggerAction,
-} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.2/dist/framer/overrides.js";
+} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist/framer/overrides.js";
 
 // Authentication triggers
 export function triggerLoginPopup(Component): ComponentType {
@@ -190,7 +190,7 @@ import {
   showForProperty,
   hideForProperty,
   toggleProperty,
-} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.2/dist/framer/overrides.js";
+} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist/framer/overrides.js";
 
 //////
 // 🚨 Requires a person custom property with system name: CompletedLessons
@@ -244,7 +244,7 @@ import {
   showForProperty,
   hideForProperty,
   toggleProperty,
-} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.2/dist/framer/overrides.js";
+} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist/framer/overrides.js";
 
 //////
 // 🚨 Requires a person custom property with system name: Bookmarks
