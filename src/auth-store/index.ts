@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { create, type StoreApi } from "zustand";
 import { getOutseta, outsetaLog } from "../outseta";
 import { debounce, computeUser } from "./utils";
 
@@ -35,63 +35,13 @@ export interface AuthActions {
 
 export interface AuthStore extends AuthState, AuthActions {}
 
+// Log Helper
+const log = (...args: any[]) => {
+  outsetaLog("auth.store")(...args, { storeData: { ...authStore.getState() } });
+};
+
 // Create the Zustand store
 export const authStore = create<AuthStore>()((set, get, store) => {
-  // Debounced function for API persistence
-  const debouncedPersistUpdates = debounce(async () => {
-    const logPrefix = `debouncedPersistUpdates -|`;
-
-    const { pendingUpdates, persistUser } = get();
-    if (pendingUpdates.length === 0 || !persistUser) {
-      log(logPrefix, "No pending updates or persistUser function available");
-      return;
-    }
-
-    // Capture the current pending updates to process
-    const updates = [...pendingUpdates];
-    const combinedUpdates = updates.reduce(
-      (acc, update) => ({
-        ...acc,
-        ...update.updates,
-      }),
-      {}
-    );
-
-    try {
-      log(logPrefix, "Processing updates", { updates, combinedUpdates });
-      const updatedServerUser = await persistUser(combinedUpdates);
-
-      // Success: remove only the processed updates
-      const remainingUpdates = pendingUpdates.filter(
-        (update: PendingUpdate) =>
-          !updates.some(
-            (processed: PendingUpdate) => processed.id === update.id
-          )
-      );
-
-      set({
-        pendingUpdates: remainingUpdates,
-        serverUser: updatedServerUser,
-      });
-
-      log(logPrefix, "Successfully persisted updates", { updatedServerUser });
-    } catch (error) {
-      // Failure: remove only the failed processed updates
-      const remainingUpdates = pendingUpdates.filter(
-        (update: PendingUpdate) =>
-          !updates.some(
-            (processed: PendingUpdate) => processed.id === update.id
-          )
-      );
-
-      set({
-        pendingUpdates: remainingUpdates,
-      });
-
-      log(logPrefix, "Failed to persist updates", error);
-    }
-  }, 500);
-
   return {
     // State
     status: "pending",
@@ -200,9 +150,6 @@ export const authStore = create<AuthStore>()((set, get, store) => {
         });
 
         log(logPrefix, "Added pending update", { updates, pendingUpdate });
-
-        // Trigger persistence
-        debouncedPersistUpdates();
       } catch (error) {
         if (error instanceof Error) {
           log(logPrefix, "Failed", error.message);
@@ -228,7 +175,7 @@ export const authStore = create<AuthStore>()((set, get, store) => {
   };
 });
 
-// Subscribe to state changes to automatically compute user
+// Subscribe to state changes to automatically compute user and persist updates
 authStore.subscribe((state, prevState) => {
   // Compute user when serverUser or pendingUpdates change
   if (
@@ -241,7 +188,77 @@ authStore.subscribe((state, prevState) => {
       user: computedUser,
     });
   }
+
+  // Trigger persistence when pendingUpdates change (and we have updates to persist)
+  if (
+    state.pendingUpdates !== prevState.pendingUpdates &&
+    state.pendingUpdates.length > 0 &&
+    state.persistUser
+  ) {
+    log("pendingUpdates changed, triggering persistence");
+    debouncedPersistUpdates(authStore);
+  }
 });
+
+// Debounced function for API persistence
+const debouncedPersistUpdates = debounce(
+  async (authStore: StoreApi<AuthStore>) => {
+    const logPrefix = `debouncedPersistUpdates -|`;
+
+    const { pendingUpdates, persistUser } = authStore.getState();
+    if (pendingUpdates.length === 0 || !persistUser) {
+      log(logPrefix, "No pending updates or persistUser function available");
+      return;
+    }
+
+    // Capture the current pending updates to process
+    const updates = [...pendingUpdates];
+    const combinedUpdates = updates.reduce(
+      (acc, update) => ({
+        ...acc,
+        ...update.updates,
+      }),
+      {}
+    );
+
+    try {
+      log(logPrefix, "Processing updates", { updates, combinedUpdates });
+      const updatedServerUser = await persistUser(combinedUpdates);
+
+      // Success: remove only the processed updates
+      const { pendingUpdates: currentPendingUpdates } = authStore.getState();
+      const remainingUpdates = currentPendingUpdates.filter(
+        (update: PendingUpdate) =>
+          !updates.some(
+            (processed: PendingUpdate) => processed.id === update.id
+          )
+      );
+
+      authStore.setState({
+        pendingUpdates: remainingUpdates,
+        serverUser: updatedServerUser,
+      });
+
+      log(logPrefix, "Successfully persisted updates", { updatedServerUser });
+    } catch (error) {
+      // Failure: remove only the failed processed updates
+      const { pendingUpdates: currentPendingUpdates } = authStore.getState();
+      const remainingUpdates = currentPendingUpdates.filter(
+        (update: PendingUpdate) =>
+          !updates.some(
+            (processed: PendingUpdate) => processed.id === update.id
+          )
+      );
+
+      authStore.setState({
+        pendingUpdates: remainingUpdates,
+      });
+
+      log(logPrefix, "Failed to persist updates", error);
+    }
+  },
+  500
+);
 
 // authStore.subscribe((state) => {
 //   log("Auth store state changed", state);
@@ -277,8 +294,3 @@ if (typeof window !== "undefined") {
   authStore.getState().syncUser("init");
   setupEventListeners();
 }
-
-// Log Helper
-const log = (...args: any[]) => {
-  outsetaLog("auth.store")(...args, { storeData: { ...authStore.getState() } });
-};
