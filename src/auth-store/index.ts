@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { getOutseta, outsetaLog } from "../outseta";
-import { setNestedProperty, debounce } from "./utils";
+import { debounce, computeUser } from "./utils";
 
 // Type for the original Outseta user object (nested structure)
 export type OutsetaUser = any;
@@ -11,86 +11,108 @@ export type OutsetaUserPropertyName = string;
 // Auth State Types
 export type AuthStatus = "pending" | "authenticated" | "anonymous";
 
+export interface PendingUpdate {
+  updates: Record<string, any>; // The exact object passed to updateUser
+  timestamp: number;
+  id: string; // For tracking individual updates
+}
+
 export interface AuthState {
   status: AuthStatus;
-  user: OutsetaUser | null;
+  serverUser: OutsetaUser | null; // Source of truth from API
+  pendingUpdates: PendingUpdate[]; // Queue of optimistic updates
+  user: OutsetaUser | null; // Computed: serverUser + pendingUpdates
   payload: any;
 }
 
 export interface AuthActions {
-  reset: (event?: string) => Promise<void>;
+  reset: (event?: string) => void;
   syncUser: (event?: string) => Promise<void>;
-  updateUser: ((data: any) => Promise<any>) | null;
-  updateUserProperty: (propertyName: string, newValue: any) => Promise<void>;
+  updateUser: (updates: Record<string, any>) => void;
+  updateUserProperty: (propertyName: string, newValue: any) => void;
+  persistUser: ((data: any) => Promise<any>) | null;
 }
 
 export interface AuthStore extends AuthState, AuthActions {}
 
 // Create the Zustand store
 export const authStore = create<AuthStore>()((set, get, store) => {
-  // Internal tracking for user update sequence (not part of store state)
-  let userUpdateSequence = 0;
+  // Debounced function for API persistence
+  const debouncedPersistUpdates = debounce(async () => {
+    const logPrefix = `debouncedPersistUpdates -|`;
 
-  // Create debounced version of the API update function
-  const debouncedPersistUser = debounce(async () => {
-    const logPrefix = `debouncedPersistUser -|`;
+    const { pendingUpdates, persistUser } = get();
+    if (pendingUpdates.length === 0 || !persistUser) {
+      log(logPrefix, "No pending updates or persistUser function available");
+      return;
+    }
+
+    // Capture the current pending updates to process
+    const updates = [...pendingUpdates];
+    const combinedUpdates = updates.reduce(
+      (acc, update) => ({
+        ...acc,
+        ...update.updates,
+      }),
+      {}
+    );
 
     try {
-      const { updateUser, user } = get();
+      log(logPrefix, "Processing updates", { updates, combinedUpdates });
+      const updatedServerUser = await persistUser(combinedUpdates);
 
-      if (!user) {
-        throw new Error("No current user data available");
-      }
+      // Success: remove only the processed updates
+      const remainingUpdates = pendingUpdates.filter(
+        (update: PendingUpdate) =>
+          !updates.some(
+            (processed: PendingUpdate) => processed.id === update.id
+          )
+      );
 
-      if (!updateUser) {
-        throw new Error("No updateUser function available");
-      }
+      set({
+        pendingUpdates: remainingUpdates,
+        serverUser: updatedServerUser,
+      });
 
-      // Capture the current sequence (set by optimistic update)
-      const currentUserUpdateSequence = userUpdateSequence;
-
-      // Update the user using the update method with the current user data
-      const updatedUser = await updateUser(user);
-      const currentPayload = get().payload;
-
-      log(logPrefix, { updatedUser });
-      // Only update store with server data if this is still the latest API call
-      // This prevents stale data from overwriting newer optimistic updates
-      if (updatedUser?.Uid !== currentPayload?.sub) {
-        await get().reset("payload/user mismatch");
-      } else if (currentUserUpdateSequence !== userUpdateSequence) {
-        log(logPrefix, "Stale user data, skipping apply");
-      } else {
-        set({ user: updatedUser });
-        log(logPrefix, "Applied user data");
-      }
+      log(logPrefix, "Successfully persisted updates", { updatedServerUser });
     } catch (error) {
-      log(logPrefix, "Failed", error);
-      // Rollback optimistic update by re-syncing
-      await get().syncUser("rollback");
+      // Failure: remove only the failed processed updates
+      const remainingUpdates = pendingUpdates.filter(
+        (update: PendingUpdate) =>
+          !updates.some(
+            (processed: PendingUpdate) => processed.id === update.id
+          )
+      );
+
+      set({
+        pendingUpdates: remainingUpdates,
+      });
+
+      log(logPrefix, "Failed to persist updates", error);
     }
   }, 500);
 
   return {
     // State
     status: "pending",
-    payload: null,
+    serverUser: null,
+    pendingUpdates: [],
     user: null,
-    updateUser: null,
+    payload: null,
+    persistUser: null,
 
     /**
      * Clears the user data from the store
      * @param event - The event that triggered the clear (for logging purposes)
      */
     reset: async (event: string = "manual") => {
-      const logPrefix = `resetUser ${event} -|`;
+      const logPrefix = `resetStore ${event} -|`;
       try {
-        userUpdateSequence = 0; // Reset sequence
         set(store.getInitialState());
         await get().syncUser(event);
-        log(logPrefix, "Reset user completed");
+        log(logPrefix, "Reset store completed");
       } catch (error) {
-        log(logPrefix, "Reset user failed", error);
+        log(logPrefix, "Reset store failed", error);
       }
     },
 
@@ -116,35 +138,28 @@ export const authStore = create<AuthStore>()((set, get, store) => {
           payload: payload || null,
           // If current payload sub is the same as the user, keep the user
           user: payload?.sub === get().user?.Uid ? get().user : null,
-          updateUser:
-            payload?.sub === get().user?.Uid ? get().updateUser : null,
+          persistUser:
+            payload?.sub === get().user?.Uid ? get().persistUser : null,
         });
 
         log(logPrefix, "Applied payload");
 
-        userUpdateSequence++;
-        const currentUserUpdateSequence = userUpdateSequence;
-        const fetchedUser = await outseta.getUser();
-        const currentUser = get().user;
-        const currentPayload = get().payload;
+        if (payload) {
+          const fetchedUser = await outseta.getUser();
+          const currentPayload = get().payload;
 
-        log(logPrefix, "Fetched user data", { fetchedUser });
+          log(logPrefix, "Fetched user data", { fetchedUser });
 
-        if (fetchedUser?.Uid !== currentPayload?.sub) {
-          await get().reset("payload/user mismatch");
-        } else if (
-          // If no current user, or the sequence is different, apply the fetched user
-          !currentUser ||
-          currentUserUpdateSequence !== userUpdateSequence
-        ) {
-          set({
-            status: "authenticated",
-            user: fetchedUser,
-            updateUser: fetchedUser.update?.bind(fetchedUser),
-          });
-          log(logPrefix, "Applied user data", { fetchedUser });
-        } else {
-          log(logPrefix, "Stale user data, skipping apply");
+          if (fetchedUser?.Uid !== currentPayload?.sub) {
+            await get().reset("payload/user mismatch");
+          } else {
+            set({
+              status: "authenticated",
+              serverUser: fetchedUser,
+              persistUser: fetchedUser.update?.bind(fetchedUser),
+            });
+            log(logPrefix, "Applied user data", { fetchedUser });
+          }
         }
       } catch (error) {
         // Don't change status on error, keep current state
@@ -157,45 +172,38 @@ export const authStore = create<AuthStore>()((set, get, store) => {
     },
 
     /**
-     * Updates a specific user property both in the store and via Outseta API
-     * Performs optimistic updates for better UX and rolls back on errors
-     * Uses debouncing to prevent rapid API calls - only the last update will be processed
-     * Supports dot notation for nested properties (e.g., "Account.FullName")
+     * Updates user properties by adding them to the pending updates queue
+     * The middleware will automatically compute the user and persist changes
      *
-     * @param propertyName - The name of the property to update (supports dot notation)
-     * @param newValue - The new value for the property
+     * @param updates - Object containing property updates (supports dot notation)
      */
-    updateUserProperty: async (
-      propertyName: OutsetaUserPropertyName,
-      newValue: any
-    ) => {
-      const logPrefix = `updateUserProperty ${propertyName} -|`;
+    updateUser: (updates: Record<string, any>) => {
+      const logPrefix = `updateUser -|`;
 
       try {
-        // Set optimistic update immediately for better UX
         const currentUser = get().user;
         if (!currentUser) {
           throw new Error("Authentication required");
         }
 
-        // Increment sequence for this optimistic update
-        userUpdateSequence++;
+        // Create a new pending update
+        const pendingUpdate: PendingUpdate = {
+          updates,
+          timestamp: Date.now(),
+          id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        };
 
-        const optimisticallyUpdatedUser = setNestedProperty(
-          currentUser,
-          propertyName,
-          newValue
-        );
-        set({ user: optimisticallyUpdatedUser });
-        log(logPrefix, "Applied optimistic update", {
-          propertyName,
-          newValue,
+        // Add to pending updates queue
+        const { pendingUpdates } = get();
+        set({
+          pendingUpdates: [...pendingUpdates, pendingUpdate],
         });
 
-        // Trigger the debounced API update
-        debouncedPersistUser();
+        log(logPrefix, "Added pending update", { updates, pendingUpdate });
+
+        // Trigger persistence
+        debouncedPersistUpdates();
       } catch (error) {
-        // Don't change status on error, keep current state
         if (error instanceof Error) {
           log(logPrefix, "Failed", error.message);
         } else {
@@ -203,7 +211,36 @@ export const authStore = create<AuthStore>()((set, get, store) => {
         }
       }
     },
+
+    /**
+     * Updates a specific user property (convenience wrapper for updateUser)
+     * Supports dot notation for nested properties (e.g., "Account.FullName")
+     *
+     * @param propertyName - The name of the property to update (supports dot notation)
+     * @param newValue - The new value for the property
+     */
+    updateUserProperty: (
+      propertyName: OutsetaUserPropertyName,
+      newValue: any
+    ) => {
+      return get().updateUser({ [propertyName]: newValue });
+    },
   };
+});
+
+// Subscribe to state changes to automatically compute user
+authStore.subscribe((state, prevState) => {
+  // Compute user when serverUser or pendingUpdates change
+  if (
+    state.serverUser !== prevState.serverUser ||
+    state.pendingUpdates !== prevState.pendingUpdates
+  ) {
+    log("serverUser or pendingUpdates changed, computing user");
+    const computedUser = computeUser(state.serverUser, state.pendingUpdates);
+    authStore.setState({
+      user: computedUser,
+    });
+  }
 });
 
 // authStore.subscribe((state) => {
@@ -219,13 +256,14 @@ const setupEventListeners = () => {
   if (!outseta) return;
 
   // Events that should sync user data
-  const fetchUserEvents = [
+  const syncUserEvents = [
     "accessToken.set",
     "profile.update",
     "account.update",
+    "subscription.update",
   ];
 
-  fetchUserEvents.forEach((event) => {
+  syncUserEvents.forEach((event) => {
     outseta.on(event, () => authStore.getState().syncUser(event));
   });
 

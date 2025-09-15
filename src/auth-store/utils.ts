@@ -187,3 +187,42 @@ export function debounce<T extends (...args: any[]) => any>(
     }, delay);
   };
 }
+
+/**
+ * Computes the final user object by applying pending updates to the server user
+ * This creates a merged object where pending updates override server values
+ *
+ * @param serverUser - The user object from the server (source of truth)
+ * @param pendingUpdates - Array of pending updates to apply
+ * @returns The computed user object with pending updates applied
+ *
+ * @example
+ * const serverUser = { Account: { FullName: "John" }, Person: { Email: "john@example.com" } };
+ * const pendingUpdates = [
+ *   { updates: { "Account.FullName": "Jane" }, timestamp: 1234567890, id: "1" }
+ * ];
+ * computeUser(serverUser, pendingUpdates);
+ * // Returns: { Account: { FullName: "Jane" }, Person: { Email: "john@example.com" } }
+ */
+export function computeUser(
+  serverUser: any,
+  pendingUpdates: Array<{
+    updates: Record<string, any>;
+    timestamp: number;
+    id: string;
+  }>
+): any {
+  if (!serverUser) return null;
+
+  // Start with a deep copy of the server user
+  let computedUser = JSON.parse(JSON.stringify(serverUser));
+
+  // Apply each pending update in order
+  for (const pendingUpdate of pendingUpdates) {
+    for (const [propertyName, value] of Object.entries(pendingUpdate.updates)) {
+      computedUser = setNestedProperty(computedUser, propertyName, value);
+    }
+  }
+
+  return computedUser;
+}
