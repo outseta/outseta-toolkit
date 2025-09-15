@@ -140,7 +140,7 @@ export const authStore = create<AuthStore>()((set, get, store) => {
         const pendingUpdate: PendingUpdate = {
           updates,
           timestamp: Date.now(),
-          id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          id: `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
         };
 
         // Add to pending updates queue
