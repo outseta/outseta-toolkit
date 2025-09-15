@@ -1,3 +1,5 @@
+import { set, get, debounce, cloneDeep } from "lodash";
+
 /**
  * Sets a nested property value in an object using dot notation
  * This allows updating deeply nested properties like "Account.FullName" or "Person.Email"
@@ -22,85 +24,9 @@
 export function setNestedProperty(obj: any, path: string, value: any): any {
   if (!obj || !path) return obj;
 
-  const parts = path.split(".");
-  const result = { ...obj };
-  let current = result;
-
-  // Navigate to the parent of the target property
-  for (let i = 0; i < parts.length - 1; i++) {
-    const part = parts[i];
-
-    // Check if this part contains an array index
-    const arrayMatch = part.match(/^(.+)\[(\d+)\]$/);
-    if (arrayMatch) {
-      const [, propertyName, indexStr] = arrayMatch;
-      const index = parseInt(indexStr, 10);
-
-      // Ensure the property exists and is an array
-      if (!(propertyName in current) || !Array.isArray(current[propertyName])) {
-        current[propertyName] = [];
-      } else {
-        current[propertyName] = [...current[propertyName]];
-      }
-
-      // Ensure the array is long enough
-      while (current[propertyName].length <= index) {
-        current[propertyName].push(null);
-      }
-
-      // Navigate to the array element
-      if (
-        current[propertyName][index] === null ||
-        typeof current[propertyName][index] !== "object"
-      ) {
-        current[propertyName][index] = {};
-      } else {
-        current[propertyName][index] = { ...current[propertyName][index] };
-      }
-
-      current = current[propertyName][index];
-    } else {
-      // Regular object property
-      if (
-        !(part in current) ||
-        typeof current[part] !== "object" ||
-        current[part] === null
-      ) {
-        current[part] = {};
-      } else {
-        current[part] = { ...current[part] };
-      }
-      current = current[part];
-    }
-  }
-
-  // Set the final property
-  const finalPart = parts[parts.length - 1];
-  const finalArrayMatch = finalPart.match(/^(.+)\[(\d+)\]$/);
-
-  if (finalArrayMatch) {
-    const [, propertyName, indexStr] = finalArrayMatch;
-    const index = parseInt(indexStr, 10);
-
-    // Ensure the property exists and is an array
-    if (!(propertyName in current) || !Array.isArray(current[propertyName])) {
-      current[propertyName] = [];
-    } else {
-      current[propertyName] = [...current[propertyName]];
-    }
-
-    // Ensure the array is long enough
-    while (current[propertyName].length <= index) {
-      current[propertyName].push(null);
-    }
-
-    // Set the array element
-    current[propertyName][index] = value;
-  } else {
-    // Regular property
-    current[finalPart] = value;
-  }
-
+  // Use lodash set with a deep clone to maintain immutability
+  const result = cloneDeep(obj);
+  set(result, path, value);
   return result;
 }
 
@@ -128,65 +54,11 @@ export function setNestedProperty(obj: any, path: string, value: any): any {
  */
 export function getNestedProperty(obj: any, path: string): any {
   if (!obj || !path) return undefined;
-
-  // Split by dots, but handle array indices properly
-  const parts = path.split(".");
-  let current = obj;
-
-  for (const part of parts) {
-    if (current === null || current === undefined) return undefined;
-
-    // Check if this part contains an array index
-    const arrayMatch = part.match(/^(.+)\[(\d+)\]$/);
-    if (arrayMatch) {
-      const [, propertyName, indexStr] = arrayMatch;
-      const index = parseInt(indexStr, 10);
-
-      if (!Array.isArray(current[propertyName])) return undefined;
-      current = current[propertyName][index];
-    } else {
-      current = current[part];
-    }
-  }
-
-  return current;
+  return get(obj, path);
 }
 
-/**
- * Creates a debounced function that delays invoking the provided function
- * until after the specified delay has elapsed since the last time it was invoked.
- * Each time the debounced function is invoked, it cancels the previous delayed invocation
- * and reschedules a new one.
- *
- * @param func - The function to debounce
- * @param delay - The number of milliseconds to delay
- * @returns A debounced version of the function
- *
- * @example
- * const debouncedSave = debounce((data) => saveToAPI(data), 300);
- * debouncedSave("data1"); // Will be cancelled
- * debouncedSave("data2"); // Will be cancelled
- * debouncedSave("data3"); // Only this will execute after 300ms
- */
-export function debounce<T extends (...args: any[]) => any>(
-  func: T,
-  delay: number
-): (...args: Parameters<T>) => void {
-  let timeoutId: NodeJS.Timeout | null = null;
-
-  return (...args: Parameters<T>) => {
-    // Clear the previous timeout
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-
-    // Set a new timeout
-    timeoutId = setTimeout(() => {
-      func(...args);
-      timeoutId = null;
-    }, delay);
-  };
-}
+// Re-export lodash debounce for consistency
+export { debounce };
 
 /**
  * Computes the final user object by applying pending updates to the server user
@@ -214,8 +86,8 @@ export function computeUser(
 ): any {
   if (!serverUser) return null;
 
-  // Start with a deep copy of the server user
-  let computedUser = JSON.parse(JSON.stringify(serverUser));
+  // Start with a deep copy of the server user using lodash cloneDeep
+  let computedUser = cloneDeep(serverUser);
 
   // Apply each pending update in order
   for (const pendingUpdate of pendingUpdates) {
