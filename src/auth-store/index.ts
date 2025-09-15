@@ -86,21 +86,25 @@ export const authStore = create<AuthStore>()((set, get, store) => {
         set({
           status: payload ? "authenticated" : "anonymous",
           payload: payload || null,
-          // If current payload sub is the same as the user, keep the user
-          user: payload?.sub === get().user?.Uid ? get().user : null,
+          // If current payload sub is not the same as the current serverUser,
+          // nullify the serverUser
+          serverUser:
+            payload?.sub === get().serverUser?.Uid ? get().serverUser : null,
+          // and persistUser
           persistUser:
-            payload?.sub === get().user?.Uid ? get().persistUser : null,
+            payload?.sub === get().serverUser?.Uid ? get().persistUser : null,
+          // no need to set user as it is computed from serverUser and pendingUpdates
         });
 
         log(logPrefix, "Applied payload");
 
         if (payload) {
+          // If there is a payload, fetch the user
           const fetchedUser = await outseta.getUser();
-          const currentPayload = get().payload;
 
           log(logPrefix, "Fetched user data", { fetchedUser });
 
-          if (fetchedUser?.Uid !== currentPayload?.sub) {
+          if (fetchedUser?.Uid !== payload?.sub) {
             await get().reset("payload/user mismatch");
           } else {
             set({
@@ -136,7 +140,9 @@ export const authStore = create<AuthStore>()((set, get, store) => {
           throw new Error("Authentication required");
         }
 
-        // Create a new pending update
+        // Create a new pending update,
+        // a store subscriber will automatically compute the user and persist updates
+        // and make sure the changes are persisted
         const pendingUpdate: PendingUpdate = {
           updates,
           timestamp: Date.now(),
