@@ -23,6 +23,7 @@ export interface AuthState {
   pendingUpdates: PendingUpdate[]; // Queue of optimistic updates
   user: OutsetaUser | null; // Computed: serverUser + pendingUpdates
   payload: any;
+  persistUser: ((data: any) => Promise<any>) | null; // Function to persist user updates
 }
 
 export interface AuthActions {
@@ -30,10 +31,19 @@ export interface AuthActions {
   syncUser: (event?: string) => Promise<void>;
   updateUser: (updates: Record<string, any>) => void;
   updateUserProperty: (propertyName: string, newValue: any) => void;
-  persistUser: ((data: any) => Promise<any>) | null;
 }
 
 export interface AuthStore extends AuthState, AuthActions {}
+
+// Initial state for the auth store
+const initialState: AuthState = {
+  status: "pending",
+  serverUser: null,
+  pendingUpdates: [],
+  user: null,
+  payload: null,
+  persistUser: null,
+};
 
 // Log Helper
 const log = (...args: any[]) => {
@@ -41,15 +51,10 @@ const log = (...args: any[]) => {
 };
 
 // Create the Zustand store
-export const authStore = create<AuthStore>()((set, get, store) => {
+export const authStore = create<AuthStore>()((set, get) => {
   return {
     // State
-    status: "pending",
-    serverUser: null,
-    pendingUpdates: [],
-    user: null,
-    payload: null,
-    persistUser: null,
+    ...initialState,
 
     /**
      * Clears the user data from the store
@@ -58,7 +63,7 @@ export const authStore = create<AuthStore>()((set, get, store) => {
     reset: async (event: string = "manual") => {
       const logPrefix = `resetStore ${event} -|`;
       try {
-        set(store.getInitialState());
+        set(initialState);
         await get().syncUser(event);
         log(logPrefix, "Reset store completed");
       } catch (error) {
