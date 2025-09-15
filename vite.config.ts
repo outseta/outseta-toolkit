@@ -35,7 +35,7 @@ export default defineConfig({
     // Enable source maps for debugging
     sourcemap: true,
     // Ensure proper module format
-    minify: false,
+    minify: true,
   },
   // Enable TypeScript support
   esbuild: {
