@@ -18,20 +18,16 @@ export interface AuthState {
 }
 
 export interface AuthActions {
+  reset: (event?: string) => Promise<void>;
   syncUser: (event?: string) => Promise<void>;
-  resetUser: (event?: string) => void;
   updateUser: ((data: any) => Promise<any>) | null;
   updateUserProperty: (propertyName: string, newValue: any) => Promise<void>;
 }
 
 export interface AuthStore extends AuthState, AuthActions {}
 
-const log = (...args: any[]) => {
-  outsetaLog("auth.store")(...args, { storeData: { ...authStore.getState() } });
-};
-
 // Create the Zustand store
-export const authStore = create<AuthStore>((set, get) => {
+export const authStore = create<AuthStore>()((set, get, store) => {
   // Internal tracking for user update sequence (not part of store state)
   let userUpdateSequence = 0;
 
@@ -61,7 +57,7 @@ export const authStore = create<AuthStore>((set, get) => {
       // Only update store with server data if this is still the latest API call
       // This prevents stale data from overwriting newer optimistic updates
       if (updatedUser?.Uid !== currentPayload?.sub) {
-        await get().resetUser("payload/user mismatch");
+        await get().reset("payload/user mismatch");
       } else if (currentUserUpdateSequence !== userUpdateSequence) {
         log(logPrefix, "Stale user data, skipping apply");
       } else {
@@ -86,16 +82,11 @@ export const authStore = create<AuthStore>((set, get) => {
      * Clears the user data from the store
      * @param event - The event that triggered the clear (for logging purposes)
      */
-    resetUser: async (event: string = "manual") => {
+    reset: async (event: string = "manual") => {
       const logPrefix = `resetUser ${event} -|`;
       try {
         userUpdateSequence = 0; // Reset sequence
-        set({
-          status: "pending",
-          payload: null,
-          user: null,
-          updateUser: null,
-        });
+        set(store.getInitialState());
         await get().syncUser(event);
         log(logPrefix, "Reset user completed");
       } catch (error) {
@@ -140,7 +131,7 @@ export const authStore = create<AuthStore>((set, get) => {
         log(logPrefix, "Fetched user data", { fetchedUser });
 
         if (fetchedUser?.Uid !== currentPayload?.sub) {
-          await get().resetUser("payload/user mismatch");
+          await get().reset("payload/user mismatch");
         } else if (
           // If no current user, or the sequence is different, apply the fetched user
           !currentUser ||
@@ -238,7 +229,7 @@ const setupEventListeners = () => {
     outseta.on(event, () => authStore.getState().syncUser(event));
   });
 
-  outseta.on("logout", () => authStore.getState().resetUser("logout"));
+  outseta.on("logout", () => authStore.getState().reset("logout"));
 
   log("Event listeners setup complete");
 };
@@ -248,3 +239,8 @@ if (typeof window !== "undefined") {
   authStore.getState().syncUser("init");
   setupEventListeners();
 }
+
+// Log Helper
+const log = (...args: any[]) => {
+  outsetaLog("auth.store")(...args, { storeData: { ...authStore.getState() } });
+};
