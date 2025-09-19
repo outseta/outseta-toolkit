@@ -6,7 +6,7 @@ export function isFramerCanvas(): boolean {
   try {
     return window.location.host.includes("framercanvas.com");
   } catch (error) {
-    // If any detection method fails, assume we're not in Framer
+    // If it fails, assume we're not in Framer
     return false;
   }
 }

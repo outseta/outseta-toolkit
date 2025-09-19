@@ -20,16 +20,21 @@ export const initializeAuthStore = (outseta: Outseta | null) => {
 // Lazy initialization - store is only created when first accessed
 let _authStore: StoreApi<AuthStore> | null = null;
 
-export const createAuthStore = (isSandboxed: boolean) => {
+export const createAuthStore = (
+  isSandboxed: boolean,
+  hostname = window?.location.hostname || "ssr"
+) => {
   if (!_authStore) {
     const outseta = getOutseta();
-    if (!isSandboxed && !outseta) {
-      throw new Error(
+
+    if (hostname !== "ssr" && !isSandboxed && !outseta) {
+      console.error(
         "Outseta is not available, have you added the Outseta Script and Options to the head of the site?"
       );
     }
+
     log("Initializing auth store", {
-      domain: window.location.hostname,
+      domain: hostname,
     });
     _authStore = initializeAuthStore(outseta);
   }

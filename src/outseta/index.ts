@@ -39,11 +39,7 @@ let _cachedDebugScope: string | null = null;
 
 const initializeDebugScope = () => {
   if (_cachedDebugScope === null) {
-    if (!window.localStorage) {
-      _cachedDebugScope = "";
-    } else {
-      _cachedDebugScope = window.localStorage.getItem("outseta.debug");
-    }
+    _cachedDebugScope = window?.localStorage?.getItem("outseta.debug") || "";
   }
   return _cachedDebugScope;
 };
