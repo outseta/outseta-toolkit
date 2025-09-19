@@ -33,7 +33,7 @@ export default defineConfig({
     // Target modern browsers for better tree shaking
     target: "es2020",
     // Enable source maps for debugging
-    sourcemap: true,
+    sourcemap: false,
     // Ensure proper module format
     minify: true,
   },

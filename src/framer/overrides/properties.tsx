@@ -1,9 +1,10 @@
 import React, { forwardRef } from "react";
-import { authStore } from "../../auth-store";
-import { outsetaLog } from "../../outseta";
+import { OutsetaLogger } from "../../outseta";
 import { getNestedProperty } from "../../auth-store/utils";
 
-import { compare } from "./compare";
+import useAuthStore from "./useAuthStore";
+
+import { compare } from "./utils";
 
 type PropertyOptions = {
   name: string;
@@ -16,7 +17,7 @@ type ComparePropertyOptions = {
   flags?: "ignore-case"[];
 };
 
-const log = outsetaLog("framer.overrides");
+const log = OutsetaLogger(`framer.overrides.properties`);
 
 /**
  * Maps property names to their source (user or payload)
@@ -85,8 +86,8 @@ export function withProperty(
     const logPrefix = `withUserProperty ${propertyName} -|`;
 
     try {
-      const user = authStore((state) => state.user);
-      const payload = authStore((state) => state.payload);
+      const user = useAuthStore((state) => state.user);
+      const payload = useAuthStore((state) => state.payload);
 
       if (!user) {
         throw new Error("User loaded required");
@@ -125,7 +126,7 @@ export function withImageProperty(
     const logPrefix = `withUserImageProperty ${propertyName} -|`;
 
     try {
-      const user = authStore((state) => state.user);
+      const user = useAuthStore((state) => state.user);
 
       if (!user) {
         throw new Error("User loaded required");
@@ -194,8 +195,8 @@ export function showForProperty(
     const logPrefix = `showForUserProperty ${propertyName} -|`;
 
     try {
-      const user = authStore((state) => state.user);
-      const payload = authStore((state) => state.payload);
+      const user = useAuthStore((state) => state.user);
+      const payload = useAuthStore((state) => state.payload);
 
       if (!user) {
         throw new Error("User loaded required");
@@ -248,8 +249,8 @@ export function hideForProperty(
     const logPrefix = `hideForUserProperty ${propertyName} -|`;
 
     try {
-      const user = authStore((state) => state.user);
-      const payload = authStore((state) => state.payload);
+      const user = useAuthStore((state) => state.user);
+      const payload = useAuthStore((state) => state.payload);
 
       if (!user) {
         throw new Error("User loaded required");
@@ -302,8 +303,8 @@ export function primaryVariantForProperty(
     const logPrefix = `variantForProperty ${propertyName} -|`;
 
     try {
-      const user = authStore((state) => state.user);
-      const payload = authStore((state) => state.payload);
+      const user = useAuthStore((state) => state.user);
+      const payload = useAuthStore((state) => state.payload);
 
       const propertyValue = getPropertyValue({ user, payload }, propertyName);
       const resolvedValue = resolveValue(value, props);
@@ -345,8 +346,10 @@ export function toggleProperty(
   return forwardRef((props, ref) => {
     const logPrefix = `toggleUserProperty ${propertyName} -|`;
     try {
-      const user = authStore((state) => state.user);
-      const updateUserProperty = authStore((state) => state.updateUserProperty);
+      const user = useAuthStore((state) => state.user);
+      const updateUserProperty = useAuthStore(
+        (state) => state.updateUserProperty
+      );
 
       if (!user) {
         throw new Error("User loaded required");
