@@ -22,17 +22,10 @@ export function showForAuthStatus(
 
     try {
       const status = useAuthStore((state) => state.status);
-      const user = useAuthStore((state) => state.user);
 
       log(logPrefix, { status, validStatus });
 
       switch (validStatus) {
-        case "user-loaded":
-          if (!user) {
-            throw new Error("User not loaded");
-          }
-          break;
-
         case "anonymous":
           if (status !== "anonymous") {
             throw new Error("Not in anonymous state");
@@ -57,6 +50,26 @@ export function showForAuthStatus(
 
       log(logPrefix, "Status match, showing component");
       return <Component ref={ref} {...props} />;
+    } catch (error) {
+      if (error instanceof Error) {
+        log(logPrefix, "Hiding component", error.message);
+      } else {
+        log(logPrefix, "Hiding component", error);
+      }
+      return null;
+    }
+  });
+}
+
+export function selectAuthVariant(
+  Component: React.ComponentType<any>
+): React.ComponentType<any> {
+  return forwardRef((props, ref) => {
+    const logPrefix = `selectAuthStatusVariant -|`;
+    try {
+      const status = useAuthStore((state) => state.status);
+      log(logPrefix, { status });
+      return <Component ref={ref} {...props} variant={status} />;
     } catch (error) {
       if (error instanceof Error) {
         log(logPrefix, "Hiding component", error.message);

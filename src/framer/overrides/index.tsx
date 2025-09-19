@@ -1,15 +1,8 @@
 // Re-export all authentication-related functions
-export { showForAuthStatus, triggerPopup, triggerAction } from "./auth";
+export * as auth from "./auth";
 
 // Re-export all property-related functions
-export {
-  toggleProperty,
-  showForProperty,
-  withProperty,
-  withImageProperty,
-  hideForProperty,
-  primaryVariantForProperty,
-} from "./properties";
+export * as user from "./properties";
 
 // Re-export test functions
 export { withTestText } from "./test";

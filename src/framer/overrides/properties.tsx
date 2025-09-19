@@ -17,7 +17,17 @@ type ComparePropertyOptions = {
   flags?: "ignore-case"[];
 };
 
-const log = OutsetaLogger(`framer.overrides.properties`);
+type MatchVariantOptions = {
+  matchVariant?: string;
+  noMatchVariant?: string;
+};
+
+const matchVariantDefaults: MatchVariantOptions = {
+  matchVariant: "Match",
+  noMatchVariant: "NoMatch",
+};
+
+const log = OutsetaLogger(`framer.overrides.user`);
 
 /**
  * Maps property names to their source (user or payload)
@@ -30,6 +40,7 @@ function mapPropertyToSource(propertyName: string): {
 } {
   switch (propertyName) {
     case "CurrentPlanUid":
+    case "CurrentPlanUids":
       return { mappedName: "outseta:planUid", source: "payload" };
     case "CurrentAddOnUids":
       return { mappedName: "outseta:addOnUids", source: "payload" };
@@ -103,9 +114,9 @@ export function withProperty(
       return <Component ref={ref} {...props} text={propertyValue} />;
     } catch (error) {
       if (error instanceof Error) {
-        log(logPrefix, "Hiding component", error.message);
+        log(logPrefix, "Hiding component -", error.message);
       } else {
-        log(logPrefix, "Hiding component", error);
+        log(logPrefix, "Hiding component -", error);
       }
       return null;
     }
@@ -164,9 +175,9 @@ export function withImageProperty(
       );
     } catch (error) {
       if (error instanceof Error) {
-        log(logPrefix, "Hiding component", error.message);
+        log(logPrefix, "Hiding component -", error.message);
       } else {
-        log(logPrefix, "Hiding component", error);
+        log(logPrefix, "Hiding component -", error);
       }
       return null;
     }
@@ -218,9 +229,9 @@ export function showForProperty(
       return <Component ref={ref} {...props} />;
     } catch (error) {
       if (error instanceof Error) {
-        log(logPrefix, "Hiding component", error.message);
+        log(logPrefix, "Hiding component -", error.message);
       } else {
-        log(logPrefix, "Hiding component", error);
+        log(logPrefix, "Hiding component -", error);
       }
       return null;
     }
@@ -272,9 +283,128 @@ export function hideForProperty(
       return <Component ref={ref} {...props} />;
     } catch (error) {
       if (error instanceof Error) {
-        log(logPrefix, "Hiding component", error.message);
+        log(logPrefix, "Hiding component -", error.message);
       } else {
-        log(logPrefix, "Hiding component", error);
+        log(logPrefix, "Hiding component -", error);
+      }
+      return null;
+    }
+  });
+}
+
+/**
+ * Creates a toggle action for any property
+ * @param Component - The component to wrap
+ * @param options - Configuration
+ * @param options.name - Property name
+ * @param options.value - Value to toggle (can be "props.propertyName")
+ */
+export function toggleProperty(
+  Component: React.ComponentType<any>,
+  {
+    name: propertyName,
+    value: valueToToggle,
+    matchVariant = matchVariantDefaults.matchVariant,
+    noMatchVariant = matchVariantDefaults.noMatchVariant,
+  }: {
+    name: string;
+    value: string;
+  } & MatchVariantOptions
+): React.ComponentType<any> {
+  return forwardRef((props, ref) => {
+    const logPrefix = `toggleUserProperty ${propertyName} -|`;
+
+    try {
+      const user = useAuthStore((state) => state.user);
+      const updateUserProperty = useAuthStore(
+        (state) => state.updateUserProperty
+      );
+
+      if (!user) {
+        throw new Error("User loaded required");
+      }
+
+      // Resolve toggle value from props if needed
+      const resolvedValueToToggle = resolveValue(valueToToggle, props);
+
+      // No toggle properties in payload, so no need to use getPropertyValue
+      const propertyValue = getNestedProperty(user, propertyName) || "";
+      const propertyValueAsArray =
+        typeof propertyValue === "string"
+          ? propertyValue.split(",").map((item) => item?.trim())
+          : [];
+
+      log(logPrefix, { user, valueToToggle: resolvedValueToToggle });
+
+      const handleClick = async (event: React.MouseEvent) => {
+        event.preventDefault();
+
+        const newPropertyValueAsArray = [
+          // Filter out the toggle value and empty values
+          ...propertyValueAsArray.filter(
+            (item) => item !== resolvedValueToToggle && item.trim() !== ""
+          ),
+          // Add toggle value at the end if not included in current value
+          ...(propertyValueAsArray.includes(resolvedValueToToggle)
+            ? []
+            : [resolvedValueToToggle]),
+        ].filter((item) => item.trim() !== ""); // Final filter to remove any empty values
+
+        await updateUserProperty(
+          propertyName,
+          newPropertyValueAsArray.join(", ")
+        );
+
+        // Call original onClick if provided
+        if (props.onClick) {
+          props.onClick(event);
+        }
+      };
+
+      const active = propertyValueAsArray.includes(resolvedValueToToggle);
+
+      return (
+        <Component
+          ref={ref}
+          {...props}
+          variant={active ? matchVariant : noMatchVariant}
+          onClick={handleClick}
+        />
+      );
+    } catch (error) {
+      if (error instanceof Error) {
+        log(logPrefix, "Hiding component -", error.message);
+      } else {
+        log(logPrefix, "Hiding component -", error);
+      }
+      return null;
+    }
+  });
+}
+
+export function selectPropertyVariant(
+  Component: React.ComponentType<any>,
+  { name: propertyName }: PropertyOptions
+): React.ComponentType<any> {
+  return forwardRef((props, ref) => {
+    const logPrefix = `selectPropertyVariant ${propertyName} -|`;
+
+    try {
+      const user = useAuthStore((state) => state.user);
+      const payload = useAuthStore((state) => state.payload);
+
+      if (!user) {
+        throw new Error("User loaded required");
+      }
+
+      const propertyValue = getPropertyValue({ user, payload }, propertyName);
+      log(logPrefix, { variant: propertyValue, props });
+      return <Component ref={ref} {...props} variant={propertyValue} />;
+    } catch (error) {
+      if (error instanceof Error) {
+        log(logPrefix, "Hiding component -", error.message);
+      } else {
+        log(logPrefix, "Hiding component -", error);
       }
       return null;
     }
@@ -290,21 +420,27 @@ export function hideForProperty(
  * @param options.compare - Comparison type: "equal" or "array-includes"
  * @param options.flags - Additional flags like ["ignore-case"]
  */
-export function primaryVariantForProperty(
+export function selectPropertyMatchVariant(
   Component: React.ComponentType<any>,
   {
     name: propertyName,
     value,
     compare: compareType = "equal",
     flags = [],
-  }: ComparePropertyOptions
+    matchVariant = matchVariantDefaults.matchVariant,
+    noMatchVariant = matchVariantDefaults.noMatchVariant,
+  }: ComparePropertyOptions & MatchVariantOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `variantForProperty ${propertyName} -|`;
+    const logPrefix = `selectPropertyMatchVariant ${propertyName} -|`;
 
     try {
       const user = useAuthStore((state) => state.user);
       const payload = useAuthStore((state) => state.payload);
+
+      if (!user) {
+        throw new Error("User loaded required");
+      }
 
       const propertyValue = getPropertyValue({ user, payload }, propertyName);
       const resolvedValue = resolveValue(value, props);
@@ -316,97 +452,17 @@ export function primaryVariantForProperty(
         ["props.variant"]: props.variant,
       });
 
-      if (!compare(propertyValue, resolvedValue, compareType, flags)) {
-        throw new Error("Match not found");
-      }
-      log(logPrefix, "Match found - defaulting to primary variant");
-      return <Component ref={ref} {...props} variant={undefined} />;
+      const variant = compare(propertyValue, resolvedValue, compareType, flags)
+        ? matchVariant
+        : noMatchVariant;
+
+      log(logPrefix, { variant });
+      return <Component ref={ref} {...props} variant={variant} />;
     } catch (error) {
       if (error instanceof Error) {
-        log(logPrefix, "Keeping current variant", error.message);
+        log(logPrefix, "Hiding component -", error.message);
       } else {
-        log(logPrefix, "Keeping current variant", error);
-      }
-      return <Component ref={ref} {...props} />;
-    }
-  });
-}
-
-/**
- * Creates a toggle action for any property
- * @param Component - The component to wrap
- * @param options - Configuration
- * @param options.name - Property name
- * @param options.value - Value to toggle (can be "props.propertyName")
- */
-export function toggleProperty(
-  Component: React.ComponentType<any>,
-  { name: propertyName, value: toggleValue }: { name: string; value: string }
-): React.ComponentType<any> {
-  return forwardRef((props, ref) => {
-    const logPrefix = `toggleUserProperty ${propertyName} -|`;
-    try {
-      const user = useAuthStore((state) => state.user);
-      const updateUserProperty = useAuthStore(
-        (state) => state.updateUserProperty
-      );
-
-      if (!user) {
-        throw new Error("User loaded required");
-      }
-
-      // Resolve toggle value from props if needed
-      const resolvedToggleValue = resolveValue(toggleValue, props);
-
-      // No image property in payload, so no need to use getPropertyValue
-      const propertyValue = getNestedProperty(user, propertyName) || "";
-      const propertyValueAsArray =
-        typeof propertyValue === "string"
-          ? propertyValue.split(",").map((item) => item.trim())
-          : [];
-
-      const handleClick = async (event: React.MouseEvent) => {
-        event.preventDefault();
-
-        log(logPrefix, { resolvedToggleValue });
-
-        const newPropertyValueAsArray = [
-          // Filter out the toggle value and empty values
-          ...propertyValueAsArray.filter(
-            (item) => item !== resolvedToggleValue && item.trim() !== ""
-          ),
-          // Add toggle value at the end if not included in current value
-          ...(propertyValueAsArray.includes(resolvedToggleValue)
-            ? []
-            : [resolvedToggleValue]),
-        ].filter((item) => item.trim() !== ""); // Final filter to remove any empty values
-
-        await updateUserProperty(
-          propertyName,
-          newPropertyValueAsArray.join(", ")
-        );
-
-        // Call original onClick if provided
-        if (props.onClick) {
-          props.onClick(event);
-        }
-      };
-
-      const active = propertyValueAsArray.includes(resolvedToggleValue);
-
-      return (
-        <Component
-          ref={ref}
-          {...props}
-          variant={active ? props.variant : undefined}
-          onClick={handleClick}
-        />
-      );
-    } catch (error) {
-      if (error instanceof Error) {
-        log(logPrefix, "Hiding component", error.message);
-      } else {
-        log(logPrefix, "Hiding component", error);
+        log(logPrefix, "Hiding component -", error);
       }
       return null;
     }
