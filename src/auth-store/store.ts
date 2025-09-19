@@ -114,7 +114,7 @@ export const createStoreInstance = ({
 
         // Only update serverUser if we have a result and this is the most recent request
         if (requestId === requestCounter) {
-          // If sucessful the updatedServerUser has a value,
+          // If successful the updatedServerUser has a value,
           // otherwise use the existing serverUser
           serverUser = updatedServerUser || serverUser;
           // Update the store with the new computed user
