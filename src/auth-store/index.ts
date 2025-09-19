@@ -12,15 +12,12 @@ export const initializeAuthStore = (outseta: Outseta | null) => {
   log("initializeAuthStore -|", window?.location?.hostname, { outseta });
 
   const store = createStoreInstance({ outseta, log });
-  setTimeout(() => {
-    // Wait until next tick to sync user
-    // React SSR to Client needs stable initial state for initial render
+  queueMicrotask(() => {
     store.getState().syncUser("init");
     if (outseta) {
       setupEventListeners({ outseta, store });
     }
-  }, 0);
-
+  });
   return store;
 };
 
