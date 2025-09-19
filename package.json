@@ -17,7 +17,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "vite build && tsc",
+    "build": "vite build && tsc --project tsconfig.build.json && npm run clean-types",
+    "clean-types": "rm -rf dist/auth-store dist/outseta",
     "dev": "vite build --watch",
     "preview": "vite preview",
     "type-check": "tsc --noEmit",

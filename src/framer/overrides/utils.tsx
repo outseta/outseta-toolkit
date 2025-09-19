@@ -1,3 +1,16 @@
+/**
+ * Detects if the current environment is Framer canvas mode
+ * @returns true if running in Framer canvas
+ */
+export function isFramerCanvas(): boolean {
+  try {
+    return window.location.host.includes("framercanvas.com");
+  } catch (error) {
+    // If any detection method fails, assume we're not in Framer
+    return false;
+  }
+}
+
 function arrayIncludes(array: any[], value: any, flags?: "ignore-case"[]) {
   if (flags?.includes("ignore-case")) {
     return array.some((item: any) => {

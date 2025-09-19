@@ -10,3 +10,6 @@ export {
   hideForProperty,
   primaryVariantForProperty,
 } from "./properties";
+
+// Re-export test functions
+export { withTestText } from "./test";

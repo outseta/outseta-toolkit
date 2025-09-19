@@ -1,21 +1,9 @@
 import React, { forwardRef } from "react";
-import { authStore, type AuthStatus } from "../../auth-store";
-import { outsetaLog } from "../../outseta";
+import { OutsetaLogger } from "../../outseta";
 
-const log = outsetaLog("framer.overrides");
+import useAuthStore, { type AuthStatus } from "./useAuthStore";
 
-/**
- * Detects if the current environment is Framer canvas mode
- * @returns true if running in Framer canvas
- */
-function isFramerCanvas(): boolean {
-  try {
-    return window.location.host.includes("framercanvas.com");
-  } catch (error) {
-    // If any detection method fails, assume we're not in Framer
-    return false;
-  }
-}
+const log = OutsetaLogger("framer.overrides.auth");
 
 /**
  * Shows a component only when the authentication state matches the specified state
@@ -33,11 +21,10 @@ export function showForAuthStatus(
     const logPrefix = `showForAuthStatus ${validStatus} -|`;
 
     try {
-      const status = authStore((state) => state.status);
-      const user = authStore((state) => state.user);
-      const isFramerEnv = isFramerCanvas();
+      const status = useAuthStore((state) => state.status);
+      const user = useAuthStore((state) => state.user);
 
-      log(logPrefix, { status, validStatus, isFramerEnv });
+      log(logPrefix, { status, validStatus });
 
       switch (validStatus) {
         case "user-loaded":
@@ -47,7 +34,7 @@ export function showForAuthStatus(
           break;
 
         case "anonymous":
-          if (!isFramerEnv && status !== "anonymous") {
+          if (status !== "anonymous") {
             throw new Error("Not in anonymous state");
           }
           break;
@@ -97,10 +84,9 @@ export function triggerPopup(
     const logPrefix = `triggerPopup ${embed} -|`;
 
     try {
-      const status = authStore((state) => state.status);
-      const isFramerEnv = isFramerCanvas();
+      const status = useAuthStore((state) => state.status);
 
-      log(logPrefix, { status, isFramerEnv });
+      log(logPrefix, { status });
 
       // Set appropriate data attributes based on embed type
       const dataAttributes: Record<string, string> = {
@@ -109,14 +95,14 @@ export function triggerPopup(
 
       switch (embed) {
         case "register":
-          if (!isFramerEnv && status !== "anonymous") {
+          if (status !== "anonymous") {
             throw new Error("Not anonymous");
           }
           dataAttributes["data-o-auth"] = "1";
           dataAttributes["data-widget-mode"] = "register";
           break;
         case "login":
-          if (!isFramerEnv && status !== "anonymous") {
+          if (status !== "anonymous") {
             throw new Error("Not anonymous");
           }
           dataAttributes["data-o-auth"] = "1";
@@ -161,7 +147,7 @@ export function triggerAction(
     const logPrefix = `triggerAction ${action} -|`;
 
     try {
-      const status = authStore((state) => state.status);
+      const status = useAuthStore((state) => state.status);
 
       log(logPrefix, { status });
 

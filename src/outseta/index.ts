@@ -14,43 +14,35 @@ export type {
 // Declare module augmentation for better IDE support
 declare global {
   interface Window {
+    outseta_onload: () => void;
     Outseta?: {
-      getUser: () => Promise<OutsetaUser>;
-      getJwtPayload: () => OutsetaJwtPayload;
+      getUser: () => Promise<OutsetaUser | null>;
+      getJwtPayload: () => OutsetaJwtPayload | null;
       on: (event: string, callback: () => void) => void;
-      debug: (namespace: string, ...args: any[]) => void;
+      debug: (...args: any[]) => void;
     };
   }
 }
 
-/**
- * Gets the Outseta instance from the global window object
- * Provides helpful logging if Outseta is not available
- *
- * @returns The Outseta instance if available, null otherwise
- */
+export type Outseta = typeof window.Outseta;
+
 export function getOutseta(): typeof window.Outseta | null {
-  if (typeof window !== "undefined" && window.Outseta) {
-    return window.Outseta;
-  } else if (typeof window !== "undefined") {
-    console.error(
-      "Outseta is missing, have you added the Outseta Script and Options to the head of the site?"
-    );
+  if (typeof window === "undefined" || !window.Outseta) {
     return null;
   }
+
+  return window.Outseta;
 }
 
 /**
  * Debug logging helper that uses Outseta's debug functionality
- * Only logs when Outseta debug is available and enabled
+ * Provides consistent module identification across all logging
  *
- * @param args - Arguments to log
+ * @param namespace - Module namespace for identification
+ * @returns A logging function with module ID
  */
-export function outsetaLog(namespace: string) {
+export function OutsetaLogger(namespace: string) {
   return (...args: any[]): void => {
-    const outseta = getOutseta();
-    if (outseta?.debug) {
-      outseta.debug(`outseta.toolkit.${namespace}`, ...args);
-    }
+    console.log(`[outseta.toolkit.${namespace}]`, ...args);
   };
 }

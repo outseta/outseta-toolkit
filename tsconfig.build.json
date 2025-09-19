@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/framer/overrides/index.tsx",
+    "src/framer/overrides/test.tsx"
+  ],
+  "compilerOptions": {
+    "emitDeclarationOnly": true,
+    "declaration": true,
+    "declarationMap": true,
+    "declarationDir": "dist",
+    "rootDir": "src"
+  }
+}
