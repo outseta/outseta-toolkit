@@ -43,12 +43,12 @@ export const createStoreInstance = ({
   createStore<AuthStore>()((set, get) => {
     // Non reactive state
     let serverUser: OutsetaUser = undefined;
-    let requestCounter = 0;
+    let requestCounter = 1;
     let pendingUpdates: Array<{
       updates: Record<string, any>;
       timestamp: number;
       id: string;
-      processing?: boolean;
+      requestId?: number;
     }> = [];
     let persistUser:
       | ((data: OutsetaUser) => Promise<OutsetaUser | null>)
@@ -71,7 +71,7 @@ export const createStoreInstance = ({
 
       // Only process updates that aren't currently being processed
       const updatesToProcess = pendingUpdates.filter(
-        (update) => !update.processing
+        (update) => !update.requestId
       );
 
       if (updatesToProcess.length === 0 || !persistUser) {
@@ -83,14 +83,10 @@ export const createStoreInstance = ({
       }
 
       // Generate unique request ID to track order and prevent race conditions
-      const requestNumber = ++requestCounter;
+      const requestId = ++requestCounter;
 
-      // Mark updates as processing to prevent duplicate processing
-      const newProcessingUpdateIds = updatesToProcess.map(
-        (update) => update.id
-      );
       updatesToProcess.forEach((update) => {
-        update.processing = true;
+        update.requestId = requestId;
       });
 
       const combinedUpdates = updatesToProcess.reduce(
@@ -107,7 +103,7 @@ export const createStoreInstance = ({
         log(logPrefix, "Processing updates", {
           updatesToProcess,
           combinedUpdates,
-          requestNumber,
+          requestId,
         });
         updatedServerUser = await persistUser(combinedUpdates);
       } catch (error) {
@@ -115,31 +111,33 @@ export const createStoreInstance = ({
       } finally {
         // Remove the processed updates completely
         pendingUpdates = pendingUpdates.filter(
-          (update) => !newProcessingUpdateIds.includes(update.id)
+          (update) => update.requestId !== requestId
         );
 
-        if (!pendingUpdates.length) {
-          // Reset request counter when no remaining updates
-          requestCounter = 0;
-          log("No remaining updates, reset request counter");
-        }
-
         // Only update serverUser if we have a result and this is the most recent request
-        if (updatedServerUser && requestNumber === requestCounter) {
-          serverUser = updatedServerUser;
+        if (requestId === requestCounter) {
+          // If sucessful the updatedServerUser has a value,
+          // otherwise use the existing serverUser
+          serverUser = updatedServerUser || serverUser;
           // Update the store with the new computed user
           const computedUser = computeUser(serverUser, pendingUpdates);
           set({ user: computedUser });
 
           log(logPrefix, "Latest request - updated user", {
             updatedServerUser,
-            requestId: requestNumber,
+            requestId,
           });
         } else if (updatedServerUser) {
-          log(logPrefix, "Discarded stale response - newer request exists -", {
-            requestId: requestNumber,
+          log(logPrefix, "Discarded stale response - newer request exists", {
+            requestId,
             currentRequest: requestCounter,
           });
+        }
+
+        if (!pendingUpdates.length) {
+          // Reset request counter when no remaining updates
+          requestCounter = 0;
+          log("No remaining updates, reset request counter");
         }
       }
     }, 500);
