@@ -331,7 +331,7 @@ export function toggleProperty(
       const propertyValue = getNestedProperty(user, propertyName) || "";
       const propertyValueAsArray =
         typeof propertyValue === "string"
-          ? propertyValue.split(",").map((item) => item?.trim())
+          ? propertyValue.split(",").map((item) => item.trim())
           : [];
 
       log(logPrefix, { user, valueToToggle: resolvedValueToToggle });
