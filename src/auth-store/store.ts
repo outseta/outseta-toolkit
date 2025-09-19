@@ -26,7 +26,6 @@ export interface AuthActions {
 
 export interface AuthStore extends AuthState, AuthActions {}
 
-// Initial state for the auth store
 const initialState: AuthState = {
   status: "pending",
   user: null,
@@ -35,13 +34,12 @@ const initialState: AuthState = {
 
 export const createStoreInstance = ({
   outseta,
-  log: logFn,
+  log,
 }: {
   outseta: Outseta | null;
   log: (...args: any[]) => void;
 }) =>
   createStore<AuthStore>()((set, get) => {
-    // Non reactive state
     let serverUser: OutsetaUser = undefined;
     let requestCounter = 1;
     let pendingUpdates: Array<{
@@ -55,8 +53,8 @@ export const createStoreInstance = ({
       | null = null;
 
     // Log Helper - fire-and-forget with store context
-    const log = (...args: any[]) => {
-      logFn(...args, {
+    const storeLog = (...args: any[]) => {
+      log(...args, {
         storeData: { ...get() },
         externalData: {
           serverUser,
@@ -75,7 +73,7 @@ export const createStoreInstance = ({
       );
 
       if (updatesToProcess.length === 0 || !persistUser) {
-        log(
+        storeLog(
           logPrefix,
           "No unprocessed updates available or persistUser function available"
         );
@@ -100,14 +98,14 @@ export const createStoreInstance = ({
       let updatedServerUser: OutsetaUser = undefined;
 
       try {
-        log(logPrefix, "Processing updates", {
+        storeLog(logPrefix, "Processing updates", {
           updatesToProcess,
           combinedUpdates,
           requestId,
         });
         updatedServerUser = await persistUser(combinedUpdates);
       } catch (error) {
-        log(logPrefix, "Failed to persist updates", error);
+        storeLog(logPrefix, "Failed to persist updates", error);
       } finally {
         // Remove the processed updates completely
         pendingUpdates = pendingUpdates.filter(
@@ -123,21 +121,25 @@ export const createStoreInstance = ({
           const computedUser = computeUser(serverUser, pendingUpdates);
           set({ user: computedUser });
 
-          log(logPrefix, "Latest request - updated user", {
+          storeLog(logPrefix, "Latest request - updated user", {
             updatedServerUser,
             requestId,
           });
         } else if (updatedServerUser) {
-          log(logPrefix, "Discarded stale response - newer request exists", {
-            requestId,
-            currentRequest: requestCounter,
-          });
+          storeLog(
+            logPrefix,
+            "Discarded stale response - newer request exists",
+            {
+              requestId,
+              currentRequest: requestCounter,
+            }
+          );
         }
 
         if (!pendingUpdates.length) {
           // Reset request counter when no remaining updates
           requestCounter = 0;
-          log("No remaining updates, reset request counter");
+          storeLog("No remaining updates, reset request counter");
         }
       }
     }, 500);
@@ -161,9 +163,9 @@ export const createStoreInstance = ({
 
           // Reset store state
           set(initialState);
-          log(logPrefix, "Reset store completed");
+          storeLog(logPrefix, "Reset store completed");
         } catch (error) {
-          log(logPrefix, "Reset store failed", error);
+          storeLog(logPrefix, "Reset store failed", error);
         }
       },
 
@@ -175,6 +177,7 @@ export const createStoreInstance = ({
        */
       syncUser: async (event: string = "manual") => {
         const logPrefix = `syncUser ${event} -|`;
+
         if (!outseta) {
           set({ status: "anonymous" });
           return;
@@ -188,7 +191,7 @@ export const createStoreInstance = ({
             payload: payload || null,
           });
 
-          log(logPrefix, get().status);
+          storeLog(logPrefix, get().status);
 
           if (!outseta) {
             return;
@@ -198,7 +201,7 @@ export const createStoreInstance = ({
           const fetchedUser = await outseta.getUser();
           const currentPayload = get().payload;
 
-          log(logPrefix, "Fetched user data", { fetchedUser });
+          storeLog(logPrefix, "Fetched user data", { fetchedUser });
 
           if (fetchedUser?.Uid !== currentPayload?.sub) {
             await get().reset("payload/user mismatch");
@@ -212,14 +215,14 @@ export const createStoreInstance = ({
               user: computedUser,
             });
 
-            log(logPrefix, "Applied user data", { fetchedUser });
+            storeLog(logPrefix, "Applied user data", { fetchedUser });
           }
         } catch (error) {
           // Don't change status on error, keep current state
           if (error instanceof Error) {
-            log(logPrefix, "Error - keeping current state", error.message);
+            storeLog(logPrefix, "Error - keeping current state", error.message);
           } else {
-            log(logPrefix, "Error - keeping current state", error);
+            storeLog(logPrefix, "Error - keeping current state", error);
           }
         }
       },
@@ -257,16 +260,20 @@ export const createStoreInstance = ({
           // Trigger debounced persistence
           debouncedPersistUpdates();
 
-          log(logPrefix, "Added pending update and computed optimistic user", {
-            updates,
-            pendingUpdate,
-            optimisticUser,
-          });
+          storeLog(
+            logPrefix,
+            "Added pending update and computed optimistic user",
+            {
+              updates,
+              pendingUpdate,
+              optimisticUser,
+            }
+          );
         } catch (error) {
           if (error instanceof Error) {
-            log(logPrefix, "Failed", error.message);
+            storeLog(logPrefix, "Failed", error.message);
           } else {
-            log(logPrefix, "Failed", error);
+            storeLog(logPrefix, "Failed", error);
           }
         }
       },

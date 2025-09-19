@@ -9,33 +9,34 @@ const log = OutsetaLogger("auth.store");
 
 // Create the Zustand store
 export const initializeAuthStore = (outseta: Outseta | null) => {
+  log("initializeAuthStore -|", window?.location?.hostname, { outseta });
+
   const store = createStoreInstance({ outseta, log });
-  store.getState().syncUser("init");
-  if (outseta) {
-    setupEventListeners({ outseta, store });
-  }
+  setTimeout(() => {
+    // Wait until next tick to sync user
+    // React SSR to Client needs stable initial state for initial render
+    store.getState().syncUser("init");
+    if (outseta) {
+      setupEventListeners({ outseta, store });
+    }
+  }, 0);
+
   return store;
 };
 
 // Lazy initialization - store is only created when first accessed
 let _authStore: StoreApi<AuthStore> | null = null;
 
-export const createAuthStore = (
-  isSandboxed: boolean,
-  hostname = window?.location.hostname || "ssr"
-) => {
+export const createAuthStore = (supressMissingOutsetaWarning: boolean) => {
   if (!_authStore) {
     const outseta = getOutseta();
 
-    if (hostname !== "ssr" && !isSandboxed && !outseta) {
+    if (!supressMissingOutsetaWarning && !outseta) {
       console.error(
         "Outseta is not available, have you added the Outseta Script and Options to the head of the site?"
       );
     }
 
-    log("Initializing auth store", {
-      domain: hostname,
-    });
     _authStore = initializeAuthStore(outseta);
   }
   return _authStore;
@@ -49,6 +50,8 @@ function setupEventListeners({
   outseta: NonNullable<Outseta>;
   store: StoreApi<AuthStore>;
 }) {
+  const logPrefix = "setupEventListeners -|";
+
   const { syncUser, reset }: AuthStore = store.getState();
 
   // Events that should sync user data
@@ -60,7 +63,7 @@ function setupEventListeners({
   ];
 
   syncUserEvents.forEach((event) => {
-    log(`Setting up Outseta event listener for ${event}`);
+    log(logPrefix, event);
     outseta.on(event, () => {
       syncUser(event);
     });
@@ -69,7 +72,7 @@ function setupEventListeners({
   const resetEvents = ["logout"];
 
   resetEvents.forEach((event) => {
-    log(`Setting up Outseta event listener for ${event}`);
+    log(logPrefix, event);
     outseta.on(event, () => {
       reset(event);
     });
