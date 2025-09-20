@@ -10,30 +10,12 @@ type AddOnOptions = {
   addOnUid: string;
 };
 
-type VariantOptions = {
-  withVariantName?: string;
-  withoutVariantName?: string;
+type VariantNames = {
+  whenTrue?: string;
+  whenFalse?: string;
 };
 
 const log = OutsetaLogger(`framer.overrides.subscriptions`);
-
-/**
- * Gets plan UID from JWT payload
- * @param payload - The JWT payload
- * @returns The plan UID
- */
-function getPlanUid(payload: any): string | null {
-  return payload?.["outseta:planUid"] || null;
-}
-
-/**
- * Gets add-on UIDs from JWT payload
- * @param payload - The JWT payload
- * @returns Array of add-on UIDs
- */
-function getAddOnUids(payload: any): string[] {
-  return payload?.["outseta:addOnUids"] || [];
-}
 
 /**
  * Resolves a value from props if it starts with "props."
@@ -68,7 +50,7 @@ export function showForPlan(
         throw new Error("JWT payload required");
       }
 
-      const currentPlanUid = getPlanUid(payload);
+      const currentPlanUid = payload["outseta:planUid"];
       const resolvedValuePlanUid = resolveValue(planUid, props);
 
       log(logPrefix, {
@@ -113,7 +95,7 @@ export function hideForPlan(
         throw new Error("JWT payload required");
       }
 
-      const currentPlanUid = getPlanUid(payload);
+      const currentPlanUid = payload["outseta:planUid"];
       const resolvedValuePlanUid = resolveValue(planUid, props);
 
       log(logPrefix, {
@@ -158,7 +140,7 @@ export function showForAddOnUid(
         throw new Error("JWT payload required");
       }
 
-      const currentAddOnUids = getAddOnUids(payload);
+      const currentAddOnUids = payload["outseta:addOnUids"];
       const resolvedValueAddOnUid = resolveValue(addOnUid, props);
 
       log(logPrefix, {
@@ -203,7 +185,7 @@ export function hideForAddOnUid(
         throw new Error("JWT payload required");
       }
 
-      const currentAddOnUids = getAddOnUids(payload);
+      const currentAddOnUids = payload["outseta:addOnUids"];
       const resolvedValueAddOnUid = resolveValue(addOnUid, props);
 
       log(logPrefix, {
@@ -245,7 +227,7 @@ export function withPlanUid(
         throw new Error("JWT payload required");
       }
 
-      const currentPlanUid = getPlanUid(payload);
+      const currentPlanUid = payload["outseta:planUid"];
 
       log(logPrefix, { currentPlanUid });
 
@@ -269,7 +251,7 @@ export function withPlanUid(
  * Sets component text to add-on UID values as comma-separated list
  * @param Component - The component to wrap
  */
-export function withAddOnUid(
+export function withAddOnUids(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
@@ -282,7 +264,7 @@ export function withAddOnUid(
         throw new Error("JWT payload required");
       }
 
-      const currentAddOnUids = getAddOnUids(payload);
+      const currentAddOnUids = payload["outseta:addOnUids"];
 
       log(logPrefix, { currentAddOnUids });
 
@@ -305,10 +287,10 @@ export function withAddOnUid(
 }
 
 /**
- * Selects the variant with the same name as the user's current plan
+ * Selects the variant with the same name as the user's current plan UID
  * @param Component - The component to wrap
  */
-export function selectPlanUidVariant(
+export function selectPlanVariant(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
@@ -321,7 +303,7 @@ export function selectPlanUidVariant(
         throw new Error("JWT payload required");
       }
 
-      const currentPlanUid = getPlanUid(payload);
+      const currentPlanUid = payload["outseta:planUid"];
 
       log(logPrefix, {
         currentPlanUid,
@@ -344,23 +326,23 @@ export function selectPlanUidVariant(
 }
 
 /**
- * Selects variant based on plan UID presence
+ * Selects variant for plan UID presence
  * @param Component - The component to wrap
  * @param options - Configuration
  * @param options.planUid - Plan UID to check for
- * @param options.withVariantName - Variant name when plan matches (default: "WithPlan")
- * @param options.withoutVariantName - Variant name when plan doesn't match (default: "WithoutPlan")
+ * @param options.whenTrue - Variant name when plan matches (default: "WithPlan")
+ * @param options.whenFalse - Variant name when plan doesn't match (default: "WithoutPlan")
  */
-export function selectHasPlanUidVariant(
+export function selectVariantForPlan(
   Component: React.ComponentType<any>,
   {
     planUid,
-    withVariantName = "WithPlan",
-    withoutVariantName = "WithoutPlan",
-  }: PlanOptions & VariantOptions
+    whenTrue = "WithPlan",
+    whenFalse = "WithoutPlan",
+  }: PlanOptions & VariantNames
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `selectHasPlanUidVariant ${planUid} -|`;
+    const logPrefix = `selectVariantForPlan ${planUid} -|`;
 
     try {
       const payload = useAuthStore((state) => state.payload);
@@ -369,7 +351,7 @@ export function selectHasPlanUidVariant(
         throw new Error("JWT payload required");
       }
 
-      const currentPlanUid = getPlanUid(payload);
+      const currentPlanUid = payload["outseta:planUid"];
       const resolvedValuePlanUid = resolveValue(planUid, props);
 
       log(logPrefix, {
@@ -379,7 +361,7 @@ export function selectHasPlanUidVariant(
 
       // Select variant based on whether the plan matches
       const hasPlan = currentPlanUid === resolvedValuePlanUid;
-      const variantName = hasPlan ? withVariantName : withoutVariantName;
+      const variantName = hasPlan ? whenTrue : whenFalse;
 
       log(logPrefix, `Selecting variant: ${variantName}`);
       return <Component ref={ref} {...props} variant={variantName} />;
@@ -395,21 +377,23 @@ export function selectHasPlanUidVariant(
 }
 
 /**
- * Selects variant based on add-on UID presence
+ * Selects variant for add-on UID presence
  * @param Component - The component to wrap
  * @param options - Configuration
  * @param options.addOnUid - Add-on UID to check for
+ * @param options.whenTrue - Variant name when add-on is present (default: "WithAddOn")
+ * @param options.whenFalse - Variant name when add-on is not present (default: "WithoutAddOn")
  */
-export function selectHasAddOnUidVariant(
+export function selectVariantForAddOn(
   Component: React.ComponentType<any>,
   {
     addOnUid,
-    withVariantName = "WithAddOn",
-    withoutVariantName = "WithoutAddOn",
-  }: AddOnOptions & VariantOptions
+    whenTrue = "WithAddOn",
+    whenFalse = "WithoutAddOn",
+  }: AddOnOptions & VariantNames
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `selectHasAddOnUidVariant ${addOnUid} -|`;
+    const logPrefix = `selectVariantForAddOn ${addOnUid} -|`;
 
     try {
       const payload = useAuthStore((state) => state.payload);
@@ -418,7 +402,7 @@ export function selectHasAddOnUidVariant(
         throw new Error("JWT payload required");
       }
 
-      const currentAddOnUids = getAddOnUids(payload);
+      const currentAddOnUids = payload["outseta:addOnUids"];
       const resolvedValueAddOnUid = resolveValue(addOnUid, props);
 
       log(logPrefix, {
@@ -428,7 +412,7 @@ export function selectHasAddOnUidVariant(
 
       // Select variant based on whether the add-on is present
       const hasAddOn = currentAddOnUids.includes(resolvedValueAddOnUid);
-      const variantName = hasAddOn ? withVariantName : withoutVariantName;
+      const variantName = hasAddOn ? whenTrue : whenFalse;
 
       log(logPrefix, `Selecting variant: ${variantName}`);
       return <Component ref={ref} {...props} variant={variantName} />;
