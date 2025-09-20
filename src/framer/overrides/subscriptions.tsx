@@ -10,6 +10,11 @@ type AddOnOptions = {
   addOnUid: string;
 };
 
+type VariantOptions = {
+  withVariantName?: string;
+  withoutVariantName?: string;
+};
+
 const log = OutsetaLogger(`framer.overrides.subscriptions`);
 
 /**
@@ -288,6 +293,145 @@ export function withAddOnUid(
       const displayValue = currentAddOnUids.join(", ");
 
       return <Component ref={ref} {...props} text={displayValue} />;
+    } catch (error) {
+      if (error instanceof Error) {
+        log(logPrefix, "Hiding component -", error.message);
+      } else {
+        log(logPrefix, "Hiding component -", error);
+      }
+      return null;
+    }
+  });
+}
+
+/**
+ * Selects the variant with the same name as the user's current plan
+ * @param Component - The component to wrap
+ */
+export function selectPlanUidVariant(
+  Component: React.ComponentType<any>
+): React.ComponentType<any> {
+  return forwardRef((props, ref) => {
+    const logPrefix = `selectPlanUidVariant -|`;
+
+    try {
+      const payload = useAuthStore((state) => state.payload);
+
+      if (!payload) {
+        throw new Error("JWT payload required");
+      }
+
+      const currentPlanUid = getPlanUid(payload);
+
+      log(logPrefix, {
+        currentPlanUid,
+      });
+
+      // Select variant with the same name as the current plan UID
+      const variantName = currentPlanUid;
+
+      log(logPrefix, `Selecting variant: ${variantName}`);
+      return <Component ref={ref} {...props} variant={variantName} />;
+    } catch (error) {
+      if (error instanceof Error) {
+        log(logPrefix, "Hiding component -", error.message);
+      } else {
+        log(logPrefix, "Hiding component -", error);
+      }
+      return null;
+    }
+  });
+}
+
+/**
+ * Selects variant based on plan UID presence
+ * @param Component - The component to wrap
+ * @param options - Configuration
+ * @param options.planUid - Plan UID to check for
+ * @param options.withVariantName - Variant name when plan matches (default: "WithPlan")
+ * @param options.withoutVariantName - Variant name when plan doesn't match (default: "WithoutPlan")
+ */
+export function selectHasPlanUidVariant(
+  Component: React.ComponentType<any>,
+  {
+    planUid,
+    withVariantName = "WithPlan",
+    withoutVariantName = "WithoutPlan",
+  }: PlanOptions & VariantOptions
+): React.ComponentType<any> {
+  return forwardRef((props, ref) => {
+    const logPrefix = `selectHasPlanUidVariant ${planUid} -|`;
+
+    try {
+      const payload = useAuthStore((state) => state.payload);
+
+      if (!payload) {
+        throw new Error("JWT payload required");
+      }
+
+      const currentPlanUid = getPlanUid(payload);
+      const resolvedValuePlanUid = resolveValue(planUid, props);
+
+      log(logPrefix, {
+        currentPlanUid,
+        resolvedValuePlanUid,
+      });
+
+      // Select variant based on whether the plan matches
+      const hasPlan = currentPlanUid === resolvedValuePlanUid;
+      const variantName = hasPlan ? withVariantName : withoutVariantName;
+
+      log(logPrefix, `Selecting variant: ${variantName}`);
+      return <Component ref={ref} {...props} variant={variantName} />;
+    } catch (error) {
+      if (error instanceof Error) {
+        log(logPrefix, "Hiding component -", error.message);
+      } else {
+        log(logPrefix, "Hiding component -", error);
+      }
+      return null;
+    }
+  });
+}
+
+/**
+ * Selects variant based on add-on UID presence
+ * @param Component - The component to wrap
+ * @param options - Configuration
+ * @param options.addOnUid - Add-on UID to check for
+ */
+export function selectHasAddOnUidVariant(
+  Component: React.ComponentType<any>,
+  {
+    addOnUid,
+    withVariantName = "WithAddOn",
+    withoutVariantName = "WithoutAddOn",
+  }: AddOnOptions & VariantOptions
+): React.ComponentType<any> {
+  return forwardRef((props, ref) => {
+    const logPrefix = `selectHasAddOnUidVariant ${addOnUid} -|`;
+
+    try {
+      const payload = useAuthStore((state) => state.payload);
+
+      if (!payload) {
+        throw new Error("JWT payload required");
+      }
+
+      const currentAddOnUids = getAddOnUids(payload);
+      const resolvedValueAddOnUid = resolveValue(addOnUid, props);
+
+      log(logPrefix, {
+        currentAddOnUids,
+        resolvedValueAddOnUid,
+      });
+
+      // Select variant based on whether the add-on is present
+      const hasAddOn = currentAddOnUids.includes(resolvedValueAddOnUid);
+      const variantName = hasAddOn ? withVariantName : withoutVariantName;
+
+      log(logPrefix, `Selecting variant: ${variantName}`);
+      return <Component ref={ref} {...props} variant={variantName} />;
     } catch (error) {
       if (error instanceof Error) {
         log(logPrefix, "Hiding component -", error.message);
