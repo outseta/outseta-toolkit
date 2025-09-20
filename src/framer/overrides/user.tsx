@@ -188,7 +188,7 @@ export function showForProperty(
       });
 
       if (!compare(propertyValue, resolvedValue, compareType, flags)) {
-        throw new Error("Match not found - hiding component");
+        throw new Error("Match not found");
       }
 
       log(logPrefix, "Match found - showing component");
@@ -241,7 +241,7 @@ export function hideForProperty(
       });
 
       if (compare(propertyValue, resolvedValue, compareType, flags)) {
-        throw new Error("Match found - hiding component");
+        throw new Error("Match found");
       }
 
       log(logPrefix, "Match not found - showing component");
