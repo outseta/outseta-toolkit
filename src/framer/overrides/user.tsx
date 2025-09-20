@@ -11,7 +11,7 @@ import {
 export function withFirstName(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
-  return withTextPropertyFunc(Component, { name: "FirstName" });
+  return withTextPropertyFunc(Component, { property: "FirstName" });
 }
 
 /**
@@ -21,7 +21,7 @@ export function withFirstName(
 export function withLastName(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
-  return withTextPropertyFunc(Component, { name: "LastName" });
+  return withTextPropertyFunc(Component, { property: "LastName" });
 }
 
 /**
@@ -31,7 +31,7 @@ export function withLastName(
 export function withFullName(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
-  return withTextPropertyFunc(Component, { name: "FullName" });
+  return withTextPropertyFunc(Component, { property: "FullName" });
 }
 
 /**
@@ -41,7 +41,7 @@ export function withFullName(
 export function withEmail(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
-  return withTextPropertyFunc(Component, { name: "Email" });
+  return withTextPropertyFunc(Component, { property: "Email" });
 }
 
 /**
@@ -51,7 +51,7 @@ export function withEmail(
 export function withAvatar(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
-  return withImagePropertyFunc(Component, { name: "ProfileImageS3Url" });
+  return withImagePropertyFunc(Component, { property: "ProfileImageS3Url" });
 }
 
 /**
@@ -61,19 +61,19 @@ export function withAvatar(
 export function withAccountName(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
-  return withTextPropertyFunc(Component, { name: "Account.Name" });
+  return withTextPropertyFunc(Component, { property: "Account.Name" });
 }
 
 export function withTextProperty(
   Component: React.ComponentType<any>,
   propertyName: string
 ): React.ComponentType<any> {
-  return withTextPropertyFunc(Component, { name: propertyName });
+  return withTextPropertyFunc(Component, { property: propertyName });
 }
 
 export function withImageProperty(
   Component: React.ComponentType<any>,
   propertyName: string
 ): React.ComponentType<any> {
-  return withImagePropertyFunc(Component, { name: propertyName });
+  return withImagePropertyFunc(Component, { property: propertyName });
 }

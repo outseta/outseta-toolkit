@@ -7,6 +7,12 @@ export * as user from "./user";
 // Re-export all property-related functions
 export * from "./properties";
 
+// Re-export all lesson convenience functions
+export * from "./lessons";
+
+// Re-export all bookmark convenience functions
+export * from "./bookmarks";
+
 // Re-export all subscription-related functions
 export * as subscriptions from "./subscriptions";
 
