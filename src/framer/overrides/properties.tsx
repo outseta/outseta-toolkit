@@ -30,44 +30,13 @@ const matchVariantDefaults: MatchVariantOptions = {
 const log = OutsetaLogger(`framer.overrides.user`);
 
 /**
- * Maps property names to their source (user or payload)
- * @param propertyName - The property name to check
- * @returns The mapped property name and source
- */
-function mapPropertyToSource(propertyName: string): {
-  mappedName: string;
-  source: "user" | "payload";
-} {
-  switch (propertyName) {
-    case "CurrentPlanUid":
-    case "CurrentPlanUids":
-      return { mappedName: "outseta:planUid", source: "payload" };
-    case "CurrentAddOnUids":
-      return { mappedName: "outseta:addOnUids", source: "payload" };
-    default:
-      return { mappedName: propertyName, source: "user" };
-  }
-}
-
-/**
- * Gets a property value from either user or payload based on the property name
- * @param params - Object containing user and payload
- * @param params.user - The user object
- * @param params.payload - The payload object
+ * Gets a property value from user data
+ * @param user - The user object
  * @param propertyName - The property name to get
  * @returns The property value
  */
-function getPropertyValue(
-  { user, payload }: { user: any; payload: any },
-  propertyName: string
-): any {
-  const { mappedName, source } = mapPropertyToSource(propertyName);
-
-  if (source === "payload") {
-    return payload?.[mappedName];
-  } else {
-    return getNestedProperty(user, mappedName);
-  }
+function getPropertyValue(user: any, propertyName: string): any {
+  return getNestedProperty(user, propertyName);
 }
 
 /**
@@ -98,13 +67,12 @@ export function withProperty(
 
     try {
       const user = useAuthStore((state) => state.user);
-      const payload = useAuthStore((state) => state.payload);
 
       if (!user) {
         throw new Error("User loaded required");
       }
 
-      let propertyValue = getPropertyValue({ user, payload }, propertyName);
+      let propertyValue = getPropertyValue(user, propertyName);
 
       if (typeof propertyValue !== "string") {
         throw new Error("Not a string");
@@ -143,7 +111,6 @@ export function withImageProperty(
         throw new Error("User loaded required");
       }
 
-      // No image property in payload, so no need to use getPropertyValue
       const imageSrc = getNestedProperty(user, propertyName) as string;
 
       log(logPrefix, { imageSrc });
@@ -207,12 +174,11 @@ export function showForProperty(
 
     try {
       const user = useAuthStore((state) => state.user);
-      const payload = useAuthStore((state) => state.payload);
 
       if (!user) {
         throw new Error("User loaded required");
       }
-      const propertyValue = getPropertyValue({ user, payload }, propertyName);
+      const propertyValue = getPropertyValue(user, propertyName);
       const resolvedValue = resolveValue(value, props);
 
       log(logPrefix, {
@@ -261,12 +227,11 @@ export function hideForProperty(
 
     try {
       const user = useAuthStore((state) => state.user);
-      const payload = useAuthStore((state) => state.payload);
 
       if (!user) {
         throw new Error("User loaded required");
       }
-      const propertyValue = getPropertyValue({ user, payload }, propertyName);
+      const propertyValue = getPropertyValue(user, propertyName);
       const resolvedValue = resolveValue(value, props);
 
       log(logPrefix, {
@@ -327,7 +292,6 @@ export function toggleProperty(
       // Resolve toggle value from props if needed
       const resolvedValueToToggle = resolveValue(valueToToggle, props);
 
-      // No toggle properties in payload, so no need to use getPropertyValue
       const propertyValue = getNestedProperty(user, propertyName) || "";
       const propertyValueAsArray =
         typeof propertyValue === "string"
@@ -391,13 +355,12 @@ export function selectPropertyVariant(
 
     try {
       const user = useAuthStore((state) => state.user);
-      const payload = useAuthStore((state) => state.payload);
 
       if (!user) {
         throw new Error("User loaded required");
       }
 
-      const propertyValue = getPropertyValue({ user, payload }, propertyName);
+      const propertyValue = getPropertyValue(user, propertyName);
       log(logPrefix, { variant: propertyValue, props });
       return <Component ref={ref} {...props} variant={propertyValue} />;
     } catch (error) {
@@ -436,13 +399,12 @@ export function selectPropertyMatchVariant(
 
     try {
       const user = useAuthStore((state) => state.user);
-      const payload = useAuthStore((state) => state.payload);
 
       if (!user) {
         throw new Error("User loaded required");
       }
 
-      const propertyValue = getPropertyValue({ user, payload }, propertyName);
+      const propertyValue = getPropertyValue(user, propertyName);
       const resolvedValue = resolveValue(value, props);
 
       log(logPrefix, {
