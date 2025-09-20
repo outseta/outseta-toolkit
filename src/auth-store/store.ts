@@ -1,9 +1,6 @@
 import { createStore } from "zustand/vanilla";
-import { Outseta } from "../outseta";
+import { Outseta, OutsetaJwtPayload, OutsetaUser } from "../outseta";
 import { debounce, computeUser } from "./utils";
-
-// Type for the original Outseta user object (nested structure)
-export type OutsetaUser = any;
 
 // Type for property names that can be accessed with dot notation
 export type OutsetaUserPropertyName = string;
@@ -14,7 +11,7 @@ export type AuthStatus = "pending" | "authenticated" | "anonymous";
 export interface AuthState {
   status: AuthStatus;
   user: OutsetaUser | null; // Computed: serverUser + pendingUpdates
-  payload: any;
+  payload: OutsetaJwtPayload | null;
 }
 
 export interface AuthActions {
@@ -40,7 +37,7 @@ export const createStoreInstance = ({
   log: (...args: any[]) => void;
 }) =>
   createStore<AuthStore>()((set, get) => {
-    let serverUser: OutsetaUser = undefined;
+    let serverUser: OutsetaUser | null = null;
     let requestCounter = 1;
     let pendingUpdates: Array<{
       updates: Record<string, any>;
@@ -49,7 +46,7 @@ export const createStoreInstance = ({
       requestId?: number;
     }> = [];
     let persistUser:
-      | ((data: OutsetaUser) => Promise<OutsetaUser | null>)
+      | ((data: Partial<OutsetaUser>) => Promise<OutsetaUser | null>)
       | null = null;
 
     // Log Helper - fire-and-forget with store context
@@ -87,7 +84,7 @@ export const createStoreInstance = ({
         update.requestId = requestId;
       });
 
-      const combinedUpdates = updatesToProcess.reduce(
+      const combinedUpdates: Partial<OutsetaUser> = updatesToProcess.reduce(
         (acc, update) => ({
           ...acc,
           ...update.updates,
@@ -95,7 +92,7 @@ export const createStoreInstance = ({
         {}
       );
 
-      let updatedServerUser: OutsetaUser = undefined;
+      let updatedServerUser: OutsetaUser | null = null;
 
       try {
         storeLog(logPrefix, "Processing updates", {
