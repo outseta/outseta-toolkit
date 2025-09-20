@@ -58,12 +58,12 @@ function resolveValue(value: any, props: any) {
  * @param options - Configuration
  * @param options.name - Property name to display
  */
-export function withProperty(
+export function withTextProperty(
   Component: React.ComponentType<any>,
   { name: propertyName }: PropertyOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `withUserProperty ${propertyName} -|`;
+    const logPrefix = `withTextProperty ${propertyName} -|`;
 
     try {
       const user = useAuthStore((state) => state.user);
@@ -102,7 +102,7 @@ export function withImageProperty(
   { name: propertyName }: PropertyOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `withUserImageProperty ${propertyName} -|`;
+    const logPrefix = `withImageProperty ${propertyName} -|`;
 
     try {
       const user = useAuthStore((state) => state.user);
@@ -170,7 +170,7 @@ export function showForProperty(
   }: ComparePropertyOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `showForUserProperty ${propertyName} -|`;
+    const logPrefix = `showForProperty ${propertyName} -|`;
 
     try {
       const user = useAuthStore((state) => state.user);
@@ -223,7 +223,7 @@ export function hideForProperty(
   }: ComparePropertyOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `hideForUserProperty ${propertyName} -|`;
+    const logPrefix = `hideForProperty ${propertyName} -|`;
 
     try {
       const user = useAuthStore((state) => state.user);
@@ -277,7 +277,7 @@ export function toggleProperty(
   } & MatchVariantOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `toggleUserProperty ${propertyName} -|`;
+    const logPrefix = `toggleProperty ${propertyName} -|`;
 
     try {
       const user = useAuthStore((state) => state.user);
@@ -346,12 +346,12 @@ export function toggleProperty(
   });
 }
 
-export function selectPropertyVariant(
+export function selectVariantForProperty(
   Component: React.ComponentType<any>,
   { name: propertyName }: PropertyOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `selectPropertyVariant ${propertyName} -|`;
+    const logPrefix = `selectVariantForProperty ${propertyName} -|`;
 
     try {
       const user = useAuthStore((state) => state.user);
