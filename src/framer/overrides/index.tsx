@@ -1,8 +1,11 @@
 // Re-export all authentication-related functions
 export * as auth from "./auth";
 
-// Re-export all property-related functions
+// Re-export all user convenience functions
 export * as user from "./user";
+
+// Re-export all property-related functions
+export * from "./properties";
 
 // Re-export all subscription-related functions
 export * as subscriptions from "./subscriptions";
