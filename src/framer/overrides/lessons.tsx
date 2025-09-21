@@ -1,15 +1,26 @@
 import React from "react";
+
 import {
-  showForPropertyValue,
-  showForNotPropertyValue,
+  showForPropertyMatch,
+  showForNotPropertyMatch,
+  variantForPropertyMatch,
   toggleProperty,
-  variantForProperty,
+  withTextProperty,
 } from "./properties";
 
-const NAME = "LessonsCompleted";
-const VALUE = "props.slug";
-const COMPARE = "array-includes";
-const FLAG = "ignore-case";
+const PROPERTY_LESSONS_COMPLETED = "LessonsCompleted";
+const PROPS_SLUG = "props.slug";
+const INCLUDES = "includes";
+
+/**
+ * Sets component text to bookmarks
+ * @param Component - The component to wrap
+ */
+export function withLessonsCompleted(
+  Component: React.ComponentType<any>
+): React.ComponentType<any> {
+  return withTextProperty(Component, PROPERTY_LESSONS_COMPLETED);
+}
 
 /**
  * Shows component if lesson is completed
@@ -19,11 +30,9 @@ const FLAG = "ignore-case";
 export function showForLessonCompleted(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
-  return showForPropertyValue(Component, {
-    property: NAME,
-    value: VALUE,
-    compare: COMPARE,
-    flags: [FLAG],
+  return showForPropertyMatch(Component, PROPERTY_LESSONS_COMPLETED, {
+    value: PROPS_SLUG,
+    compare: INCLUDES,
   });
 }
 
@@ -35,11 +44,9 @@ export function showForLessonCompleted(
 export function showForLessonNotCompleted(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
-  return showForNotPropertyValue(Component, {
-    property: NAME,
-    value: VALUE,
-    compare: COMPARE,
-    flags: [FLAG],
+  return showForNotPropertyMatch(Component, PROPERTY_LESSONS_COMPLETED, {
+    value: PROPS_SLUG,
+    compare: INCLUDES,
   });
 }
 
@@ -52,9 +59,8 @@ export function showForLessonNotCompleted(
 export function toggleLessonCompletion(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
-  return toggleProperty(Component, {
-    property: NAME,
-    value: VALUE,
+  return toggleProperty(Component, PROPERTY_LESSONS_COMPLETED, {
+    value: PROPS_SLUG,
     matchVariant: "Completed",
     noMatchVariant: "NotCompleted",
   });
@@ -67,11 +73,9 @@ export function toggleLessonCompletion(
 export function variantForLessonCompletion(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
-  return variantForProperty(Component, {
-    property: NAME,
-    value: VALUE,
-    compare: COMPARE,
-    flags: [FLAG],
+  return variantForPropertyMatch(Component, PROPERTY_LESSONS_COMPLETED, {
+    value: PROPS_SLUG,
+    compare: INCLUDES,
     matchVariant: "Completed",
     noMatchVariant: "NotCompleted",
   });

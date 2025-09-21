@@ -1,20 +1,13 @@
-// Re-export all authentication-related functions
+// Native functionality
 export * as auth from "./auth";
-
-// Re-export all user convenience functions
+export * as plans from "./plans";
+export * as addOns from "./addOns";
 export * as user from "./user";
+export * as custom from "./properties";
 
-// Re-export all property-related functions
-export * from "./properties";
+// Ready-made convenience functionality
+export * as bookmarks from "./bookmarks";
+export * as lessons from "./lessons";
 
-// Re-export all lesson convenience functions
-export * from "./lessons";
-
-// Re-export all bookmark convenience functions
-export * from "./bookmarks";
-
-// Re-export all subscription-related functions
-export * as subscriptions from "./subscriptions";
-
-// Re-export test functions
+// To test if overrides are available at the correct url
 export * from "./test";

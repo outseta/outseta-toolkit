@@ -1,4 +1,5 @@
 import React, { forwardRef } from "react";
+import { camelCase } from "lodash";
 import { OutsetaLogger } from "../../outseta";
 
 import useAuthStore, { type AuthStatus } from "./useAuthStore";
@@ -7,7 +8,6 @@ const log = OutsetaLogger("framer.overrides.auth");
 
 /**
  * Shows a component only when the authentication state matches the specified state
- * When in Framer canvas or preview mode, treats "anonymous" status as true
  *
  * @param Component - The React component to conditionally render
  * @param validState - The authentication state that allows the component to show
@@ -15,17 +15,17 @@ const log = OutsetaLogger("framer.overrides.auth");
  */
 export function showForAuthStatus(
   Component: React.ComponentType<any>,
-  validStatus: AuthStatus | "user-loaded"
+  status: AuthStatus
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `showForAuthStatus ${validStatus} -|`;
+    const logPrefix = `showForAuthStatus ${status} -|`;
 
     try {
       const status = useAuthStore((state) => state.status);
 
-      log(logPrefix, { status, validStatus });
+      log(logPrefix, { status, validStatus: status });
 
-      switch (validStatus) {
+      switch (status) {
         case "anonymous":
           if (status !== "anonymous") {
             throw new Error("Not in anonymous state");
@@ -61,15 +61,40 @@ export function showForAuthStatus(
   });
 }
 
-export function selectAuthVariant(
+export function showForAnonymous(
+  Component: React.ComponentType<any>
+): React.ComponentType<any> {
+  return showForAuthStatus(Component, "anonymous");
+}
+
+export function showForAuthenticated(
+  Component: React.ComponentType<any>
+): React.ComponentType<any> {
+  return showForAuthStatus(Component, "authenticated");
+}
+
+export function showForPending(
+  Component: React.ComponentType<any>
+): React.ComponentType<any> {
+  return showForAuthStatus(Component, "pending");
+}
+
+/**
+ * Sets component variant to the current auth status
+ *
+ * @param Component - The React component to wrap
+ * @returns A forwarded ref component that sets the variant based on the auth status
+ */
+export function variantForAuthStatus(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `selectAuthStatusVariant -|`;
+    const logPrefix = `variantForAuthStatus -|`;
     try {
       const status = useAuthStore((state) => state.status);
-      log(logPrefix, { status });
-      return <Component ref={ref} {...props} variant={status} />;
+      const camelCaseStatus = camelCase(status);
+      log(logPrefix, "Selecting variant", camelCaseStatus);
+      return <Component ref={ref} {...props} variant={camelCaseStatus} />;
     } catch (error) {
       if (error instanceof Error) {
         log(logPrefix, "Hiding component", error.message);
@@ -89,7 +114,7 @@ export function selectAuthVariant(
  * @param embed - The type of Outseta popup embed: "register", "login", or "profile"
  * @returns A forwarded ref component that triggers the specified Outseta popup
  */
-export function triggerPopup(
+export function popupEmbed(
   Component: React.ComponentType<any>,
   embed: "register" | "login" | "profile"
 ): React.ComponentType<any> {
@@ -144,6 +169,24 @@ export function triggerPopup(
   });
 }
 
+export function popupRegisterEmbed(
+  Component: React.ComponentType<any>
+): React.ComponentType<any> {
+  return popupEmbed(Component, "register");
+}
+
+export function popupLoginEmbed(
+  Component: React.ComponentType<any>
+): React.ComponentType<any> {
+  return popupEmbed(Component, "login");
+}
+
+export function popupProfileEmbed(
+  Component: React.ComponentType<any>
+): React.ComponentType<any> {
+  return popupEmbed(Component, "profile");
+}
+
 /**
  * Converts a component to trigger Outseta action embeds
  * Handles logout actions with proper visibility rules
@@ -152,7 +195,7 @@ export function triggerPopup(
  * @param action - The type of action: "logout"
  * @returns A forwarded ref component that triggers the specified Outseta action
  */
-export function triggerAction(
+export function action(
   Component: React.ComponentType<any>,
   action: "logout"
 ): React.ComponentType<any> {
@@ -190,4 +233,10 @@ export function triggerAction(
       return null;
     }
   });
+}
+
+export function logout(
+  Component: React.ComponentType<any>
+): React.ComponentType<any> {
+  return action(Component, "logout");
 }

@@ -1,6 +1,14 @@
 import { create } from "zustand";
 import { createAuthStore, AuthStore, AuthStatus } from "../../auth-store";
-import { isFramerCanvas } from "./utils";
+
+function isFramerCanvas(): boolean {
+  try {
+    return window.location.host.includes("framercanvas.com");
+  } catch (error) {
+    // If it fails, assume we're not in Framer
+    return false;
+  }
+}
 
 /**
  * React store that shares the same state as the vanilla auth store

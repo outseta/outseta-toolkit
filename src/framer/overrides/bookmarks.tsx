@@ -1,60 +1,68 @@
 import React from "react";
 import {
-  showForPropertyValue,
-  showForNotPropertyValue,
+  showForPropertyMatch,
+  showForNotPropertyMatch,
+  variantForPropertyMatch,
   toggleProperty,
-  variantForProperty,
+  withTextProperty,
 } from "./properties";
 
-const NAME = "Bookmarks";
-const VALUE = "props.slug";
-const COMPARE = "array-includes";
-const FLAG = "ignore-case";
+const PROPERTY_BOOKMARKS = "Bookmarks";
+const PROPS_SLUG = "props.slug";
+const INCLUDES = "includes";
+
+/**
+ * Sets component text to bookmarks
+ * @param Component - The component to wrap
+ */
+export function withBookmarks(
+  Component: React.ComponentType<any>
+): React.ComponentType<any> {
+  return withTextProperty(Component, PROPERTY_BOOKMARKS);
+}
 
 /**
  * Shows component if item is bookmarked
+ * finds the value on the component's `slug` property
  * @param Component - The component to wrap
- * @param options - Configuration
  */
 export function showForBookmarked(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
-  return showForPropertyValue(Component, {
-    property: NAME,
-    value: VALUE,
-    compare: COMPARE,
-    flags: [FLAG],
+  return showForPropertyMatch(Component, PROPERTY_BOOKMARKS, {
+    value: PROPS_SLUG,
+    compare: INCLUDES,
   });
 }
 
 /**
  * Hides component if item is bookmarked
  * @param Component - The component to wrap
- * @param options - Configuration
+ * @param options.slug - Item slug to toggle (can be "props.slug")
+ * @param options.matchVariant - Variant name result of the toggle match (default: "Match")
+ * @param options.noMatchVariant - Variant name result of the toggle does not match (default: "NoMatch")
  */
 export function showForNotBookmarked(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
-  return showForNotPropertyValue(Component, {
-    property: NAME,
-    value: VALUE,
-    compare: COMPARE,
-    flags: [FLAG],
+  return showForNotPropertyMatch(Component, PROPERTY_BOOKMARKS, {
+    value: PROPS_SLUG,
+    compare: INCLUDES,
   });
 }
 
 /**
  * Toggles bookmark status for an item
  * @param Component - The component to wrap
- * @param options - Configuration
  * @param options.slug - Item slug to toggle (can be "props.slug")
+ * @param options.matchVariant - Variant name result of the toggle match (default: "Match")
+ * @param options.noMatchVariant - Variant name result of the toggle does not match (default: "NoMatch")
  */
-export function toggleBookmark(
+export function toggleBookmarked(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
-  return toggleProperty(Component, {
-    property: NAME,
-    value: VALUE,
+  return toggleProperty(Component, PROPERTY_BOOKMARKS, {
+    value: PROPS_SLUG,
     matchVariant: "Bookmarked",
     noMatchVariant: "NotBookmarked",
   });
@@ -63,15 +71,15 @@ export function toggleBookmark(
 /**
  * Sets component variant based on bookmark status
  * @param Component - The component to wrap
+ * @param options - Configuration
+ * @param options.slug - Item slug to toggle (can be "props.slug")
  */
 export function variantForBookmarked(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
-  return variantForProperty(Component, {
-    property: NAME,
-    value: VALUE,
-    compare: COMPARE,
-    flags: [FLAG],
+  return variantForPropertyMatch(Component, PROPERTY_BOOKMARKS, {
+    value: PROPS_SLUG,
+    compare: INCLUDES,
     matchVariant: "Bookmarked",
     noMatchVariant: "NotBookmarked",
   });
