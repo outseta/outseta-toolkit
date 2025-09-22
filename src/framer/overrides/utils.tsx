@@ -64,7 +64,7 @@ export function normalizeAsArray(value: any): any[] {
     return value
       .split(",")
       .map((item) => item.trim())
-      .filter((item) => item !== "");
+      .filter((item) => item !== ""); // remove potential empty strings
   }
 
   // For non-string, non-array values, wrap in array
@@ -86,9 +86,9 @@ export function toggleValueInArray(
   const wasArray = Array.isArray(originalValue);
   const arrayValue = normalizeAsArray(originalValue);
 
-  // Filter out the toggle value and empty values
+  // Filter out the toggle value
   const filteredArray = arrayValue.filter(
-    (item) => !isEqual(item, valueToToggle, ignoreCase) && item.trim() !== ""
+    (item) => !isEqual(item, valueToToggle, ignoreCase)
   );
 
   // Add toggle value if it wasn't in the original array

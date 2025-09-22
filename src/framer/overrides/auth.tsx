@@ -15,37 +15,18 @@ const log = OutsetaLogger("framer.overrides.auth");
  */
 export function showForAuthStatus(
   Component: React.ComponentType<any>,
-  status: AuthStatus
+  validStatus: AuthStatus
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `showForAuthStatus ${status} -|`;
+    const logPrefix = `showForAuthStatus ${validStatus} -|`;
 
     try {
-      const status = useAuthStore((state) => state.status);
+      const currentStatus = useAuthStore((state) => state.status);
 
-      log(logPrefix, { status, validStatus: status });
+      log(logPrefix, { status: currentStatus, validStatus });
 
-      switch (status) {
-        case "anonymous":
-          if (status !== "anonymous") {
-            throw new Error("Not in anonymous state");
-          }
-          break;
-
-        case "authenticated":
-          if (status !== "authenticated") {
-            throw new Error("Not in authenticated state");
-          }
-          break;
-
-        case "pending":
-          if (status !== "pending") {
-            throw new Error("Not in pending state");
-          }
-          break;
-
-        default:
-          throw new Error("Invalid status");
+      if (currentStatus !== validStatus) {
+        throw new Error(`Current auth status is not ${validStatus}`);
       }
 
       log(logPrefix, "Status match, showing component");
