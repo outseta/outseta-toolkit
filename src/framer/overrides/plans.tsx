@@ -136,7 +136,7 @@ export function showWhenNotPlan(
   });
 }
 
-export function variantFromPlanUid(
+export function planUidVariant(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {

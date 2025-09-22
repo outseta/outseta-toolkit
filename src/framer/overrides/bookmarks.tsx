@@ -48,7 +48,7 @@ export function toggleBookmarked(
   });
 }
 
-export function variantForBookmarked(
+export function bookmarkedVariant(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return variantWhenProperty(Component, PROPERTY_BOOKMARKS, {

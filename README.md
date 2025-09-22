@@ -62,8 +62,8 @@ export function showWhenAuthenticated(Component): ComponentType {
 
 // Set component variant based on authentication status
 // ℹ️ The Framer component must have the variants: `Anonymous` and `Authenticated`
-export function variantFromAuthStatus(Component): ComponentType {
-  return auth.variantFromAuthStatus(Component);
+export function authStatusVariant(Component): ComponentType {
+  return auth.authStatusVariant(Component);
 }
 
 //// USER DATA ////
@@ -109,8 +109,8 @@ export function withPlanUid(Component): ComponentType {
 // Selects `OW45KRmg`variant for a user on the OW45KRmg plan
 // Selects `amRjLEmJ` variant for a user on the amRjLEmJ plan
 // If variant not found, the component will use the premium variant
-export function variantFromPlanUid(Component): ComponentType {
-  return plans.variantFromPlanUid(Component);
+export function planUidVariant(Component): ComponentType {
+  return plans.planUidVariant(Component);
 }
 
 /*
@@ -217,8 +217,8 @@ export function toggleBookmarked(Component): ComponentType {
 
 // Select variant `Bookmarked` when item is bookmarked
 // Select variant `NotBookmarked` when item is not bookmarked
-export function variantForBookmarked(Component): ComponentType {
-  return bookmarks.variantForBookmarked(Component);
+export function bookmarkedVariant(Component): ComponentType {
+  return bookmarks.bookmarkedVariant(Component);
 }
 
 //// LESSONS ////
@@ -260,8 +260,8 @@ export function toggleLessonCompleted(Component): ComponentType {
 
 // Select variant `Completed` when lesson is completed
 // Select variant `NotCompleted` when lesson is not completed
-export function variantForLessonCompleted(Component): ComponentType {
-  return lessons.variantForLessonCompleted(Component);
+export function lessonCompletedVariant(Component): ComponentType {
+  return lessons.lessonCompletedVariant(Component);
 }
 ```
 

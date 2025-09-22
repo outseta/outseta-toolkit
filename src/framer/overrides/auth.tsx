@@ -53,11 +53,11 @@ export function showWhenPending(
   return showWhenAuthStatus(Component, "pending");
 }
 
-export function variantFromAuthStatus(
+export function authStatusVariant(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `variantFromAuthStatus -|`;
+    const logPrefix = `authStatusVariant -|`;
     try {
       const status = useAuthStore((state) => state.status);
       const camelCaseStatus = camelCase(status);

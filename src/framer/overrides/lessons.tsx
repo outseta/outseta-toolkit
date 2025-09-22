@@ -49,7 +49,7 @@ export function toggleLessonCompleted(
   });
 }
 
-export function variantForLessonCompleted(
+export function lessonCompletedVariant(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return variantWhenProperty(Component, PROPERTY_LESSONS_COMPLETED, {

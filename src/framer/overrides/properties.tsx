@@ -286,12 +286,12 @@ export function toggleProperty(
   });
 }
 
-export function variantFromProperty(
+export function propertyVariant(
   Component: React.ComponentType<any>,
   property: string
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `variantFromProperty ${property} -|`;
+    const logPrefix = `propertyVariant ${property} -|`;
 
     try {
       const user = useAuthStore((state) => state.user);
