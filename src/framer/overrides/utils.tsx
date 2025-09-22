@@ -111,6 +111,9 @@ export function toggleValueInArray(
   }
 }
 
+type CompareType = "equal" | "includes";
+type CompareFlag = "ignore-case";
+
 /**
  * Main comparison function that replaces the old compare() function
  * @param propertyValue - The property value to check
@@ -122,8 +125,8 @@ export function toggleValueInArray(
 export function comparePropertyValue(
   propertyValue: any,
   targetValue: any,
-  type: "equal" | "includes",
-  flags: "ignore-case"[] = []
+  type: CompareType,
+  flags: CompareFlag[] = []
 ): boolean {
   switch (type) {
     case "equal":
