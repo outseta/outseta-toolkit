@@ -40,7 +40,7 @@ export function showWhenLessonNotCompleted(
   });
 }
 
-export function toggleLessonCompletion(
+export function toggleLessonCompleted(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return toggleProperty(Component, PROPERTY_LESSONS_COMPLETED, {
@@ -49,7 +49,7 @@ export function toggleLessonCompletion(
   });
 }
 
-export function variantFromLessonCompletionStatus(
+export function variantForLessonCompleted(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return variantWhenProperty(Component, PROPERTY_LESSONS_COMPLETED, {

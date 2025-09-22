@@ -177,7 +177,7 @@ export function showWhenNotAddOn_PowerUp(Component): ComponentType {
 // Select variant `Inactive` for users without the PowerUp add-on
 // ℹ️ Requires `Active` and `Inactive` component variants
 export function variantWhenAddOn_PowerUp(Component): ComponentType {
-  return addOns.variantFromAddOnStatus(Component, "OW4pRYWg");
+  return addOns.variantWhenAddOn(Component, "OW4pRYWg");
 }
 
 //// BOOKMARKS ////
@@ -217,8 +217,8 @@ export function toggleBookmarked(Component): ComponentType {
 
 // Select variant `Bookmarked` when item is bookmarked
 // Select variant `NotBookmarked` when item is not bookmarked
-export function variantFromBookmarkStatus(Component): ComponentType {
-  return bookmarks.variantFromBookmarkStatus(Component);
+export function variantForBookmarked(Component): ComponentType {
+  return bookmarks.variantForBookmarked(Component);
 }
 
 //// LESSONS ////
@@ -254,14 +254,14 @@ export function showWhenLessonNotCompleted(Component): ComponentType {
 // Toggle lesson completion status
 // Select variant `Completed` when lesson is completed
 // Select variant `NotCompleted` when lesson is not completed
-export function toggleLessonCompletion(Component): ComponentType {
-  return lessons.toggleLessonCompletion(Component);
+export function toggleLessonCompleted(Component): ComponentType {
+  return lessons.toggleLessonCompleted(Component);
 }
 
 // Select variant `Completed` when lesson is completed
 // Select variant `NotCompleted` when lesson is not completed
-export function variantFromLessonCompletionStatus(Component): ComponentType {
-  return lessons.variantFromLessonCompletionStatus(Component);
+export function variantForLessonCompleted(Component): ComponentType {
+  return lessons.variantForLessonCompleted(Component);
 }
 ```
 
