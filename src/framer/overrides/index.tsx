@@ -1,8 +1,13 @@
-// Re-export all authentication-related functions
+// Native functionality
 export * as auth from "./auth";
+export * as plans from "./plans";
+export * as addOns from "./addOns";
+export * as user from "./user";
+export * as custom from "./properties";
 
-// Re-export all property-related functions
-export * as user from "./properties";
+// Ready-made convenience functionality
+export * as bookmarks from "./bookmarks";
+export * as lessons from "./lessons";
 
-// Re-export test functions
-export { withTestText } from "./test";
+// To test if overrides are available at the correct url
+export * from "./test";

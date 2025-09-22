@@ -4,107 +4,60 @@ import { getNestedProperty } from "../../auth-store/utils";
 
 import useAuthStore from "./useAuthStore";
 
-import { compare } from "./utils";
+import {
+  comparePropertyValue,
+  resolveValue,
+  toggleValueInArray,
+  type CompareType,
+  type CompareFlag,
+} from "./utils";
 
-type PropertyOptions = {
-  name: string;
-};
+type PropertyKey = string;
 
-type ComparePropertyOptions = {
-  name: string;
+type CompareOptions = {
   value: any;
-  compare?: "equal" | "array-includes";
-  flags?: "ignore-case"[];
+  compare: CompareType;
+  flags?: CompareFlag[];
 };
 
 type MatchVariantOptions = {
-  matchVariant?: string;
-  noMatchVariant?: string;
+  matchVariant: string;
+  noMatchVariant: string;
 };
 
-const matchVariantDefaults: MatchVariantOptions = {
-  matchVariant: "Match",
-  noMatchVariant: "NoMatch",
-};
-
-const log = OutsetaLogger(`framer.overrides.user`);
+const log = OutsetaLogger(`framer.overrides.properties`);
 
 /**
- * Maps property names to their source (user or payload)
- * @param propertyName - The property name to check
- * @returns The mapped property name and source
- */
-function mapPropertyToSource(propertyName: string): {
-  mappedName: string;
-  source: "user" | "payload";
-} {
-  switch (propertyName) {
-    case "CurrentPlanUid":
-    case "CurrentPlanUids":
-      return { mappedName: "outseta:planUid", source: "payload" };
-    case "CurrentAddOnUids":
-      return { mappedName: "outseta:addOnUids", source: "payload" };
-    default:
-      return { mappedName: propertyName, source: "user" };
-  }
-}
-
-/**
- * Gets a property value from either user or payload based on the property name
- * @param params - Object containing user and payload
- * @param params.user - The user object
- * @param params.payload - The payload object
+ * Gets a property value from user data
+ * @param user - The user object
  * @param propertyName - The property name to get
  * @returns The property value
  */
-function getPropertyValue(
-  { user, payload }: { user: any; payload: any },
-  propertyName: string
-): any {
-  const { mappedName, source } = mapPropertyToSource(propertyName);
-
-  if (source === "payload") {
-    return payload?.[mappedName];
-  } else {
-    return getNestedProperty(user, mappedName);
-  }
-}
-
-/**
- * Resolves a value from props if it starts with "props."
- * @param value - The value to resolve
- * @param props - The component props
- * @returns The resolved value
- */
-function resolveValue(value: any, props: any) {
-  if (typeof value === "string" && value.startsWith("props.")) {
-    return props[value.replace("props.", "")];
-  }
-  return value;
+function getPropertyValue(user: any, propertyName: string): any {
+  return getNestedProperty(user, propertyName);
 }
 
 /**
  * Sets component text to a user property value
  * @param Component - The component to wrap
  * @param options - Configuration
- * @param options.name - Property name to display
+ * @param options.property - Property name to display
  */
-export function withProperty(
+export function withTextProperty(
   Component: React.ComponentType<any>,
-  { name: propertyName }: PropertyOptions
+  property: PropertyKey
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `withUserProperty ${propertyName} -|`;
+    const logPrefix = `withTextProperty ${property} -|`;
 
     try {
       const user = useAuthStore((state) => state.user);
-      const payload = useAuthStore((state) => state.payload);
 
       if (!user) {
-        throw new Error("User loaded required");
+        throw new Error("User data required");
       }
 
-      let propertyValue = getPropertyValue({ user, payload }, propertyName);
+      let propertyValue = getPropertyValue(user, property);
 
       if (typeof propertyValue !== "string") {
         throw new Error("Not a string");
@@ -127,24 +80,23 @@ export function withProperty(
  * Sets component background image to a user property value
  * @param Component - The component to wrap
  * @param options - Configuration
- * @param options.name - Property name containing image URL
+ * @param options.property - Property name containing image URL
  */
 export function withImageProperty(
   Component: React.ComponentType<any>,
-  { name: propertyName }: PropertyOptions
+  property: PropertyKey
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `withUserImageProperty ${propertyName} -|`;
+    const logPrefix = `withImageProperty ${property} -|`;
 
     try {
       const user = useAuthStore((state) => state.user);
 
       if (!user) {
-        throw new Error("User loaded required");
+        throw new Error("User data required");
       }
 
-      // No image property in payload, so no need to use getPropertyValue
-      const imageSrc = getNestedProperty(user, propertyName) as string;
+      const imageSrc = getNestedProperty(user, property) as string;
 
       log(logPrefix, { imageSrc });
 
@@ -187,32 +139,27 @@ export function withImageProperty(
 /**
  * Shows component based on property comparison
  * @param Component - The component to wrap
+ * @param property - Property name to check
  * @param options - Configuration
- * @param options.name - Property name to check
  * @param options.value - Value to compare against (can be "props.propertyName")
- * @param options.compare - Comparison type: "equal" or "array-includes"
- * @param options.flags - Additional flags like ["ignore-case"]
+ * @param options.compare - Comparison type: "equal" or "includes"
+ * @param options.flags - Array of flags: ["ignore-case"]
  */
-export function showForProperty(
+export function showForPropertyMatch(
   Component: React.ComponentType<any>,
-  {
-    name: propertyName,
-    value,
-    compare: compareType = "equal",
-    flags = [],
-  }: ComparePropertyOptions
+  property: PropertyKey,
+  { value, compare: compareType, flags }: CompareOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `showForUserProperty ${propertyName} -|`;
+    const logPrefix = `showForProperty ${property} -|`;
 
     try {
       const user = useAuthStore((state) => state.user);
-      const payload = useAuthStore((state) => state.payload);
 
       if (!user) {
-        throw new Error("User loaded required");
+        throw new Error("User data required");
       }
-      const propertyValue = getPropertyValue({ user, payload }, propertyName);
+      const propertyValue = getPropertyValue(user, property);
       const resolvedValue = resolveValue(value, props);
 
       log(logPrefix, {
@@ -221,8 +168,15 @@ export function showForProperty(
         compareType,
       });
 
-      if (!compare(propertyValue, resolvedValue, compareType, flags)) {
-        throw new Error("Match not found - hiding component");
+      const matches = comparePropertyValue(
+        propertyValue,
+        resolvedValue,
+        compareType,
+        flags
+      );
+
+      if (!matches) {
+        throw new Error("Match not found");
       }
 
       log(logPrefix, "Match found - showing component");
@@ -239,34 +193,29 @@ export function showForProperty(
 }
 
 /**
- * Hides component based on user property comparison
+ * Shows component based on user property comparison
  * @param Component - The component to wrap
+ * @param property - Property name to check
  * @param options - Configuration
- * @param options.name - Property name to check
  * @param options.value - Value to compare against (can be "props.propertyName")
- * @param options.compare - Comparison type: "equal" or "array-includes"
+ * @param options.compare - Comparison type: "equal" or "includes"
  * @param options.flags - Additional flags like ["ignore-case"]
  */
-export function hideForProperty(
+export function showForNotPropertyMatch(
   Component: React.ComponentType<any>,
-  {
-    name: propertyName,
-    value,
-    compare: compareType = "equal",
-    flags = [],
-  }: ComparePropertyOptions
+  property: PropertyKey,
+  { value, compare: compareType, flags }: CompareOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `hideForUserProperty ${propertyName} -|`;
+    const logPrefix = `showForNotProperty ${property} -|`;
 
     try {
       const user = useAuthStore((state) => state.user);
-      const payload = useAuthStore((state) => state.payload);
 
       if (!user) {
-        throw new Error("User loaded required");
+        throw new Error("User data required");
       }
-      const propertyValue = getPropertyValue({ user, payload }, propertyName);
+      const propertyValue = getPropertyValue(user, property);
       const resolvedValue = resolveValue(value, props);
 
       log(logPrefix, {
@@ -275,8 +224,15 @@ export function hideForProperty(
         compareType,
       });
 
-      if (compare(propertyValue, resolvedValue, compareType, flags)) {
-        throw new Error("Match found - hiding component");
+      const matches = comparePropertyValue(
+        propertyValue,
+        resolvedValue,
+        compareType,
+        flags
+      );
+
+      if (matches) {
+        throw new Error("Match found");
       }
 
       log(logPrefix, "Match not found - showing component");
@@ -295,24 +251,24 @@ export function hideForProperty(
 /**
  * Creates a toggle action for any property
  * @param Component - The component to wrap
+ * @param property - Property name to toggle
  * @param options - Configuration
- * @param options.name - Property name
  * @param options.value - Value to toggle (can be "props.propertyName")
+ * @param options.matchVariant - Variant name result of the toggle match (default: "Match")
+ * @param options.noMatchVariant - Variant name result of the toggle does not match (default: "NoMatch")
  */
 export function toggleProperty(
   Component: React.ComponentType<any>,
+  property: PropertyKey,
   {
-    name: propertyName,
     value: valueToToggle,
-    matchVariant = matchVariantDefaults.matchVariant,
-    noMatchVariant = matchVariantDefaults.noMatchVariant,
-  }: {
-    name: string;
-    value: string;
-  } & MatchVariantOptions
+    flags,
+    matchVariant,
+    noMatchVariant,
+  }: Pick<CompareOptions, "value" | "flags"> & MatchVariantOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `toggleUserProperty ${propertyName} -|`;
+    const logPrefix = `toggleProperty ${property} -|`;
 
     try {
       const user = useAuthStore((state) => state.user);
@@ -321,39 +277,27 @@ export function toggleProperty(
       );
 
       if (!user) {
-        throw new Error("User loaded required");
+        throw new Error("User data required");
       }
 
       // Resolve toggle value from props if needed
       const resolvedValueToToggle = resolveValue(valueToToggle, props);
 
-      // No toggle properties in payload, so no need to use getPropertyValue
-      const propertyValue = getNestedProperty(user, propertyName) || "";
-      const propertyValueAsArray =
-        typeof propertyValue === "string"
-          ? propertyValue.split(",").map((item) => item.trim())
-          : [];
+      const propertyValue = getNestedProperty(user, property) || "";
 
       log(logPrefix, { user, valueToToggle: resolvedValueToToggle });
 
       const handleClick = async (event: React.MouseEvent) => {
         event.preventDefault();
 
-        const newPropertyValueAsArray = [
-          // Filter out the toggle value and empty values
-          ...propertyValueAsArray.filter(
-            (item) => item !== resolvedValueToToggle && item.trim() !== ""
-          ),
-          // Add toggle value at the end if not included in current value
-          ...(propertyValueAsArray.includes(resolvedValueToToggle)
-            ? []
-            : [resolvedValueToToggle]),
-        ].filter((item) => item.trim() !== ""); // Final filter to remove any empty values
-
-        await updateUserProperty(
-          propertyName,
-          newPropertyValueAsArray.join(", ")
+        const ignoreCase = flags?.includes("ignore-case") || false;
+        const newPropertyValue = toggleValueInArray(
+          propertyValue,
+          resolvedValueToToggle,
+          ignoreCase
         );
+
+        await updateUserProperty(property, newPropertyValue);
 
         // Call original onClick if provided
         if (props.onClick) {
@@ -361,13 +305,18 @@ export function toggleProperty(
         }
       };
 
-      const active = propertyValueAsArray.includes(resolvedValueToToggle);
+      const matches = comparePropertyValue(
+        propertyValue,
+        resolvedValueToToggle,
+        "includes",
+        flags
+      );
 
       return (
         <Component
           ref={ref}
           {...props}
-          variant={active ? matchVariant : noMatchVariant}
+          variant={matches ? matchVariant : noMatchVariant}
           onClick={handleClick}
         />
       );
@@ -382,22 +331,21 @@ export function toggleProperty(
   });
 }
 
-export function selectPropertyVariant(
+export function variantForProperty(
   Component: React.ComponentType<any>,
-  { name: propertyName }: PropertyOptions
+  property: string
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `selectPropertyVariant ${propertyName} -|`;
+    const logPrefix = `variantForProperty ${property} -|`;
 
     try {
       const user = useAuthStore((state) => state.user);
-      const payload = useAuthStore((state) => state.payload);
 
       if (!user) {
-        throw new Error("User loaded required");
+        throw new Error("User data required");
       }
 
-      const propertyValue = getPropertyValue({ user, payload }, propertyName);
+      const propertyValue = getPropertyValue(user, property);
       log(logPrefix, { variant: propertyValue, props });
       return <Component ref={ref} {...props} variant={propertyValue} />;
     } catch (error) {
@@ -414,35 +362,36 @@ export function selectPropertyVariant(
 /**
  * Sets component variant based on property comparison
  * @param Component - The component to wrap
+ * @param property - Property name to check
+ * @param value - Value to compare against (can be "props.propertyName")
  * @param options - Configuration
- * @param options.name - Property name to check
- * @param options.value - Value to compare against (can be "props.propertyName")
- * @param options.compare - Comparison type: "equal" or "array-includes"
+ * @param options.compare - Comparison type: "equal" or "includes"
  * @param options.flags - Additional flags like ["ignore-case"]
+ * @param options.matchVariant - Variant name when match is found (default: "Match")
+ * @param options.noMatchVariant - Variant name when match is not found (default: "NoMatch")
  */
-export function selectPropertyMatchVariant(
+export function variantForPropertyMatch(
   Component: React.ComponentType<any>,
+  property: PropertyKey,
   {
-    name: propertyName,
     value,
-    compare: compareType = "equal",
-    flags = [],
-    matchVariant = matchVariantDefaults.matchVariant,
-    noMatchVariant = matchVariantDefaults.noMatchVariant,
-  }: ComparePropertyOptions & MatchVariantOptions
+    compare: compareType,
+    flags,
+    matchVariant,
+    noMatchVariant,
+  }: CompareOptions & MatchVariantOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `selectPropertyMatchVariant ${propertyName} -|`;
+    const logPrefix = `selectPropertyMatchVariant ${property} -|`;
 
     try {
       const user = useAuthStore((state) => state.user);
-      const payload = useAuthStore((state) => state.payload);
 
       if (!user) {
-        throw new Error("User loaded required");
+        throw new Error("User data required");
       }
 
-      const propertyValue = getPropertyValue({ user, payload }, propertyName);
+      const propertyValue = getPropertyValue(user, property);
       const resolvedValue = resolveValue(value, props);
 
       log(logPrefix, {
@@ -452,9 +401,14 @@ export function selectPropertyMatchVariant(
         ["props.variant"]: props.variant,
       });
 
-      const variant = compare(propertyValue, resolvedValue, compareType, flags)
-        ? matchVariant
-        : noMatchVariant;
+      const matches = comparePropertyValue(
+        propertyValue,
+        resolvedValue,
+        compareType,
+        flags
+      );
+
+      const variant = matches ? matchVariant : noMatchVariant;
 
       log(logPrefix, { variant });
       return <Component ref={ref} {...props} variant={variant} />;
