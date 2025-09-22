@@ -6,19 +6,12 @@ import useAuthStore, { type AuthStatus } from "./useAuthStore";
 
 const log = OutsetaLogger("framer.overrides.auth");
 
-/**
- * Shows a component only when the authentication state matches the specified state
- *
- * @param Component - The React component to conditionally render
- * @param validState - The authentication state that allows the component to show
- * @returns A forwarded ref component that conditionally renders based on auth state
- */
-export function showForAuthStatus(
+function showWhenAuthStatus(
   Component: React.ComponentType<any>,
   validStatus: AuthStatus
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `showForAuthStatus ${validStatus} -|`;
+    const logPrefix = `showWhenAuthStatus ${validStatus} -|`;
 
     try {
       const currentStatus = useAuthStore((state) => state.status);
@@ -42,35 +35,29 @@ export function showForAuthStatus(
   });
 }
 
-export function showForAnonymous(
+export function showWhenAnonymous(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
-  return showForAuthStatus(Component, "anonymous");
+  return showWhenAuthStatus(Component, "anonymous");
 }
 
-export function showForAuthenticated(
+export function showWhenAuthenticated(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
-  return showForAuthStatus(Component, "authenticated");
+  return showWhenAuthStatus(Component, "authenticated");
 }
 
-export function showForPending(
+export function showWhenPending(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
-  return showForAuthStatus(Component, "pending");
+  return showWhenAuthStatus(Component, "pending");
 }
 
-/**
- * Sets component variant to the current auth status
- *
- * @param Component - The React component to wrap
- * @returns A forwarded ref component that sets the variant based on the auth status
- */
-export function variantForAuthStatus(
+export function authStatusVariant(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `variantForAuthStatus -|`;
+    const logPrefix = `authStatusVariant -|`;
     try {
       const status = useAuthStore((state) => state.status);
       const camelCaseStatus = camelCase(status);
@@ -87,14 +74,6 @@ export function variantForAuthStatus(
   });
 }
 
-/**
- * Converts a component to trigger Outseta popup embeds
- * Handles registration, login, and profile popup embeds with proper visibility rules
- *
- * @param Component - The React component to wrap
- * @param embed - The type of Outseta popup embed: "register", "login", or "profile"
- * @returns A forwarded ref component that triggers the specified Outseta popup
- */
 export function popupEmbed(
   Component: React.ComponentType<any>,
   embed: "register" | "login" | "profile"
@@ -168,15 +147,7 @@ export function popupProfileEmbed(
   return popupEmbed(Component, "profile");
 }
 
-/**
- * Converts a component to trigger Outseta action embeds
- * Handles logout actions with proper visibility rules
- *
- * @param Component - The React component to wrap
- * @param action - The type of action: "logout"
- * @returns A forwarded ref component that triggers the specified Outseta action
- */
-export function action(
+function action(
   Component: React.ComponentType<any>,
   action: "logout"
 ): React.ComponentType<any> {

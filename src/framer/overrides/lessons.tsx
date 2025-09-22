@@ -1,9 +1,9 @@
 import React from "react";
 
 import {
-  showForPropertyMatch,
-  showForNotPropertyMatch,
-  variantForPropertyMatch,
+  showWhenProperty,
+  showWhenNotProperty,
+  variantForProperty,
   toggleProperty,
   withTextProperty,
 } from "./properties";
@@ -11,72 +11,50 @@ import {
 const PROPERTY_LESSONS_COMPLETED = "LessonsCompleted";
 const PROPS_SLUG = "props.slug";
 const INCLUDES = "includes";
+const VARIANTS = {
+  activeVariant: "Completed",
+  inactiveVariant: "NotCompleted",
+};
 
-/**
- * Sets component text to bookmarks
- * @param Component - The component to wrap
- */
-export function withLessonsCompleted(
+export function withLessonsCompletedAsText(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return withTextProperty(Component, PROPERTY_LESSONS_COMPLETED);
 }
 
-/**
- * Shows component if lesson is completed
- * @param Component - The component to wrap
- * @param options - Configuration
- */
-export function showForLessonCompleted(
+export function showWhenLessonCompleted(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
-  return showForPropertyMatch(Component, PROPERTY_LESSONS_COMPLETED, {
+  return showWhenProperty(Component, PROPERTY_LESSONS_COMPLETED, {
     value: PROPS_SLUG,
     compare: INCLUDES,
   });
 }
 
-/**
- * Hides component if lesson is completed
- * @param Component - The component to wrap
- * @param options - Configuration
- */
-export function showForLessonNotCompleted(
+export function showWhenLessonNotCompleted(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
-  return showForNotPropertyMatch(Component, PROPERTY_LESSONS_COMPLETED, {
+  return showWhenNotProperty(Component, PROPERTY_LESSONS_COMPLETED, {
     value: PROPS_SLUG,
     compare: INCLUDES,
   });
 }
 
-/**
- * Toggles lesson completion status for an item
- * @param Component - The component to wrap
- * @param options - Configuration
- * @param options.slug - Item slug to toggle (can be "props.slug")
- */
-export function toggleLessonCompletion(
+export function toggleLessonCompleted(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return toggleProperty(Component, PROPERTY_LESSONS_COMPLETED, {
     value: PROPS_SLUG,
-    matchVariant: "Completed",
-    noMatchVariant: "NotCompleted",
+    ...VARIANTS,
   });
 }
 
-/**
- * Sets component variant based on lesson completion status
- * @param Component - The component to wrap
- */
-export function variantForLessonCompletion(
+export function lessonCompletedVariant(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
-  return variantForPropertyMatch(Component, PROPERTY_LESSONS_COMPLETED, {
+  return variantForProperty(Component, PROPERTY_LESSONS_COMPLETED, {
     value: PROPS_SLUG,
     compare: INCLUDES,
-    matchVariant: "Completed",
-    noMatchVariant: "NotCompleted",
+    ...VARIANTS,
   });
 }

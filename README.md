@@ -1,575 +1,351 @@
 # Outseta Toolkit
 
-A toolkit for integrating Outseta with visual website builders like Framer and Webflow.
-
-Currently only provides Framer override functions for authentication, custom property display, and conditional visibility.
+A toolkit for integrating Outseta with Framer. Provides authentication state management, custom property display, and conditional visibility functions.
 
 ## Features
 
-🔧 **Framer Overrides**: Functions for authentication, visibility, and dynamic content\
-📦 **CDN/ESM Support**: Direct imports from CDN or npm\
-📝 **TypeScript**: Full type definitions included\
-❗ **Error Handling**: Optimistic updates with automatic rollback\
-🔄 **Event Integration**: Automatic sync with Outseta events\
-⚡ **Performance**: Debounced API calls and selective subscriptions
-
-## Installation
-
-### CDN Import
-
-```javascript
-// Framer overrides
-import {
-  trigger,
-  toggleProperty,
-  showForProperty,
-  showForAuthStatus,
-  withProperty,
-  withImageProperty,
-} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist/framer/overrides.js";
-```
+🔧 **Authentication Controls**: Show/hide content based on login status, trigger login/register/profile popups and logout action\
+👤 **User Data Display**: Automatically populate components with user names, email, avatar, and account info\
+💳 **Access Management**: Control component visibility based on subscription plans and add-ons\
+🔖 **Bookmark System**: Ready-made bookmark functionality\
+📚 **Lesson Tracking**: Ready-made lesson completion tracking and management\
+📝 **Build Your Own**: Build overrides for any custom property, user and account properties\
 
 ## Quick Start
 
-Provides override functions for integrating Outseta authentication and custom properties with Framer components. Handles authentication flows, conditional visibility, and dynamic content.
-
-### User - Framer Overrides
-
-Copy/paste the following code into a code file in your Framer project named `OutsetaUser.tsx`.
+Copy/paste the following code into a code file in your Framer project named `Outseta.tsx`. This single file provides all the most common Outseta integration functions.
 
 ```javascript
-// File: OutsetaUser.tsx
+// File: Outseta.tsx
 import { type ComponentType } from "react";
 import {
-  showForAuthStatus,
-  withProperty,
-  withImageProperty,
+  auth,
+  user,
+  plans,
+  addOns,
+  custom,
+  bookmarks,
+  lessons,
 } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist/framer/overrides.js";
 
-// Visibility controls
-export function showForAnonymous(Component): ComponentType {
-  return showForAuthStatus(Component, "anonymous");
+//// AUTHENTICATION ////
+
+// Opens login embed as popup (shows for anonymous users only)
+export function popupLoginEmbed(Component): ComponentType {
+  return auth.popupLoginEmbed(Component);
 }
 
-export function showForAuthenticated(Component): ComponentType {
-  return showForAuthStatus(Component, "authenticated");
+// Opens registration embed as popup (shows for anonymous users only)
+export function popupRegisterEmbed(Component): ComponentType {
+  return auth.popupRegisterEmbed(Component);
 }
 
-export function showWhenUserLoaded(Component): ComponentType {
-  return showForAuthStatus(Component, "user-loaded");
+// Opens profile embed as popup (shows for authenticated users only)
+export function popupProfileEmbed(Component): ComponentType {
+  return auth.popupProfileEmbed(Component);
 }
 
-// User property display
+// Triggers logout action (shows for authenticated users only)
+export function logout(Component): ComponentType {
+  return auth.logout(Component);
+}
+
+// Show component only for anonymous users
+export function showWhenAnonymous(Component): ComponentType {
+  return auth.showWhenAnonymous(Component);
+}
+
+// Show component only for authenticated users
+export function showWhenAuthenticated(Component): ComponentType {
+  return auth.showWhenAuthenticated(Component);
+}
+
+// Set component variant based on authentication status
+// ℹ️ The Framer component must have the variants: `Anonymous` and `Authenticated`
+export function authStatusVariant(Component): ComponentType {
+  return auth.authStatusVariant(Component);
+}
+
+//// USER DATA ////
+
+// Display user's first name
 export function withFirstName(Component): ComponentType {
-  return withProperty(Component, { name: "FirstName" });
+  return user.withFirstName(Component);
 }
 
+// Display user's last name
 export function withLastName(Component): ComponentType {
-  return withProperty(Component, { name: "LastName" });
+  return user.withLastName(Component);
 }
 
+// Display user's full name
 export function withFullName(Component): ComponentType {
-  return withProperty(Component, { name: "FullName" });
+  return user.withFullName(Component);
 }
 
+// Display user's email address
 export function withEmail(Component): ComponentType {
-  return withProperty(Component, { name: "Email" });
+  return user.withEmail(Component);
 }
 
+// Display user's avatar/profile image
+// ℹ️ Requires an image component
 export function withAvatar(Component): ComponentType {
-  return withImageProperty(Component, { name: "ProfileImageS3Url" });
+  return user.withAvatar(Component);
 }
 
-// Account property display
+// Display account name
 export function withAccountName(Component): ComponentType {
-  return withProperty(Component, { name: "Account.Name" });
-}
-```
-
-### Subscriptions - Framer Overrides
-
-Copy/paste the following code into a code file in your Framer project named `OutsetaSubscription.tsx`.
-
-ℹ️ **NOTE:** Remember to replace the plan uids and names with your own, and duplicate the code for additional plan uids and names.
-
-```javascript
-// File: OutsetaSubscription.tsx
-import { type ComponentType } from "react";
-import {
-  showForProperty,
-  hideForProperty,
-  primaryVariantForProperty,
-} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist/framer/overrides.js";
-
-export function primaryVariantForAddOn_OW4pRYWg(Component): ComponentType {
-  return primaryVariantForProperty(Component, {
-    name: "CurrentAddOnUids",
-    value: "OW4pRYWg",
-    compare: "array-includes",
-  });
+  return user.withAccountName(Component);
 }
 
-// 🚨 Replace OW4pRYWg with your add-on uid, and duplicate for additional add-on uids
-export function showForAddOn_OW4pRYWg(Component): ComponentType {
-  return showForProperty(Component, {
-    name: "CurrentAddOnUids",
-    value: "OW4pRYWg",
-    compare: "array-includes", // Compare as array
-  });
+//// PLANS ////
+
+// Display current plan UID
+export function withPlanUid(Component): ComponentType {
+  return plans.withPlanUid(Component);
 }
 
-// 🚨 Replace OW4pRYWg with your add-on uid, and duplicate for additional add-on uids
-export function hideForAddOn_OW4pRYWg(Component): ComponentType {
-  return hideForProperty(Component, {
-    name: "CurrentAddOnUids",
-    value: "OW4pRYWg",
-    compare: "array-includes",
-  });
+// Selects `OW45KRmg`variant for a user on the OW45KRmg plan
+// Selects `amRjLEmJ` variant for a user on the amRjLEmJ plan
+// If variant not found, the component will use the premium variant
+export function planUidVariant(Component): ComponentType {
+  return plans.planUidVariant(Component);
 }
 
-// 🚨 Replace OW45KRmg with your plan uid, and duplicate for additional plan uids
-export function showForPlan_OW45KRmg(Component): ComponentType {
-  return showForProperty(Component, {
-    name: "CurrentPlanUid",
-    value: "OW45KRmg",
-    compare: "equal",
-  });
+/*
+***********************************************************
+** 🚨 Remember to customize the plan overrides! **
+***********************************************************
+To customize the plan overrides, change the examples below:
+1. Change the plan denomination (e.g. `Premium`)
+2. Change the plan UID to match the plan denomination
+3. Update your project to use the new override
+Copy/paste and repeat for each plan needed.
+*/
+
+// Example for a "Premium" plan with UID "OW45KRmg":
+
+// Show component for users on the Premium plan
+export function showWhenPlan_Premium(Component): ComponentType {
+  return plans.showWhenPlan(Component, "OW45KRmg");
 }
 
-// 🚨 Replace OW45KRmg with your plan uid, and duplicate for additional plan uids
-export function hideForPlan_OW45KRmg(Component): ComponentType {
-  return hideForProperty(Component, {
-    name: "CurrentPlanUid",
-    value: "OW45KRmg",
-    compare: "equal",
-  });
-}
-```
-
-### Auth Triggers - Framer Overrides
-
-Copy/paste the following code into a code file in your Framer project named `OutsetaAuth.tsx`.
-
-```javascript
-// File: OutsetaAuth.tsx
-import { type ComponentType } from "react";
-import {
-  triggerPopup,
-  triggerAction,
-} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist/framer/overrides.js";
-
-// Authentication triggers
-export function triggerLoginPopup(Component): ComponentType {
-  return triggerPopup(Component, "login");
+// Show component for users not on the Premium plan
+export function showWhenNotPlan_Premium(Component): ComponentType {
+  return plans.showWhenNotPlan(Component, "OW45KRmg");
 }
 
-export function triggerRegisterPopup(Component): ComponentType {
-  return triggerPopup(Component, "register");
+// Select variant `Active` for users on the Premium plan
+// Select variant `Inactive` for users not on the Premium plan
+// ℹ️ Requires `Active`, `Inactive` component variants
+export function variantForPlan_Premium(Component): ComponentType {
+  return plans.variantForPlan(Component, "OW45KRmg");
 }
 
-export function triggerProfilePopup(Component): ComponentType {
-  return triggerPopup(Component, "profile");
+//// ADD-ONS ////
+
+// Display current add-on UIDs as comma seperated string
+export function withAddOnUids(Component): ComponentType {
+  return addOns.withAddOnUids(Component);
 }
 
-export function triggerLogout(Component): ComponentType {
-  return triggerAction(Component, "logout");
-}
-```
+/*
+***********************************************************
+** 🚨 Remember to customize the add-on overrides! **
+***********************************************************
+To customize the add-on overrides, change the examples below:
+1. Change the add-on denomination (e.g. `PowerUp`)
+2. Change the add-on UID to match the add-on denomination
+3. Update your project to use the new override
+🔁 Copy/paste and repeat for each add-on needed.
+*/
 
-### Completed Lessons - Framer Overrides
+// Example for a "PowerUp" add-on with UID "OW4pRYWg":
 
-Copy/paste the following code into a code file in your Framer project named `OutsetaLessons.tsx`.
-
-ℹ️ **NOTE:** The `CompletedLessons` custom property is required to be configured Outseta for this to work.
-
-```javascript
-// File: OutsetaLessons.tsx
-import { type ComponentType } from "react";
-import {
-  withProperty,
-  showForProperty,
-  hideForProperty,
-  toggleProperty,
-} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist/framer/overrides.js";
-
-//////
-// 🚨 Requires a person custom property with system name: CompletedLessons
-//////
-
-// Display the completed lessons as a comma-separated list
-export function withCompletedLessons(Component): ComponentType {
-  return withProperty(Component, { name: "CompletedLessons" });
+// Show component for users with the PowerUp add-on
+export function showWhenAddOn_PowerUp(Component): ComponentType {
+  return addOns.showWhenAddOn(Component, "OW4pRYWg");
 }
 
-// Show the component if the lesson is completed
-// 🚨 The Framer component must have a `slug` property.
-export function showForLessonCompleted(Component): ComponentType {
-  return showForProperty(Component, {
-    name: "CompletedLessons",
-    value: "props.slug",
-    compare: "array-includes",
-  });
+// Show component for users without the PowerUp add-on
+export function showWhenNotAddOn_PowerUp(Component): ComponentType {
+  return addOns.showWhenNotAddOn(Component, "OW4pRYWg");
 }
 
-// Hide the component if the lesson is completed
-// 🚨 The Framer component must have a `slug` property.
-export function hideForLessonCompleted(Component): ComponentType {
-  return hideForProperty(Component, {
-    name: "CompletedLessons",
-    value: "props.slug",
-  });
+// Select variant `Active` for users with the PowerUp add-on
+// Select variant `Inactive` for users without the PowerUp add-on
+// ℹ️ Requires `Active` and `Inactive` component variants
+export function variantForAddOn_PowerUp(Component): ComponentType {
+  return addOns.variantForAddOn(Component, "OW4pRYWg");
 }
 
-// Toggle the lesson as completed
-// 🚨 The Framer component must have a `slug` property.
-export function toggleCompletedLesson(Component): ComponentType {
-  return toggleProperty(Component, {
-    name: "CompletedLessons",
-    value: "props.slug",
-  });
-}
-```
+//// BOOKMARKS ////
 
-### Bookmarks - Framer Overrides
+/*
+ ***********************************************************
+ ** 🚨 Remember to create a person custom property with system name: Bookmarks **
+ ***********************************************************
+ 1. Go to CRM > Custom Properties > Person > Add Property
+ 2. Make sure the system name is "Bookmarks"
+ 3. and the control type is "text"
+ */
 
-Copy/paste the following code into a code file in your Framer project named `OutsetaBookmarks.tsx`.
-
-ℹ️ **NOTE:** The `Bookmarks` custom property is required to be configured Outseta for this to work.
-
-```javascript
-// File: OutsetaBookmarks.tsx
-import { type ComponentType } from "react";
-import {
-  withProperty,
-  showForProperty,
-  hideForProperty,
-  toggleProperty,
-} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist/framer/overrides.js";
-
-//////
-// 🚨 Requires a person custom property with system name: Bookmarks
-//////
-
-// Display the bookmarks as a comma-separated list
+// Display bookmarks as comma-separated list
 export function withBookmarks(Component): ComponentType {
-  return withProperty(Component, { name: "Bookmarks" });
+  return bookmarks.withBookmarksAsText(Component);
 }
 
-// Show the component if the bookmark is in the list
-// 🚨 The Framer component must have a `slug` property.
-export function showForBookmarked(Component): ComponentType {
-  return showForProperty(Component, {
-    name: "Bookmarks",
-    value: "props.slug",
-    compare: "array-includes",
-  });
+/**
+ *  ℹ️ The following overrides require a `slug` property on the component
+ */
+
+// Show component if item is bookmarked
+export function showWhenBookmarked(Component): ComponentType {
+  return bookmarks.showWhenBookmarked(Component);
 }
 
-// Hide the component if the bookmark is in the list
-// 🚨 The Framer component must have a `slug` property.
-export function hideForBookmarked(Component): ComponentType {
-  return hideForProperty(Component, {
-    name: "Bookmarks",
-    value: "props.slug",
-  });
+// Show component if item is not bookmarked
+export function showWhenNotBookmarked(Component): ComponentType {
+  return bookmarks.showWhenNotBookmarked(Component);
 }
 
-// Toggle the bookmark
-// 🚨 The Framer component must have a `slug` property.
-export function toggleBookmark(Component): ComponentType {
-  return toggleProperty(Component, {
-    name: "Bookmarks",
-    value: "props.slug",
-  });
-}
-```
-
-## API Reference
-
-### Override Functions
-
-##### `triggerPopup(Component, embed)`
-
-Converts any component into an Outseta popup trigger with automatic visibility rules.
-
-**Embed Types:**
-
-- `"register"` - Registration popup (shows for anonymous users only)
-- `"login"` - Login popup (shows for anonymous users only)
-- `"profile"` - Profile management (shows for authenticated users only)
-
-```javascript
-// Use in Framer Overrides Code File
-export function triggerLoginPopup(Component): ComponentType {
-  return triggerPopup(Component, "login");
+// Toggle bookmark status
+export function toggleBookmarked(Component): ComponentType {
+  return bookmarks.toggleBookmarked(Component);
 }
 
-export function triggerRegisterPopup(Component): ComponentType {
-  return triggerPopup(Component, "register");
+// Select variant `Bookmarked` when item is bookmarked
+// Select variant `NotBookmarked` when item is not bookmarked
+export function bookmarkedVariant(Component): ComponentType {
+  return bookmarks.bookmarkedVariant(Component);
 }
 
-export function triggerProfilePopup(Component): ComponentType {
-  return triggerPopup(Component, "profile");
+//// LESSONS ////
+
+/*
+ ***********************************************************
+ ** 🚨 Remember to create a person custom property with system name: LessonsCompleted **
+ ***********************************************************
+ 1. Go to CRM > Custom Properties > Person > Add Property
+ 2. Make sure the system name is "LessonsCompleted"
+ 3. and the control type is "text"
+ */
+
+// Display completed lessons as comma-separated list
+export function withLessonsCompleted(Component): ComponentType {
+  return lessons.withLessonsCompletedAsText(Component);
 }
-```
 
-##### `triggerAction(Component, action)`
+/**
+ *  ℹ️ The following overrides require a `slug` property on the component
+ */
 
-Converts any component into an Outseta action trigger with automatic visibility rules.
+// Show component if lesson is completed
+export function showWhenLessonCompleted(Component): ComponentType {
+  return lessons.showWhenLessonCompleted(Component);
+}
 
-**Action Types:**
+// Show component if lesson is not completed
+export function showWhenLessonNotCompleted(Component): ComponentType {
+  return lessons.showWhenLessonNotCompleted(Component);
+}
 
-- `"logout"` - Logout action (shows for authenticated users only)
+// Toggle lesson completion status
+// Select variant `Completed` when lesson is completed
+// Select variant `NotCompleted` when lesson is not completed
+export function toggleLessonCompleted(Component): ComponentType {
+  return lessons.toggleLessonCompleted(Component);
+}
 
-```javascript
-// Use in Framer Overrides Code File
-export function triggerLogout(Component): ComponentType {
-  return triggerAction(Component, "logout");
+// Select variant `Completed` when lesson is completed
+// Select variant `NotCompleted` when lesson is not completed
+export function lessonCompletedVariant(Component): ComponentType {
+  return lessons.lessonCompletedVariant(Component);
 }
 ```
 
-##### `showForAuthStatus(Component, status)`
+## Create Your Own
 
-Shows component only when authentication status matches the specified state.
-
-**Status Options:**
-
-- `"pending"` - Shows when authentication status is pending
-- `"anonymous"` - Shows when authentication status is anonymous - logged out
-- `"authenticated"` - Shows when authentication status is authenticated - logged in (user data might not be fully loaded yet)
-- `"user-loaded"` - Shows when authentication status is user-loaded (user data is fully loaded and authenticated)
+For custom properties and advanced use cases, use the `custom` module:
 
 ```javascript
-// Use in Framer Overrides Code File
-export function showForAuthenticated(Component): ComponentType {
-  return showForAuthStatus(Component, "authenticated");
+import { custom } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist/framer/overrides.js";
+
+//// EXAMPLES OF CUSTOM PROPERTIES ////
+
+/*
+ ***********************************************************
+ ** 🚨 Remember to create an account custom property with system name: Account.Mascot **
+ ***********************************************************
+// 1. Go to CRM > Custom Properties > Account > Add Property
+// 2. Make sure the system name is "Mascot"
+// 3. and the control type is "text"
+// 4. Click "Add"
+ */
+
+// Display company mascot
+export function withCompanyMascot(Component): ComponentType {
+  return custom.withTextProperty(Component, "Account.Mascot");
 }
 
-export function showForAnonymous(Component): ComponentType {
-  return showForAuthStatus(Component, "anonymous");
-}
+/*
+ ***********************************************************
+ ** 🚨 Remember to create a person custom property with system name: CoffeePreference **
+ ***********************************************************
+// 1. Go to CRM > Custom Properties > Person > Add Property
+// 2. Make sure the system name is "CoffeePreference"
+// 3. and the control type is "text"
+ */
 
-export function showForPending(Component): ComponentType {
-  return showForAuthStatus(Component, "pending");
-}
-
-export function showForUserLoaded(Component): ComponentType {
-  return showForAuthStatus(Component, "user-loaded");
-}
-```
-
-##### `toggleProperty(Component, options)`
-
-Creates a toggle button for any custom property with comma-separated array support.
-
-**Options:**
-
-- `name` - Property name (supports dot notation, prefix "Account." for account custom properties)
-- `value` - Value to toggle, supports a static value and "props.propertyName" (e.g. "props.slug") to use a component's prop value
-
-```javascript
-// Use in Framer Overrides Code File
-export function toggleBookmark(Component): ComponentType {
-  return toggleProperty(Component, {
-    name: "Bookmarks", // 🚨 Requires a person custom property with system name: Bookmarks
-    value: "props.slug", // 🚨 The Framer component must have a `slug` property.
-  });
-}
-
-export function toggleNewsletterPreference(Component): ComponentType {
-  return toggleProperty(Component, {
-    name: "Preferences", // 🚨 Requires a person custom property with system name: Preferences
-    value: "newsletter",
-  });
-}
-```
-
-##### `showForProperty(Component, options)`
-
-Conditional visibility based on custom property comparison.
-
-**Options:**
-
-- `name` - Property name (supports dot notation, prefix "Account." for account custom properties)
-- `value` - Value to compare, supports a static value and "props.propertyName" (e.g. "props.slug") to use a component's prop value
-- `compare` - Comparison type: `"equal"`, `"array-includes"`
-- `flags` - Array of flags: `["ignore-case"]`
-
-```javascript
-// Use in Framer Overrides Code File
-
-export function showForVIP(Component): ComponentType {
-  return showForProperty(Component, {
-    name: "Account.CurrentSubscription.Plan.Name",
-    value: "VIP",
+export function showWhenCoffeePreference_Espresso(Component): ComponentType {
+  return custom.showWhenProperty(Component, "CoffeePreference", {
+    value: "Espresso",
     compare: "equal",
     flags: ["ignore-case"],
   });
 }
 
-export function showForBookmarked(Component): ComponentType {
-  return showForProperty(Component, {
-    name: "Bookmarks", // 🚨 Requires a person custom property with system name: Bookmarks
-    value: "props.slug", // 🚨 The Framer component must have a `slug` property.
-    compare: "array-includes",
+/*
+ ***********************************************************
+ ** 🚨 Remember to create a person custom property with system name: Skills **
+ ***********************************************************
+// 1. Go to CRM > Custom Properties > Person > Add Property
+// 2. Make sure the system name is "Skills"
+// 3. and the control type is "select"
+// 4. Add the following options: `JavaScript`, `Design`, `Marketing`
+ */
+
+// Toggle skill tag
+// Select variant `Active` when slug is present in skills
+// Select variant `Inactive` when slug is not present in skills
+// ℹ️ Requires a `slug` property on the component
+export function toggleSkillTag(Component): ComponentType {
+  return custom.toggleProperty(Component, "Skills", {
+    value: "props.slug",
   });
 }
 
-export function showForMascot_Cat(Component): ComponentType {
-  return showForProperty(Component, {
-    name: "Account.Mascot", // 🚨 Requires an account custom property with system name: Mascot
-    value: "Cat",
-    flags: ["ignore-case"],
+/*
+ ***********************************************************
+ ** 🚨 Remember to create a person custom property with system name: WatchLater **
+ ***********************************************************
+// 1. Go to CRM > Custom Properties > Person > Add Property
+// 2. Make sure the system name is "WatchLater"
+// 3. and the control type is "text"
+ */
+
+// Select variant `OnWatchLaterList` when slug is present in watch later
+// Select variant `NotOnWatchLaterList` when slug is not present in watch later
+// ℹ️ Requires a `slug` property on the component
+export function variantFromWatchLaterStatus(Component): ComponentType {
+  return custom.variantForProperty(Component, "WatchLater", {
+    value: "props.slug", // e.g., one of the following: `video1`, `video2`, `video3` etc.
+    compare: "includes",
+    activeVariant: "OnWatchLaterList",
+    inactiveVariant: "NotOnWatchLaterList",
   });
 }
-```
-
-##### `primaryVariantForProperty(Component, options)`
-
-Sets component variant based on property comparison.
-
-**Options:**
-
-- `name` - Property name (supports dot notation, prefix "Account." for account custom properties)
-- `value` - Value to compare against (can be "props.propertyName")
-- `compare` - Comparison type: "equal" or "array-includes"
-- `flags` - Additional flags like ["ignore-case"]
-
-```javascript
-// Use in Framer Overrides Code File
-
-export function primaryVariantForVIP(Component): ComponentType {
-  return primaryVariantForProperty(Component, {
-    name: "Account.CurrentSubscription.Plan.Name",
-    value: "VIP",
-    compare: "equal",
-    flags: ["ignore-case"],
-  });
-}
-
-export function primaryVariantForBookmarked(Component): ComponentType {
-  return primaryVariantForProperty(Component, {
-    name: "Bookmarks", // 🚨 Requires a person custom property with system name: Bookmarks
-    value: "props.slug", // 🚨 The Framer component must have a `slug` property.
-    compare: "array-includes",
-  });
-}
-
-export function primaryVariantForAddOn_OW4pRYWg(Component): ComponentType {
-  return primaryVariantForProperty(Component, {
-    name: "CurrentAddOnUids",
-    value: "OW4pRYWg",
-    compare: "array-includes",
-  });
-}
-```
-
-##### `withProperty(Component, options)`
-
-Sets component text to any custom property value.
-
-**Options:**
-
-- `name` - Property name (supports dot notation, prefix "Account." for account custom properties)
-
-```javascript
-// Use in Framer Overrides Code File
-export function withFirstName(Component): ComponentType {
-  return withProperty(Component, { name: "FirstName" });
-}
-
-export function withAccountName(Component): ComponentType {
-  return withProperty(Component, { name: "Account.Name" });
-}
-
-export function coffeePreference(Component): ComponentType {
-  return withProperty(Component, {
-    name: "CoffeePreference", // 🚨 Requires a person custom property with system name: CoffeePreference
-  });
-}
-
-export function companyMascot(Component): ComponentType {
-  return withProperty(Component, {
-    name: "Account.Mascot", // 🚨 Requires an account custom property with system name: Mascot
-  });
-}
-```
-
-##### `withImageProperty(Component, options)`
-
-Sets component background image to any custom property containing an image URL.
-
-**Options:**
-
-- `name` - Property name (supports dot notation)
-
-```javascript
-// Use in Framer Overrides Code File
-export function withAvatar(Component): ComponentType {
-  return withImageProperty(Component, { name: "MascotImageUrl" });
-}
-
-export function withAccountLogo(Component): ComponentType {
-  return withImageProperty(Component, { name: "Account.LogoUrl" });
-}
-```
-
-## Development
-
-```bash
-# Install dependencies
-npm install
-
-# Build the library
-npm run build
-
-# Development build with watch
-npm run dev
-
-# Type checking
-npm run type-check
-```
-
-### Testing with Local Server
-
-For testing the built files from external servers or applications:
-
-```bash
-# Build and start the local server
-npm run serve
-
-# Or manually build and serve
-npm run build
-node server.js
-```
-
-The setup provides:
-
-- Express server serving the `dist` files with CORS headers
-- Helpful endpoints:
-  - `GET /` - Server info and available endpoints
-  - `GET /api/files` - List all available files with usage examples
-- CORS-enabled for external testing
-
-**Example usage from external sites:**
-
-```javascript
-// Import from your local server
-import {
-  triggerAction,
-  triggerPopup,
-  withProperty,
-} from "http://localhost:3000/framer/overrides.js";
-```
-
-**For public testing, use ngrok:**
-
-```bash
-# In another terminal, expose locally
-ngrok http 3000
-
-# Then use the ngrok URL in your imports
-import { triggerAction, triggerPopup, withProperty } from "https://your-ngrok-url.ngrok-free.app/framer/overrides.js";
 ```
 
 ## License
@@ -578,7 +354,7 @@ MIT License - see [LICENSE](./LICENSE) for details.
 
 ## Contributing
 
-Contributions welcome. Submit pull requests for improvements.
+Contributions welcome. View the [contributing guide](./CONTRIBUTING.md) for more information.
 
 ## Support
 

@@ -7,16 +7,12 @@ import useAuthStore from "./useAuthStore";
 type PlanUid = string;
 
 type VariantNames = {
-  matchVariant?: string;
-  noMatchVariant?: string;
+  activeVariant?: string;
+  inactiveVariant?: string;
 };
 
 const log = OutsetaLogger(`framer.overrides.plans`);
 
-/**
- * Sets component text to plan UID value
- * @param Component - The component to wrap
- */
 export function withPlanUid(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
@@ -50,17 +46,12 @@ export function withPlanUid(
   });
 }
 
-/**
- * Shows component based on plan UID match
- * @param Component - The component to wrap
- * @param planUid - Plan UID to check against
- */
-export function showForPlan(
+export function showWhenPlan(
   Component: React.ComponentType<any>,
   planUid: PlanUid
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `showForPlan ${planUid} -|`;
+    const logPrefix = `showWhenPlan ${planUid} -|`;
 
     try {
       const payload = useAuthStore((state) => state.payload);
@@ -100,17 +91,12 @@ export function showForPlan(
   });
 }
 
-/**
- * Shows component based on plan UID mismatch
- * @param Component - The component to wrap
- * @param planUid - Plan UID to check against (can be "props.propertyName")
- */
-export function showForNotPlan(
+export function showWhenNotPlan(
   Component: React.ComponentType<any>,
   planUid: PlanUid
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `showForNotPlan ${planUid} -|`;
+    const logPrefix = `showWhenNotPlan ${planUid} -|`;
 
     try {
       const payload = useAuthStore((state) => state.payload);
@@ -150,11 +136,7 @@ export function showForNotPlan(
   });
 }
 
-/**
- * Sets component variant to the current plan UID
- * @param Component - The component to wrap
- */
-export function variantForPlanUid(
+export function planUidVariant(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
@@ -189,21 +171,10 @@ export function variantForPlanUid(
   });
 }
 
-/**
- * Selects variant for plan UID presence
- * @param Component - The component to wrap
- * @param planUid - Plan UID to check for
- * @param options - Configuration
- * @param options.matchVariant - Variant name when plan matches (default: "WithPlan")
- * @param options.noMatchVariant - Variant name when plan doesn't match (default: "WithoutPlan")
- */
 export function variantForPlan(
   Component: React.ComponentType<any>,
   planUid: PlanUid,
-  {
-    matchVariant = "WithPlan",
-    noMatchVariant = "WithoutPlan",
-  } = {} as VariantNames
+  { activeVariant = "Active", inactiveVariant = "Inactive" }: VariantNames = {}
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `variantForPlan ${planUid} -|`;
@@ -230,7 +201,7 @@ export function variantForPlan(
         "equal"
       );
 
-      const variantName = matches ? matchVariant : noMatchVariant;
+      const variantName = matches ? activeVariant : inactiveVariant;
 
       log(logPrefix, `Selecting variant: ${variantName}`);
       return <Component ref={ref} {...props} variant={variantName} />;
