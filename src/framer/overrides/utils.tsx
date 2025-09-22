@@ -111,8 +111,8 @@ export function toggleValueInArray(
   }
 }
 
-type CompareType = "equal" | "includes";
-type CompareFlag = "ignore-case";
+export type CompareType = "equal" | "includes";
+export type CompareFlag = "ignore-case";
 
 /**
  * Main comparison function that replaces the old compare() function

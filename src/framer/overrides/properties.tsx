@@ -8,14 +8,16 @@ import {
   comparePropertyValue,
   resolveValue,
   toggleValueInArray,
+  type CompareType,
+  type CompareFlag,
 } from "./utils";
 
 type PropertyKey = string;
 
 type CompareOptions = {
   value: any;
-  compare: "equal" | "includes";
-  flags?: "ignore-case"[];
+  compare: CompareType;
+  flags?: CompareFlag[];
 };
 
 type MatchVariantOptions = {
