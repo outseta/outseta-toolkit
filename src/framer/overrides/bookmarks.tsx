@@ -2,7 +2,7 @@ import React from "react";
 import {
   showWhenProperty,
   showWhenNotProperty,
-  variantWhenProperty,
+  variantForProperty,
   toggleProperty,
   withTextProperty,
 } from "./properties";
@@ -51,7 +51,7 @@ export function toggleBookmarked(
 export function bookmarkedVariant(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
-  return variantWhenProperty(Component, PROPERTY_BOOKMARKS, {
+  return variantForProperty(Component, PROPERTY_BOOKMARKS, {
     value: PROPS_SLUG,
     compare: INCLUDES,
     ...VARIANTS,

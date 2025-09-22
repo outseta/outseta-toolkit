@@ -138,13 +138,13 @@ export function showWhenNotAddOn(
   });
 }
 
-export function variantWhenAddOn(
+export function variantForAddOn(
   Component: React.ComponentType<any>,
   addOnUid: AddOnUid,
   { activeVariant = "Active", inactiveVariant = "Inactive" }: VariantNames = {}
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `variantWhenAddOn ${addOnUid} -|`;
+    const logPrefix = `variantForAddOn ${addOnUid} -|`;
 
     try {
       const payload = useAuthStore((state) => state.payload);

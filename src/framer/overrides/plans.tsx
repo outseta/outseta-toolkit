@@ -171,13 +171,13 @@ export function planUidVariant(
   });
 }
 
-export function variantWhenPlan(
+export function variantForPlan(
   Component: React.ComponentType<any>,
   planUid: PlanUid,
   { activeVariant = "Active", inactiveVariant = "Inactive" }: VariantNames = {}
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `variantWhenPlan ${planUid} -|`;
+    const logPrefix = `variantForPlan ${planUid} -|`;
 
     try {
       const payload = useAuthStore((state) => state.payload);

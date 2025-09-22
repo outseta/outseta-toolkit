@@ -139,8 +139,8 @@ export function showWhenNotPlan_Premium(Component): ComponentType {
 // Select variant `Active` for users on the Premium plan
 // Select variant `Inactive` for users not on the Premium plan
 // ℹ️ Requires `Active`, `Inactive` component variants
-export function variantWhenPlan_Premium(Component): ComponentType {
-  return plans.variantWhenPlan(Component, "OW45KRmg");
+export function variantForPlan_Premium(Component): ComponentType {
+  return plans.variantForPlan(Component, "OW45KRmg");
 }
 
 //// ADD-ONS ////
@@ -176,8 +176,8 @@ export function showWhenNotAddOn_PowerUp(Component): ComponentType {
 // Select variant `Active` for users with the PowerUp add-on
 // Select variant `Inactive` for users without the PowerUp add-on
 // ℹ️ Requires `Active` and `Inactive` component variants
-export function variantWhenAddOn_PowerUp(Component): ComponentType {
-  return addOns.variantWhenAddOn(Component, "OW4pRYWg");
+export function variantForAddOn_PowerUp(Component): ComponentType {
+  return addOns.variantForAddOn(Component, "OW4pRYWg");
 }
 
 //// BOOKMARKS ////
@@ -339,7 +339,7 @@ export function toggleSkillTag(Component): ComponentType {
 // Select variant `NotOnWatchLaterList` when slug is not present in watch later
 // ℹ️ Requires a `slug` property on the component
 export function variantFromWatchLaterStatus(Component): ComponentType {
-  return custom.variantWhenProperty(Component, "WatchLater", {
+  return custom.variantForProperty(Component, "WatchLater", {
     value: "props.slug", // e.g., one of the following: `video1`, `video2`, `video3` etc.
     compare: "includes",
     activeVariant: "OnWatchLaterList",

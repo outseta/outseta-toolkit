@@ -314,7 +314,7 @@ export function propertyVariant(
   });
 }
 
-export function variantWhenProperty(
+export function variantForProperty(
   Component: React.ComponentType<any>,
   property: PropertyKey,
   {
@@ -326,7 +326,7 @@ export function variantWhenProperty(
   }: CompareOptions & MatchVariantOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `variantWhenProperty ${property} -|`;
+    const logPrefix = `variantForProperty ${property} -|`;
 
     try {
       const user = useAuthStore((state) => state.user);

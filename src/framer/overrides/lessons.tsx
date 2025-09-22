@@ -3,7 +3,7 @@ import React from "react";
 import {
   showWhenProperty,
   showWhenNotProperty,
-  variantWhenProperty,
+  variantForProperty,
   toggleProperty,
   withTextProperty,
 } from "./properties";
@@ -52,7 +52,7 @@ export function toggleLessonCompleted(
 export function lessonCompletedVariant(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
-  return variantWhenProperty(Component, PROPERTY_LESSONS_COMPLETED, {
+  return variantForProperty(Component, PROPERTY_LESSONS_COMPLETED, {
     value: PROPS_SLUG,
     compare: INCLUDES,
     ...VARIANTS,
