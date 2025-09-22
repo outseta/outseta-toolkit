@@ -55,14 +55,14 @@ export function withAddOnUids(
 /**
  * Shows component based on add-on UID presence
  * @param Component - The component to wrap
- * @param addOnUid - Add-on UID to check against (can be "props.propertyName")
+ * @param addOnUid - Add-on UID to check against
  */
-export function showForAddOnUid(
+export function showForAddOn(
   Component: React.ComponentType<any>,
   addOnUid: AddOnUid
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `showForAddOnUid ${addOnUid} -|`;
+    const logPrefix = `showForAddOn ${addOnUid} -|`;
 
     try {
       const payload = useAuthStore((state) => state.payload);
@@ -107,12 +107,12 @@ export function showForAddOnUid(
  * @param Component - The component to wrap
  * @param addOnUid - Add-on UID to check against (can be "props.propertyName")
  */
-export function showForNotAddOnUid(
+export function showForNotAddOn(
   Component: React.ComponentType<any>,
   addOnUid: AddOnUid
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `hideForAddOnUid ${addOnUid} -|`;
+    const logPrefix = `showForNotAddOn ${addOnUid} -|`;
 
     try {
       const payload = useAuthStore((state) => state.payload);
@@ -153,22 +153,66 @@ export function showForNotAddOnUid(
 }
 
 /**
+ * Sets component variant to the current add-on UIDs as comma-separated list
+ * @param Component - The component to wrap
+ */
+export function variantForAddOnUids(
+  Component: React.ComponentType<any>
+): React.ComponentType<any> {
+  return forwardRef((props, ref) => {
+    const logPrefix = `addOnUidsVariant -|`;
+
+    try {
+      const payload = useAuthStore((state) => state.payload);
+
+      if (!payload) {
+        throw new Error("JWT payload required");
+      }
+
+      const currentAddOnUids = payload["outseta:addOnUids"];
+
+      log(logPrefix, {
+        currentAddOnUids,
+      });
+
+      if (!currentAddOnUids || currentAddOnUids.length === 0) {
+        throw new Error("No add-on UIDs available");
+      }
+
+      // Select variant with the same name as the comma-separated add-on UIDs
+      const variantName = currentAddOnUids.join(", ");
+
+      log(logPrefix, `Selecting variant: ${variantName}`);
+      return <Component ref={ref} {...props} variant={variantName} />;
+    } catch (error) {
+      if (error instanceof Error) {
+        log(logPrefix, "Hiding component -", error.message);
+      } else {
+        log(logPrefix, "Hiding component -", error);
+      }
+      return null;
+    }
+  });
+}
+
+/**
  * Selects variant for add-on UID presence
  * @param Component - The component to wrap
- * @param addOnUid - Add-on UID to check against (can be "props.propertyName")
- * @param options.matchVariant - Variant name when add-on is present (default: "WithAddOn")
- * @param options.noMatchVariant - Variant name when add-on is not present (default: "WithoutAddOn")
+ * @param addOnUid - Add-on UID to check against
+ * @param options - Configuration
+ * @param options.matchVariant - Variant name when add-on matches (default: "WithAddOn")
+ * @param options.noMatchVariant - Variant name when add-on doesn't match (default: "WithoutAddOn")
  */
-export function variantForAddOnUid(
+export function variantForAddOn(
   Component: React.ComponentType<any>,
   addOnUid: AddOnUid,
   {
     matchVariant = "WithAddOn",
     noMatchVariant = "WithoutAddOn",
-  } = {} as VariantNames
+  }: VariantNames = {}
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `variantForAddOnUid ${addOnUid} -|`;
+    const logPrefix = `variantForAddOn ${addOnUid} -|`;
 
     try {
       const payload = useAuthStore((state) => state.payload);

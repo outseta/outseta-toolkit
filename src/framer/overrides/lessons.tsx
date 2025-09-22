@@ -37,7 +37,7 @@ export function showForLessonCompleted(
 }
 
 /**
- * Hides component if lesson is completed
+ * Shows component if lesson is not completed
  * @param Component - The component to wrap
  * @param options - Configuration
  */

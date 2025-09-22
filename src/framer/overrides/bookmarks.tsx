@@ -36,7 +36,7 @@ export function showForBookmarked(
 }
 
 /**
- * Hides component if item is bookmarked
+ * Show component if item is not bookmarked
  * @param Component - The component to wrap
  * @param options.slug - Item slug to toggle (can be "props.slug")
  * @param options.matchVariant - Variant name result of the toggle match (default: "Match")

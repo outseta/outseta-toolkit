@@ -29,32 +29,28 @@ import {
 } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist/framer/overrides.js";
 
 //////
-// 🔧 Authentication Triggers
+// 🔧 Authentication
 //////
 
 // Trigger login popup (shows for anonymous users only)
-export function triggerLoginPopup(Component): ComponentType {
+export function popupLoginEmbed(Component): ComponentType {
   return auth.popupLoginEmbed(Component);
 }
 
 // Trigger registration popup (shows for anonymous users only)
-export function triggerRegisterPopup(Component): ComponentType {
+export function popupRegisterEmbed(Component): ComponentType {
   return auth.popupRegisterEmbed(Component);
 }
 
 // Trigger profile popup (shows for authenticated users only)
-export function triggerProfilePopup(Component): ComponentType {
+export function popupProfileEmbed(Component): ComponentType {
   return auth.popupProfileEmbed(Component);
 }
 
 // Trigger logout action (shows for authenticated users only)
-export function triggerLogout(Component): ComponentType {
+export function logout(Component): ComponentType {
   return auth.logout(Component);
 }
-
-//////
-// 🔧 Authentication Status Visibility
-//////
 
 // Show component only for anonymous users
 export function showForAnonymous(Component): ComponentType {
@@ -73,7 +69,7 @@ export function variantForAuthStatus(Component): ComponentType {
 }
 
 //////
-// 🔧 User Properties
+// 🔧 User Data
 //////
 
 // Display user's first name
@@ -107,24 +103,12 @@ export function withAccountName(Component): ComponentType {
 }
 
 //////
-// 🔧 Plan & Add-On Visibility
-// 🚨 Replace the UIDs below with your actual plan and add-on UIDs
+// 🔧 Plan features
 //////
 
-// Show component for specific plan
-export function showForPlan_OW45KRmg(Component): ComponentType {
-  return plans.showForPlan(Component, "OW45KRmg");
-}
-
-// Hide component for specific plan
-export function hideForPlan_OW45KRmg(Component): ComponentType {
-  return plans.hideForPlan(Component, "OW45KRmg");
-}
-
-// Set variant based on plan
-// ℹ️ Requires `WithPlan`, `WithoutPlan` component variants
-export function variantForPlan_OW45KRmg(Component): ComponentType {
-  return plans.variantForPlan(Component, "OW45KRmg");
+// Display current plan UID
+export function withPlanUid(Component): ComponentType {
+  return plans.withPlanUid(Component);
 }
 
 // Set component variant to the current plan UID
@@ -133,14 +117,44 @@ export function variantForPlanUid(Component): ComponentType {
   return plans.variantForPlanUid(Component);
 }
 
+// 🚨 Replace the UID below with your actual plan UID
+
+// Show component for specific plan
+export function showForPlan_OW45KRmg(Component): ComponentType {
+  return plans.showForPlan(Component, "OW45KRmg");
+}
+
+// Hide component for specific plan
+export function showForForNotPlan_OW45KRmg(Component): ComponentType {
+  return plans.showForNotPlan(Component, "OW45KRmg");
+}
+
+// Set variant based on plan
+// ℹ️ Requires `WithPlan`, `WithoutPlan` component variants
+export function variantForPlan_OW45KRmg(Component): ComponentType {
+  return plans.variantForPlan(Component, "OW45KRmg");
+}
+
+//////
+// 🔧 Add-Ons
+//////
+
+// Display current add-on UIDs as comma seperated string
+export function withAddOnUids(Component): ComponentType {
+  return addOns.withAddOnUids(Component);
+}
+
+// 🚨 Replace the UID below with your actual add-on UID
+// and repeat for each add-on in use
+
 // Show component for specific add-on
 export function showForAddOn_OW4pRYWg(Component): ComponentType {
   return addOns.showForAddOn(Component, "OW4pRYWg");
 }
 
 // Hide component for specific add-on
-export function hideForAddOn_OW4pRYWg(Component): ComponentType {
-  return addOns.hideForAddOn(Component, "OW4pRYWg");
+export function showForNotAddOn_OW4pRYWg(Component): ComponentType {
+  return addOns.showForNotAddOn(Component, "OW4pRYWg");
 }
 
 // Set variant based on add-on

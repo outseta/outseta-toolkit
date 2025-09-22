@@ -203,7 +203,7 @@ export function variantForPlan(
   {
     matchVariant = "WithPlan",
     noMatchVariant = "WithoutPlan",
-  } = {} as VariantNames
+  }: VariantNames = {}
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `variantForPlan ${planUid} -|`;
