@@ -21,28 +21,16 @@ type CompareOptions = {
 };
 
 type MatchVariantOptions = {
-  matchVariant: string;
-  noMatchVariant: string;
+  activeVariant?: string;
+  inactiveVariant?: string;
 };
 
 const log = OutsetaLogger(`framer.overrides.properties`);
 
-/**
- * Gets a property value from user data
- * @param user - The user object
- * @param propertyName - The property name to get
- * @returns The property value
- */
 function getPropertyValue(user: any, propertyName: string): any {
   return getNestedProperty(user, propertyName);
 }
 
-/**
- * Sets component text to a user property value
- * @param Component - The component to wrap
- * @param options - Configuration
- * @param options.property - Property name to display
- */
 export function withTextProperty(
   Component: React.ComponentType<any>,
   property: PropertyKey
@@ -76,12 +64,6 @@ export function withTextProperty(
   });
 }
 
-/**
- * Sets component background image to a user property value
- * @param Component - The component to wrap
- * @param options - Configuration
- * @param options.property - Property name containing image URL
- */
 export function withImageProperty(
   Component: React.ComponentType<any>,
   property: PropertyKey
@@ -136,16 +118,7 @@ export function withImageProperty(
   });
 }
 
-/**
- * Shows component based on property comparison
- * @param Component - The component to wrap
- * @param property - Property name to check
- * @param options - Configuration
- * @param options.value - Value to compare against (can be "props.propertyName")
- * @param options.compare - Comparison type: "equal" or "includes"
- * @param options.flags - Array of flags: ["ignore-case"]
- */
-export function showForPropertyMatch(
+export function showWhenProperty(
   Component: React.ComponentType<any>,
   property: PropertyKey,
   { value, compare: compareType, flags }: CompareOptions
@@ -192,22 +165,13 @@ export function showForPropertyMatch(
   });
 }
 
-/**
- * Shows component based on user property comparison
- * @param Component - The component to wrap
- * @param property - Property name to check
- * @param options - Configuration
- * @param options.value - Value to compare against (can be "props.propertyName")
- * @param options.compare - Comparison type: "equal" or "includes"
- * @param options.flags - Additional flags like ["ignore-case"]
- */
-export function showForNotPropertyMatch(
+export function showWhenNotProperty(
   Component: React.ComponentType<any>,
   property: PropertyKey,
   { value, compare: compareType, flags }: CompareOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `showForNotProperty ${property} -|`;
+    const logPrefix = `showWhenNotProperty ${property} -|`;
 
     try {
       const user = useAuthStore((state) => state.user);
@@ -248,23 +212,14 @@ export function showForNotPropertyMatch(
   });
 }
 
-/**
- * Creates a toggle action for any property
- * @param Component - The component to wrap
- * @param property - Property name to toggle
- * @param options - Configuration
- * @param options.value - Value to toggle (can be "props.propertyName")
- * @param options.matchVariant - Variant name result of the toggle match (default: "Match")
- * @param options.noMatchVariant - Variant name result of the toggle does not match (default: "NoMatch")
- */
 export function toggleProperty(
   Component: React.ComponentType<any>,
   property: PropertyKey,
   {
     value: valueToToggle,
     flags,
-    matchVariant,
-    noMatchVariant,
+    activeVariant = "Active",
+    inactiveVariant = "Inactive",
   }: Pick<CompareOptions, "value" | "flags"> & MatchVariantOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
@@ -316,7 +271,7 @@ export function toggleProperty(
         <Component
           ref={ref}
           {...props}
-          variant={matches ? matchVariant : noMatchVariant}
+          variant={matches ? activeVariant : inactiveVariant}
           onClick={handleClick}
         />
       );
@@ -331,12 +286,12 @@ export function toggleProperty(
   });
 }
 
-export function variantForProperty(
+export function variantFromProperty(
   Component: React.ComponentType<any>,
   property: string
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `variantForProperty ${property} -|`;
+    const logPrefix = `variantFromProperty ${property} -|`;
 
     try {
       const user = useAuthStore((state) => state.user);
@@ -359,30 +314,19 @@ export function variantForProperty(
   });
 }
 
-/**
- * Sets component variant based on property comparison
- * @param Component - The component to wrap
- * @param property - Property name to check
- * @param value - Value to compare against (can be "props.propertyName")
- * @param options - Configuration
- * @param options.compare - Comparison type: "equal" or "includes"
- * @param options.flags - Additional flags like ["ignore-case"]
- * @param options.matchVariant - Variant name when match is found (default: "Match")
- * @param options.noMatchVariant - Variant name when match is not found (default: "NoMatch")
- */
-export function variantForPropertyMatch(
+export function variantWhenProperty(
   Component: React.ComponentType<any>,
   property: PropertyKey,
   {
     value,
     compare: compareType,
     flags,
-    matchVariant,
-    noMatchVariant,
+    activeVariant = "Active",
+    inactiveVariant = "Inactive",
   }: CompareOptions & MatchVariantOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `selectPropertyMatchVariant ${property} -|`;
+    const logPrefix = `variantWhenProperty ${property} -|`;
 
     try {
       const user = useAuthStore((state) => state.user);
@@ -408,7 +352,7 @@ export function variantForPropertyMatch(
         flags
       );
 
-      const variant = matches ? matchVariant : noMatchVariant;
+      const variant = matches ? activeVariant : inactiveVariant;
 
       log(logPrefix, { variant });
       return <Component ref={ref} {...props} variant={variant} />;

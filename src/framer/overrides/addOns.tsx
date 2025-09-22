@@ -7,16 +7,12 @@ import useAuthStore from "./useAuthStore";
 type AddOnUid = string;
 
 type VariantNames = {
-  matchVariant?: string;
-  noMatchVariant?: string;
+  activeVariant?: string;
+  inactiveVariant?: string;
 };
 
 const log = OutsetaLogger(`framer.overrides.addOns`);
 
-/**
- * Sets component text to add-on UID values as comma-separated list
- * @param Component - The component to wrap
- */
 export function withAddOnUids(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
@@ -52,17 +48,12 @@ export function withAddOnUids(
   });
 }
 
-/**
- * Shows component based on add-on UID presence
- * @param Component - The component to wrap
- * @param addOnUid - Add-on UID to check against
- */
-export function showForAddOn(
+export function showWhenAddOn(
   Component: React.ComponentType<any>,
   addOnUid: AddOnUid
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `showForAddOn ${addOnUid} -|`;
+    const logPrefix = `showWhenAddOn ${addOnUid} -|`;
 
     try {
       const payload = useAuthStore((state) => state.payload);
@@ -102,17 +93,12 @@ export function showForAddOn(
   });
 }
 
-/**
- * Shows component based on add-on UID not present
- * @param Component - The component to wrap
- * @param addOnUid - Add-on UID to check against (can be "props.propertyName")
- */
-export function showForNotAddOn(
+export function showWhenNotAddOn(
   Component: React.ComponentType<any>,
   addOnUid: AddOnUid
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `showForNotAddOn ${addOnUid} -|`;
+    const logPrefix = `showWhenNotAddOn ${addOnUid} -|`;
 
     try {
       const payload = useAuthStore((state) => state.payload);
@@ -152,67 +138,13 @@ export function showForNotAddOn(
   });
 }
 
-/**
- * Sets component variant to the current add-on UIDs as comma-separated list
- * @param Component - The component to wrap
- */
-export function variantForAddOnUids(
-  Component: React.ComponentType<any>
-): React.ComponentType<any> {
-  return forwardRef((props, ref) => {
-    const logPrefix = `addOnUidsVariant -|`;
-
-    try {
-      const payload = useAuthStore((state) => state.payload);
-
-      if (!payload) {
-        throw new Error("JWT payload required");
-      }
-
-      const currentAddOnUids = payload["outseta:addOnUids"];
-
-      log(logPrefix, {
-        currentAddOnUids,
-      });
-
-      if (!currentAddOnUids || currentAddOnUids.length === 0) {
-        throw new Error("No add-on UIDs available");
-      }
-
-      // Select variant with the same name as the comma-separated add-on UIDs
-      const variantName = currentAddOnUids.join(", ");
-
-      log(logPrefix, `Selecting variant: ${variantName}`);
-      return <Component ref={ref} {...props} variant={variantName} />;
-    } catch (error) {
-      if (error instanceof Error) {
-        log(logPrefix, "Hiding component -", error.message);
-      } else {
-        log(logPrefix, "Hiding component -", error);
-      }
-      return null;
-    }
-  });
-}
-
-/**
- * Selects variant for add-on UID presence
- * @param Component - The component to wrap
- * @param addOnUid - Add-on UID to check against
- * @param options - Configuration
- * @param options.matchVariant - Variant name when add-on matches (default: "WithAddOn")
- * @param options.noMatchVariant - Variant name when add-on doesn't match (default: "WithoutAddOn")
- */
-export function variantForAddOn(
+export function variantFromAddOnStatus(
   Component: React.ComponentType<any>,
   addOnUid: AddOnUid,
-  {
-    matchVariant = "WithAddOn",
-    noMatchVariant = "WithoutAddOn",
-  }: VariantNames = {}
+  { activeVariant = "Active", inactiveVariant = "Inactive" }: VariantNames = {}
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `variantForAddOn ${addOnUid} -|`;
+    const logPrefix = `variantFromAddOnStatus ${addOnUid} -|`;
 
     try {
       const payload = useAuthStore((state) => state.payload);
@@ -235,7 +167,7 @@ export function variantForAddOn(
         resolvedValueAddOnUid,
         "includes"
       );
-      const variantName = matches ? matchVariant : noMatchVariant;
+      const variantName = matches ? activeVariant : inactiveVariant;
 
       log(logPrefix, `Selecting variant: ${variantName}`);
       return <Component ref={ref} {...props} variant={variantName} />;
