@@ -13,8 +13,8 @@ export function withPlanUid(Component): ComponentType {
 // Selects `OW45KRmg` variant for a user on the OW45KRmg plan
 // Selects `amRjLEmJ` variant for a user on the amRjLEmJ plan
 // If variant not found, the component will use the primary variant
-export function planUidVariant(Component): ComponentType {
-  return plans.planUidVariant(Component);
+export function selectPlanUidVariant(Component): ComponentType {
+  return plans.selectPlanUidVariant(Component);
 }
 
 /*
@@ -42,6 +42,6 @@ export function showWhenNotPremiumPlan(Component): ComponentType {
 
 // Selects variant `Active` for users on the Premium plan
 // Selects variant `Inactive` for users not on the Premium plan
-export function variantForPremiumPlan(Component): ComponentType {
-  return plans.variantForPlan(Component, "OW45KRmg");
+export function selectVariantForPremiumPlan(Component): ComponentType {
+  return plans.selectVariantForPlan(Component, "OW45KRmg");
 }

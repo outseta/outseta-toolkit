@@ -42,6 +42,6 @@ export function toggleLessonCompleted(Component): ComponentType {
 
 // Selects variant `Completed` when lesson is completed
 // Selects variant `NotCompleted` when lesson is not completed
-export function lessonCompletedVariant(Component): ComponentType {
-  return lessons.lessonCompletedVariant(Component);
+export function selectLessonCompletedVariant(Component): ComponentType {
+  return lessons.selectLessonCompletedVariant(Component);
 }

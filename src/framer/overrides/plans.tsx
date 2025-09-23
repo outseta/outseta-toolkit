@@ -136,7 +136,7 @@ export function showWhenNotPlan(
   });
 }
 
-export function planUidVariant(
+export function selectPlanUidVariant(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
@@ -171,7 +171,7 @@ export function planUidVariant(
   });
 }
 
-export function variantForPlan(
+export function selectVariantForPlan(
   Component: React.ComponentType<any>,
   planUid: PlanUid,
   { activeVariant = "Active", inactiveVariant = "Inactive" }: VariantNames = {}

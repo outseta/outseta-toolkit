@@ -53,7 +53,7 @@ export function showWhenPending(
   return showWhenAuthStatus(Component, "pending");
 }
 
-export function authStatusVariant(
+export function selectAuthStatusVariant(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
@@ -74,48 +74,25 @@ export function authStatusVariant(
   });
 }
 
-export function popupEmbed(
-  Component: React.ComponentType<any>,
-  embed: "register" | "login" | "profile"
+export function triggerLogout(
+  Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `triggerPopup ${embed} -|`;
+    const logPrefix = `triggerLogout -|`;
 
     try {
       const status = useAuthStore((state) => state.status);
 
       log(logPrefix, { status });
 
-      // Set appropriate data attributes based on embed type
-      const dataAttributes: Record<string, string> = {
-        "data-mode": "popup",
+      if (status !== "authenticated") {
+        throw new Error("Not authenticated");
+      }
+
+      const dataAttributes = {
+        "data-o-logout-link": "1",
       };
 
-      switch (embed) {
-        case "register":
-          if (status !== "anonymous") {
-            throw new Error("Not anonymous");
-          }
-          dataAttributes["data-o-auth"] = "1";
-          dataAttributes["data-widget-mode"] = "register";
-          break;
-        case "login":
-          if (status !== "anonymous") {
-            throw new Error("Not anonymous");
-          }
-          dataAttributes["data-o-auth"] = "1";
-          dataAttributes["data-widget-mode"] = "login";
-          break;
-        case "profile":
-          if (status !== "authenticated") {
-            throw new Error("Not authenticated");
-          }
-          dataAttributes["data-o-profile"] = "1";
-          break;
-        default:
-          throw new Error("Invalid embed type");
-      }
-
       log(logPrefix, "Setting Outseta data attributes", { dataAttributes });
       return <Component ref={ref} {...props} {...dataAttributes} />;
     } catch (error) {
@@ -127,68 +104,4 @@ export function popupEmbed(
       return null;
     }
   });
-}
-
-export function popupRegisterEmbed(
-  Component: React.ComponentType<any>
-): React.ComponentType<any> {
-  return popupEmbed(Component, "register");
-}
-
-export function popupLoginEmbed(
-  Component: React.ComponentType<any>
-): React.ComponentType<any> {
-  return popupEmbed(Component, "login");
-}
-
-export function popupProfileEmbed(
-  Component: React.ComponentType<any>
-): React.ComponentType<any> {
-  return popupEmbed(Component, "profile");
-}
-
-function action(
-  Component: React.ComponentType<any>,
-  action: "logout"
-): React.ComponentType<any> {
-  return forwardRef((props, ref) => {
-    const logPrefix = `triggerAction ${action} -|`;
-
-    try {
-      const status = useAuthStore((state) => state.status);
-
-      log(logPrefix, { status });
-
-      // Set appropriate data attributes based on action type
-      const dataAttributes: Record<string, string> = {};
-
-      switch (action) {
-        case "logout":
-          if (status !== "authenticated") {
-            throw new Error("Not authenticated");
-          }
-          dataAttributes["data-o-logout-link"] = "1";
-          break;
-
-        default:
-          throw new Error("Invalid action type");
-      }
-
-      log(logPrefix, "Setting Outseta data attributes", { dataAttributes });
-      return <Component ref={ref} {...props} {...dataAttributes} />;
-    } catch (error) {
-      if (error instanceof Error) {
-        log(logPrefix, "Hiding component", error.message);
-      } else {
-        log(logPrefix, "Hiding component", error);
-      }
-      return null;
-    }
-  });
-}
-
-export function logout(
-  Component: React.ComponentType<any>
-): React.ComponentType<any> {
-  return action(Component, "logout");
 }

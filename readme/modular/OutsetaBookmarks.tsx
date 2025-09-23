@@ -42,6 +42,6 @@ export function toggleBookmarked(Component): ComponentType {
 
 // Selects variant `Bookmarked` when the item is bookmarked
 // Selects variant `NotBookmarked` when the item is not bookmarked
-export function bookmarkedVariant(Component): ComponentType {
-  return bookmarks.bookmarkedVariant(Component);
+export function selectBookmarkedVariant(Component): ComponentType {
+  return bookmarks.selectBookmarkedVariant(Component);
 }

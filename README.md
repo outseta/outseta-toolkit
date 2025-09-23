@@ -15,31 +15,67 @@ A toolkit for integrating Outseta with Framer. Provides authentication state man
 
 Choose your approach based on your project needs:
 
-### Option 1: Modular Overrides (Recommended)
+### Option 1: All-in-One Override File (Recommended)
 
-The modulear overrides are a set of focused override files for specific functionality.
+The all-in-one override file provides all the most common Outseta integration functions in a single file.
 
-For each set of overrides, copy the following code into a code file in your Framer project with the same name:
+Copy the code from **[Outseta.tsx](./readme/Outseta.tsx)** into a code file in your Framer project.
 
-- 🔧 **[OutsetaAuth.tsx](./readme/OutsetaAuth.tsx)** - Authentication controls and login flows
-- 👤 **[OutsetaUser.tsx](./readme/OutsetaUser.tsx)** - User data display functions
-- 💳 **[OutsetaPlans.tsx](./readme/OutsetaPlans.tsx)** - Subscription plan management
-- 🔌 **[OutsetaAddOns.tsx](./readme/OutsetaAddOns.tsx)** - Add-on management
-- 🔖 **[OutsetaBookmarks.tsx](./readme/OutsetaBookmarks.tsx)** - Ready-made bookmark system
-- 📚 **[OutsetaLessons.tsx](./readme/OutsetaLessons.tsx)** - Lesson completion tracking
-- 📝 **[OutsetaCustom.tsx](./readme/OutsetaCustom.tsx)** - Custom property examples
+The file contains all of the functions listed in the Modular Overrides section below, prefixed with the module name for easy navigation in the override selector.
+
+**Benefits:** Everything in one place, comprehensive functionality, single file to manage
+**Downside:** The file is large and may be difficult to navigate
+
+### Option 2: Modular Overrides
+
+The modular overrides are a set of focused override files for specific functionality.
+
+For each set of overrides, copy the following code into a code file in your Framer project:
+
+- 🔧 **[OutsetaAuth.tsx](./readme/modular/OutsetaAuth.tsx)**
+  - `showWhenAnonymous` - Component visible only for anonymous users
+  - `showWhenAuthenticated` - Component visible only for authenticated users
+  - `selectAuthStatusVariant` - Selects variants based on auth status
+  - `triggerLogout` - Component triggers logout (shows for authenticated users only)
+- 🚀 **[OutsetaEmbeds.tsx](./readme/modular/OutsetaEmbeds.tsx)**
+  - `popupLoginEmbed` - Component opens login embed as popup
+  - `popupRegisterEmbed` - Component opens registration embed as popup
+  - `popupProfileEmbed` - Component opens profile embed as popup
+- 👤 **[OutsetaUser.tsx](./readme/modular/OutsetaUser.tsx)**
+  - `withFirstName` - Display user's first name as component text
+  - `withLastName` - Display user's last name as component text
+  - `withFullName` - Display user's full name as component text
+  - `withEmail` - Display user's email address as component text
+  - `withAvatar` - Display user's avatar/profile image as component image
+  - `withAccountName` - Display account name as component text
+- 💳 **[OutsetaPlans.tsx](./readme/modular/OutsetaPlans.tsx)**
+  - `withPlanUid` - Display current plan UID as component text
+  - `selectPlanUidVariant` - Selects variant based on plan UID
+  - `showWhenPremiumPlan` - Component visible for users on specific plan (customizable)
+  - `showWhenNotPremiumPlan` - Component visible for users not on specific plan (customizable)
+  - `selectVariantForPremiumPlan` - Selects `Active` variant for users on the Premium plan, `Inactive` variant for users not on the Premium plan (customizable)
+- 🔌 **[OutsetaAddOns.tsx](./readme/modular/OutsetaAddOns.tsx)**
+  - `withAddOnUids` - Display current add-on UIDs as component text
+  - `showWhenPowerUpAddOn` - Component visible for users with specific add-on (customizable)
+  - `showWhenNotPowerUpAddOn` - Component visible for users without specific add-on (customizable)
+  - `selectVariantForPowerUpAddOn` - Select `Active` variant for users with the PowerUp add-on, `Inactive` variant for users without the PowerUp add-on (customizable)
+- 🔖 **[OutsetaBookmarks.tsx](./readme/modular/OutsetaBookmarks.tsx)**
+  - 🚨 Requires a person custom property with system name: Bookmarks
+  - `withBookmarks` - Display bookmarks as component text
+  - `showWhenBookmarked` - Component visible if item is bookmarked
+  - `showWhenNotBookmarked` - Component visible if item is not bookmarked
+  - `toggleBookmarked` - Toggle bookmark status
+  - `selectBookmarkedVariant` - Selects `Bookmarked` variant when the item is bookmarked, `NotBookmarked` variant when the item is not bookmarked
+- 📚 **[OutsetaLessons.tsx](./readme/modular/OutsetaLessons.tsx)**
+  - 🚨 Requires a person custom property with system name: LessonsCompleted
+  - `withLessonsCompleted` - Display completed lessons as component text
+  - `showWhenLessonCompleted` - Component visible if lesson is completed
+  - `showWhenLessonNotCompleted` - Component visible if lesson is not completed
+  - `toggleLessonCompleted` - Toggle lesson completion status
+  - `selectLessonCompletedVariant` - Selects `Completed` variant when lesson is completed, `NotCompleted` variant when lesson is not completed
 
 **Benefits:** Smaller files, easier to customize, only include what you need
-**Downside:** You need to copy and paste the code for each set of overrides
-
-### Option 2: All-in-One Override File
-
-The all-in-one override file is a single file that provides all the most common Outseta integration functions in a single file.
-
-Copy the code from **[Outseta.tsx](./templates/Outseta.tsx)** that provides all the most common Outseta integration functions in a single file.
-
-**Benefits:** Everything in one place, comprehensive functionality
-**Downside:** The file is large and may be difficult to navigate
+**Downside:** Multiple files to manage and copy
 
 ## Create Your Own
 

@@ -5,24 +5,9 @@ import { auth } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist/fr
 
 //// AUTHENTICATION CONTROLS ////
 
-// Component opens login embed as popup (shows for anonymous users only)
-export function popupLoginEmbed(Component): ComponentType {
-  return auth.popupLoginEmbed(Component);
-}
-
-// Component opens registration embed as popup (shows for anonymous users only)
-export function popupRegisterEmbed(Component): ComponentType {
-  return auth.popupRegisterEmbed(Component);
-}
-
-// Component opens profile embed as popup (shows for authenticated users only)
-export function popupProfileEmbed(Component): ComponentType {
-  return auth.popupProfileEmbed(Component);
-}
-
 // Component triggers logout (shows for authenticated users only)
-export function logout(Component): ComponentType {
-  return auth.logout(Component);
+export function triggerLogout(Component): ComponentType {
+  return auth.triggerLogout(Component);
 }
 
 // Component visible only for anonymous users
@@ -38,6 +23,6 @@ export function showWhenAuthenticated(Component): ComponentType {
 // Selects `Anonymous` variant for anonymous users
 // Selects `Authenticated` variant for authenticated users
 // Selects `Pending` variant for pending users (can be omitted and the primary variant will be used)
-export function authStatusVariant(Component): ComponentType {
-  return auth.authStatusVariant(Component);
+export function selectAuthStatusVariant(Component): ComponentType {
+  return auth.selectAuthStatusVariant(Component);
 }

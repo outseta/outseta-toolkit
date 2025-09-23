@@ -1,5 +1,6 @@
 // Native functionality
 export * as auth from "./auth";
+export * as embed from "./embed";
 export * as plans from "./plans";
 export * as addOns from "./addOns";
 export * as user from "./user";
