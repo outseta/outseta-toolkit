@@ -30,9 +30,16 @@ export function auth_showWhenAuthenticated(Component): ComponentType {
 
 // Selects `Anonymous` variant for anonymous users
 // Selects `Authenticated` variant for authenticated users
-// Selects `Pending` variant for pending users (can be omitted and the primary variant will be used)
 export function auth_selectAuthStatusVariant(Component): ComponentType {
   return auth.selectAuthStatusVariant(Component);
+}
+
+// Selects primary variant for authenticated users
+// Selects configured variant for non-authenticated users
+export function auth_selectPrimaryVariantForAuthenticated(
+  Component
+): ComponentType {
+  return auth.selectPrimaryVariantForAuthenticated(Component);
 }
 
 /// EMBED ////
@@ -75,7 +82,7 @@ export function user_withEmail(Component): ComponentType {
 }
 
 // Display user's avatar/profile image as component image
-// ℹ️ NOTE: Requires an image component
+// ℹ️ **NOTE:** Requires an image component
 export function user_withAvatar(Component): ComponentType {
   return user.withAvatar(Component);
 }
@@ -94,7 +101,7 @@ export function plans_withPlanUid(Component): ComponentType {
 
 // Selects `OW45KRmg` variant for a user on the OW45KRmg plan
 // Selects `amRjLEmJ` variant for a user on the amRjLEmJ plan
-// If variant not found, the component will use the primary variant
+// If variant not found, selects the primary variant
 export function plans_selectPlanUidVariant(Component): ComponentType {
   return plans.selectPlanUidVariant(Component);
 }
@@ -122,10 +129,12 @@ export function plans_showWhenNotPremiumPlan(Component): ComponentType {
   return plans.showWhenNotPlan(Component, "OW45KRmg");
 }
 
-// Selects variant `Active` for users on the Premium plan
-// Selects variant `Inactive` for users not on the Premium plan
-export function plans_selectVariantForPremiumPlan(Component): ComponentType {
-  return plans.selectVariantForPlan(Component, "OW45KRmg");
+// Selects primary variant for users on the Premium plan
+// Selects configured variant for users not on the Premium plan
+export function plans_selectPrimaryVariantForPremiumPlan(
+  Component
+): ComponentType {
+  return plans.selectPrimaryVariantForPlan(Component, "OW45KRmg");
 }
 
 //// ADD-ONS ////
@@ -158,17 +167,19 @@ export function addOns_showWhenNotPowerUpAddOn(Component): ComponentType {
   return addOns.showWhenNotAddOn(Component, "OW4pRYWg");
 }
 
-// Selects variant `Active` for users with the PowerUp add-on
-// Selects variant `Inactive` for users without the PowerUp add-on
-export function addOns_selectVariantForPowerUpAddOn(Component): ComponentType {
-  return addOns.selectVariantForAddOn(Component, "OW4pRYWg");
+// Selects primary variant for users with the PowerUp add-on
+// Selects configured variant for users without the PowerUp add-on
+export function addOns_selectPrimaryVariantForPowerUpAddOn(
+  Component
+): ComponentType {
+  return addOns.selectPrimaryVariantForAddOn(Component, "OW4pRYWg");
 }
 
 //// BOOKMARKS ////
 
 /*
  ***********************************************************
- ** 🚨 REQUIRES: Create a person custom property with system name: Bookmarks **
+ ** 🚨 **REQUIRES** a person custom property with system name: Bookmarks **
  ***********************************************************
  1. Go to CRM > Custom Properties > Person > Add Property
  2. Make sure the system name is "Bookmarks"
@@ -181,7 +192,7 @@ export function bookmarks_withBookmarks(Component): ComponentType {
 }
 
 /**
- * ℹ️ NOTE: The following overrides require a `slug` property on the component
+ * ℹ️ **NOTE:** The following overrides require a `slug` property on the component
  */
 
 // Component visible if item is bookmarked
@@ -195,23 +206,31 @@ export function bookmarks_showWhenNotBookmarked(Component): ComponentType {
 }
 
 // Toggle bookmark status
-// Selects variant `Bookmarked` when item is bookmarked
-// Selects variant `NotBookmarked` when the item is not bookmarked
+// Selects primary variant when item is bookmarked
+// Selects configured variant when the item is not bookmarked
 export function bookmarks_toggleBookmarked(Component): ComponentType {
   return bookmarks.toggleBookmarked(Component);
 }
 
-// Selects variant `Bookmarked` when the item is bookmarked
-// Selects variant `NotBookmarked` when the item is not bookmarked
-export function bookmarks_selectBookmarkedVariant(Component): ComponentType {
-  return bookmarks.selectBookmarkedVariant(Component);
+// Selects primary variant when the item is bookmarked
+// Selects configured variant when the item is not bookmarked
+export function bookmarks_selectPrimaryVariantForBookmarked(
+  Component
+): ComponentType {
+  return bookmarks.selectPrimaryVariantForBookmarked(Component);
+}
+
+// Selects variant `Empty State` when there are no bookmarks
+// Selects primary variant when there are bookmarks
+export function bookmarks_selectCollectionVariant(Component): ComponentType {
+  return bookmarks.selectBookmarkCollectionVariant(Component);
 }
 
 //// LESSONS ////
 
 /*
  ***********************************************************
- ** 🚨 REQUIRES: Create a person custom property with system name: LessonsCompleted **
+ ** 🚨 **REQUIRES** a person custom property with system name: LessonsCompleted **
  ***********************************************************
  1. Go to CRM > Custom Properties > Person > Add Property
  2. Make sure the system name is "LessonsCompleted"
@@ -219,33 +238,35 @@ export function bookmarks_selectBookmarkedVariant(Component): ComponentType {
  */
 
 // Display completed lessons (comma-separated list) as component text
-export function lessons_withLessonsCompleted(Component): ComponentType {
+export function lessons_withCompleted(Component): ComponentType {
   return lessons.withLessonsCompletedAsText(Component);
 }
 
 /**
- * ℹ️ NOTE: The following overrides require a `slug` property on the component
+ * ℹ️ **NOTE:** The following overrides require a `slug` property on the component
  */
 
 // Component visible if lesson is completed
-export function lessons_showWhenLessonCompleted(Component): ComponentType {
+export function lessons_showWhenCompleted(Component): ComponentType {
   return lessons.showWhenLessonCompleted(Component);
 }
 
 // Component visible if lesson is not completed
-export function lessons_showWhenLessonNotCompleted(Component): ComponentType {
+export function lessons_showWhenNotCompleted(Component): ComponentType {
   return lessons.showWhenLessonNotCompleted(Component);
 }
 
 // Toggle lesson completion status
-// Selects variant `Completed` when lesson is completed
-// Selects variant `NotCompleted` when lesson is not completed
-export function lessons_toggleLessonCompleted(Component): ComponentType {
+// Selects primary variant when lesson is completed
+// Selects configured variant when lesson is not completed
+export function lessons_toggleCompleted(Component): ComponentType {
   return lessons.toggleLessonCompleted(Component);
 }
 
-// Selects variant `Completed` when lesson is completed
-// Selects variant `NotCompleted` when lesson is not completed
-export function lessons_selectLessonCompletedVariant(Component): ComponentType {
-  return lessons.selectLessonCompletedVariant(Component);
+// Selects primary variant when lesson is completed
+// Selects configured variant when lesson is not completed
+export function lessons_selectPrimaryVariantWhenCompleted(
+  Component
+): ComponentType {
+  return lessons.selectPrimaryVariantWhenLessonCompleted(Component);
 }

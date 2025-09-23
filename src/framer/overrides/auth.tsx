@@ -1,9 +1,22 @@
 import React, { forwardRef } from "react";
 import { OutsetaLogger } from "../../outseta";
 
-import useAuthStore, { type AuthStatus } from "./useAuthStore";
+import useAuthStore, { isFramerCanvas, type AuthStatus } from "./useAuthStore";
+import { resolveValue } from "./utils";
 
 const log = OutsetaLogger("framer.overrides.auth");
+
+type VariantNames = {
+  trueVariant: string | null;
+  falseVariant: string | null;
+};
+
+const VARIANTS: VariantNames = {
+  trueVariant: null,
+  falseVariant: "props.variant",
+};
+
+/// Visibility overrides
 
 function showWhenAuthStatus(
   Component: React.ComponentType<any>,
@@ -11,6 +24,11 @@ function showWhenAuthStatus(
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `showWhenAuthStatus ${validStatus} -|`;
+
+    if (isFramerCanvas()) {
+      log(logPrefix, "Framer Canvas - showing component");
+      return <Component ref={ref} {...props} />;
+    }
 
     try {
       const currentStatus = useAuthStore((state) => state.status);
@@ -52,16 +70,32 @@ export function showWhenPending(
   return showWhenAuthStatus(Component, "pending");
 }
 
+/// Variant overrides
+
 export function selectAuthStatusVariant(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `authStatusVariant -|`;
+
+    if (isFramerCanvas()) {
+      log(logPrefix, "Framer Canvas - selecting configured variant");
+      return <Component ref={ref} {...props} variant={props.variant} />;
+    }
+
     try {
       const status = useAuthStore((state) => state.status);
-      const pascalCaseStatus = status.charAt(0).toUpperCase() + status.slice(1);
-      log(logPrefix, "Selecting variant", pascalCaseStatus);
-      return <Component ref={ref} {...props} variant={pascalCaseStatus} />;
+
+      switch (status) {
+        case "anonymous":
+          log(logPrefix, "Selecting variant", "Anonymous");
+          return <Component ref={ref} {...props} variant="Anonymous" />;
+        case "authenticated":
+          log(logPrefix, "Selecting variant", "Authenticated");
+          return <Component ref={ref} {...props} variant="Authenticated" />;
+        default:
+          throw new Error("Invalid status (${status})");
+      }
     } catch (error) {
       if (error instanceof Error) {
         log(logPrefix, "Hiding component", error.message);
@@ -73,11 +107,51 @@ export function selectAuthStatusVariant(
   });
 }
 
+export function selectPrimaryVariantForAuthenticated(
+  Component: React.ComponentType<any>,
+  { trueVariant, falseVariant }: VariantNames = VARIANTS
+): React.ComponentType<any> {
+  return forwardRef((props, ref) => {
+    const logPrefix = `selectPrimaryVariantForAuthenticated -|`;
+
+    if (isFramerCanvas()) {
+      log(logPrefix, "Framer Canvas - selecting configured variant");
+      return <Component ref={ref} {...props} variant={props.variant} />;
+    }
+
+    try {
+      const status = useAuthStore((state) => state.status);
+      const resolvedTrueVariant = resolveValue(trueVariant, props);
+      const resolvedFalseVariant = resolveValue(falseVariant, props);
+      const isAuthenticated = status === "authenticated";
+      const variant = isAuthenticated
+        ? resolvedTrueVariant
+        : resolvedFalseVariant;
+      log(logPrefix, "Selecting variant", variant);
+      return <Component ref={ref} {...props} variant={variant} />;
+    } catch (error) {
+      if (error instanceof Error) {
+        log(logPrefix, "Hiding component", error.message);
+      } else {
+        log(logPrefix, "Hiding component", error);
+      }
+      return null;
+    }
+  });
+}
+
+// Actions overrides
+
 export function triggerLogout(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `triggerLogout -|`;
+
+    if (isFramerCanvas()) {
+      log(logPrefix, "Framer Canvas - showing component");
+      return <Component ref={ref} {...props} />;
+    }
 
     try {
       const status = useAuthStore((state) => state.status);

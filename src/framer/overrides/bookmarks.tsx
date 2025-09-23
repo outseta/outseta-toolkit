@@ -10,16 +10,16 @@ import {
 const PROPERTY_BOOKMARKS = "Bookmarks";
 const PROPS_SLUG = "props.slug";
 const INCLUDES = "includes";
-const VARIANTS = {
-  activeVariant: "Bookmarked",
-  inactiveVariant: "NotBookmarked",
-};
+
+// Display overrides
 
 export function withBookmarksAsText(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return withTextProperty(Component, PROPERTY_BOOKMARKS);
 }
+
+// Visibility overrides
 
 export function showWhenBookmarked(
   Component: React.ComponentType<any>
@@ -39,6 +39,13 @@ export function showWhenNotBookmarked(
   });
 }
 
+const VARIANTS = {
+  trueVariant: null,
+  falseVariant: "props.variant",
+};
+
+// Actions overrides
+
 export function toggleBookmarked(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
@@ -48,12 +55,25 @@ export function toggleBookmarked(
   });
 }
 
-export function selectBookmarkedVariant(
+// Variant overrides
+
+export function selectPrimaryVariantForBookmarked(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return selectVariantForProperty(Component, PROPERTY_BOOKMARKS, {
     value: PROPS_SLUG,
     compare: INCLUDES,
     ...VARIANTS,
+  });
+}
+
+export function selectBookmarkCollectionVariant(
+  Component: React.ComponentType<any>
+): React.ComponentType<any> {
+  return selectVariantForProperty(Component, PROPERTY_BOOKMARKS, {
+    value: "", // empty string means there are no bookmarks
+    compare: "equal",
+    trueVariant: "Empty State", // Use `Empty State` variant
+    falseVariant: null, // Use primary variant
   });
 }

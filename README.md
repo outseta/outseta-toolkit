@@ -36,6 +36,7 @@ For each set of overrides, copy the following code into a code file in your Fram
   - `showWhenAnonymous` - Component visible only for anonymous users
   - `showWhenAuthenticated` - Component visible only for authenticated users
   - `selectAuthStatusVariant` - Selects variants based on auth status
+  - `selectPrimaryVariantForAuthenticated` - Selects primary variant for authenticated users, keeps configured variant for non-authenticated users
   - `triggerLogout` - Component triggers logout (shows for authenticated users only)
 - 🚀 **[OutsetaEmbeds.tsx](./readme/modular/OutsetaEmbeds.tsx)**
   - `popupLoginEmbed` - Component opens login embed as popup
@@ -49,30 +50,35 @@ For each set of overrides, copy the following code into a code file in your Fram
   - `withAvatar` - Display user's avatar/profile image as component image
   - `withAccountName` - Display account name as component text
 - 💳 **[OutsetaPlans.tsx](./readme/modular/OutsetaPlans.tsx)**
+
   - `withPlanUid` - Display current plan UID as component text
   - `selectPlanUidVariant` - Selects variant based on plan UID
+  - `showWhenPlan` - Generic function to show component when user is on a specific plan (requires plan UID parameter)
+  - `showWhenNotPlan` - Generic function to show component when user is not on a specific plan (requires plan UID parameter)
   - `showWhenPremiumPlan` - Component visible for users on specific plan (customizable)
   - `showWhenNotPremiumPlan` - Component visible for users not on specific plan (customizable)
-  - `selectVariantForPremiumPlan` - Selects `Active` variant for users on the Premium plan, `Inactive` variant for users not on the Premium plan (customizable)
+  - `selectPrimaryVariantForPremiumPlan` - Selects primary variant for users on the Premium plan, keeps configured variant for users not on the Premium plan (customize to your plans)
+
 - 🔌 **[OutsetaAddOns.tsx](./readme/modular/OutsetaAddOns.tsx)**
   - `withAddOnUids` - Display current add-on UIDs as component text
   - `showWhenPowerUpAddOn` - Component visible for users with specific add-on (customizable)
   - `showWhenNotPowerUpAddOn` - Component visible for users without specific add-on (customizable)
-  - `selectVariantForPowerUpAddOn` - Select `Active` variant for users with the PowerUp add-on, `Inactive` variant for users without the PowerUp add-on (customizable)
+  - `selectPrimaryVariantForPowerUpAddOn` - Selects primary variant for users with the PowerUp add-on, keeps configured variant for users without the PowerUp add-on (customizable)
 - 🔖 **[OutsetaBookmarks.tsx](./readme/modular/OutsetaBookmarks.tsx)**
-  - 🚨 Requires a person custom property with system name: Bookmarks
+  - 🚨 **REQUIRES** a person custom property with system name: Bookmarks
   - `withBookmarks` - Display bookmarks as component text
   - `showWhenBookmarked` - Component visible if item is bookmarked
   - `showWhenNotBookmarked` - Component visible if item is not bookmarked
   - `toggleBookmarked` - Toggle bookmark status
-  - `selectBookmarkedVariant` - Selects `Bookmarked` variant when the item is bookmarked, `NotBookmarked` variant when the item is not bookmarked
+  - `selectPrimaryVariantForBookmarked` - Selects primary variant when the item is bookmarked, keeps configured variant when the item is not bookmarked
+  - `selectBookmarkCollectionVariant` - Selects `Empty State` variant when there are no bookmarks, uses primary variant when there are bookmarks
 - 📚 **[OutsetaLessons.tsx](./readme/modular/OutsetaLessons.tsx)**
-  - 🚨 Requires a person custom property with system name: LessonsCompleted
+  - 🚨 **REQUIRES** a person custom property with system name: LessonsCompleted
   - `withLessonsCompleted` - Display completed lessons as component text
   - `showWhenLessonCompleted` - Component visible if lesson is completed
   - `showWhenLessonNotCompleted` - Component visible if lesson is not completed
   - `toggleLessonCompleted` - Toggle lesson completion status
-  - `selectLessonCompletedVariant` - Selects `Completed` variant when lesson is completed, `NotCompleted` variant when lesson is not completed
+  - `selectPrimaryVariantWhenLessonCompleted` - Selects primary variant when lesson is completed, keeps configured variant when lesson is not completed
 
 **Benefits:** Smaller files, easier to customize, only include what you need
 **Downside:** Multiple files to manage and copy
@@ -88,7 +94,7 @@ import { custom } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist/
 
 /*
  ***********************************************************
- ** 🚨 Remember to create an account custom property with system name: Mascot **
+ ** 🚨 **REQUIRES** an account custom property with system name: Mascot **
  ***********************************************************
  1. Go to CRM > Custom Properties > Account > Add Property
  2. Make sure the system name is "Mascot"
@@ -102,7 +108,7 @@ export function withCompanyMascot(Component): ComponentType {
 
 /*
  ***********************************************************
- ** 🚨 Remember to create a person custom property with system name: CoffeePreference **
+ ** 🚨 **REQUIRES** a person custom property with system name: CoffeePreference **
  ***********************************************************
  1. Go to CRM > Custom Properties > Person > Add Property
  2. Make sure the system name is "CoffeePreference"
@@ -120,7 +126,7 @@ export function showWhenCoffeePreference_Espresso(Component): ComponentType {
 
 /*
  ***********************************************************
- ** 🚨 Remember to create a person custom property with system name: Skills **
+ ** 🚨 **REQUIRES** a person custom property with system name: Skills **
  ***********************************************************
  1. Go to CRM > Custom Properties > Person > Add Property
  2. Make sure the system name is "Skills"
@@ -131,16 +137,18 @@ export function showWhenCoffeePreference_Espresso(Component): ComponentType {
 // Toggle skill tag
 // Selects variant `Active` when slug is present in skills
 // Selects variant `Inactive` when slug is not present in skills
-// ℹ️ Requires a `slug` property on the component
+// ℹ️ **NOTE:** Requires a `slug` property on the component
 export function toggleSkillTag(Component): ComponentType {
   return custom.toggleProperty(Component, "Skills", {
-    value: "props.slug", // e.g. one of: `JavaScript`, `Design`, `Marketing`
+    value: "props.slug", // e.g. one of: `JavaScript`, `Design`, `Marketing`,
+    trueVariant: "Active",
+    falseVariant: "Inactive",
   });
 }
 
 /*
  ***********************************************************
- ** 🚨 Remember to create a person custom property with system name: WatchLater **
+ ** 🚨 **REQUIRES** a person custom property with system name: WatchLater **
  ***********************************************************
  1. Go to CRM > Custom Properties > Person > Add Property
  2. Make sure the system name is "WatchLater"
@@ -149,13 +157,13 @@ export function toggleSkillTag(Component): ComponentType {
 
 // Selects variant `OnWatchLaterList` when slug is present in watch later
 // Selects variant `NotOnWatchLaterList` when slug is not present in watch later
-// ℹ️ Requires a `slug` property on the component
+// ℹ️ **NOTE:** Requires a `slug` property on the component
 export function selectVariantFromWatchLaterStatus(Component): ComponentType {
   return custom.selectVariantForProperty(Component, "WatchLater", {
     value: "props.slug", // e.g. one of: `video1`, `video2`, `video3` etc.
     compare: "includes",
-    activeVariant: "OnWatchLaterList",
-    inactiveVariant: "NotOnWatchLaterList",
+    trueVariant: null, // Use the primary variant
+    falseVariant: "props.variant", // Use the configured variant
   });
 }
 ```

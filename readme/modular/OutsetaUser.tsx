@@ -26,7 +26,7 @@ export function withEmail(Component): ComponentType {
 }
 
 // Display user's avatar/profile image as component image
-// ℹ️ NOTE: Requires an image component
+// ℹ️ **NOTE:** Requires an image component
 export function withAvatar(Component): ComponentType {
   return user.withAvatar(Component);
 }

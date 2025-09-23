@@ -2,22 +2,24 @@ import React, { forwardRef } from "react";
 import { OutsetaLogger } from "../../outseta";
 import { comparePropertyValue, resolveValue } from "./utils";
 
-import useAuthStore from "./useAuthStore";
+import useAuthStore, { isFramerCanvas } from "./useAuthStore";
 
 type PlanUid = string;
 
-type VariantNames = {
-  activeVariant?: string;
-  inactiveVariant?: string;
-};
-
 const log = OutsetaLogger(`framer.overrides.plans`);
+
+// Display overrides
 
 export function withPlanUidAsText(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `withPlanUid -|`;
+
+    if (isFramerCanvas()) {
+      log(logPrefix, "Framer Canvas - showing placeholder plan UID");
+      return <Component ref={ref} {...props} text={`{PlanUid}`} />;
+    }
 
     try {
       const payload = useAuthStore((state) => state.payload);
@@ -46,12 +48,19 @@ export function withPlanUidAsText(
   });
 }
 
+// Visibility overrides
+
 export function showWhenPlan(
   Component: React.ComponentType<any>,
   planUid: PlanUid
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `showWhenPlan ${planUid} -|`;
+
+    if (isFramerCanvas()) {
+      log(logPrefix, "Framer Canvas - showing component");
+      return <Component ref={ref} {...props} />;
+    }
 
     try {
       const payload = useAuthStore((state) => state.payload);
@@ -98,6 +107,11 @@ export function showWhenNotPlan(
   return forwardRef((props, ref) => {
     const logPrefix = `showWhenNotPlan ${planUid} -|`;
 
+    if (isFramerCanvas()) {
+      log(logPrefix, "Framer Canvas - showing component");
+      return <Component ref={ref} {...props} />;
+    }
+
     try {
       const payload = useAuthStore((state) => state.payload);
 
@@ -136,17 +150,27 @@ export function showWhenNotPlan(
   });
 }
 
+// Variant overrides
+
+// Selects variant with the same name as the current plan UID
+// Selects primary variant when no plan UID is present
 export function selectPlanUidVariant(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `planUidVariant -|`;
 
+    if (isFramerCanvas()) {
+      log(logPrefix, "Framer Canvas - selecting configured variant");
+      return <Component ref={ref} {...props} variant={props.variant} />;
+    }
+
     try {
       const payload = useAuthStore((state) => state.payload);
 
       if (!payload) {
-        throw new Error("JWT payload required");
+        log(logPrefix, "No JWT payload available - selecting primary variant");
+        return <Component ref={ref} {...props} variant={null} />;
       }
 
       const currentPlanUid = payload["outseta:planUid"];
@@ -166,24 +190,35 @@ export function selectPlanUidVariant(
       } else {
         log(logPrefix, "Hiding component -", error);
       }
+
       return null;
     }
   });
 }
 
-export function selectVariantForPlan(
+// Selects primary variant (null) when the plan is present
+// Selects configured variant when the plan is not present
+export function selectPrimaryVariantForPlan(
   Component: React.ComponentType<any>,
-  planUid: PlanUid,
-  { activeVariant = "Active", inactiveVariant = "Inactive" }: VariantNames = {}
+  planUid: PlanUid
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `selectVariantForPlan ${planUid} -|`;
+    const logPrefix = `selectPrimaryVariantForPlan ${planUid} -|`;
+
+    if (isFramerCanvas()) {
+      log(logPrefix, "Framer Canvas - selecting configured variant");
+      return <Component ref={ref} {...props} variant={props.variant} />;
+    }
 
     try {
       const payload = useAuthStore((state) => state.payload);
 
       if (!payload) {
-        throw new Error("JWT payload required");
+        log(
+          logPrefix,
+          "No JWT payload available - selecting configured variant"
+        );
+        return <Component ref={ref} {...props} variant={props.variant} />;
       }
 
       const currentPlanUid = payload["outseta:planUid"];
@@ -201,7 +236,7 @@ export function selectVariantForPlan(
         "equal"
       );
 
-      const variantName = matches ? activeVariant : inactiveVariant;
+      const variantName = matches ? null : props.variant;
 
       log(logPrefix, `Selecting variant: ${variantName}`);
       return <Component ref={ref} {...props} variant={variantName} />;

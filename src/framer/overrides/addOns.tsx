@@ -2,22 +2,24 @@ import React, { forwardRef } from "react";
 import { OutsetaLogger } from "../../outseta";
 import { comparePropertyValue, resolveValue } from "./utils";
 
-import useAuthStore from "./useAuthStore";
+import useAuthStore, { isFramerCanvas } from "./useAuthStore";
 
 type AddOnUid = string;
 
-type VariantNames = {
-  activeVariant?: string;
-  inactiveVariant?: string;
-};
-
 const log = OutsetaLogger(`framer.overrides.addOns`);
+
+// Display overrides
 
 export function withAddOnUidsAsText(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `withAddOnUid -|`;
+
+    if (isFramerCanvas()) {
+      log(logPrefix, "Framer Canvas - showing placeholder");
+      return <Component ref={ref} {...props} text={`{AddOnUids}`} />;
+    }
 
     try {
       const payload = useAuthStore((state) => state.payload);
@@ -48,12 +50,19 @@ export function withAddOnUidsAsText(
   });
 }
 
+// Visibility overrides
+
 export function showWhenAddOn(
   Component: React.ComponentType<any>,
   addOnUid: AddOnUid
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `showWhenAddOn ${addOnUid} -|`;
+
+    if (isFramerCanvas()) {
+      log(logPrefix, "Framer Canvas - showing component");
+      return <Component ref={ref} {...props} />;
+    }
 
     try {
       const payload = useAuthStore((state) => state.payload);
@@ -100,6 +109,11 @@ export function showWhenNotAddOn(
   return forwardRef((props, ref) => {
     const logPrefix = `showWhenNotAddOn ${addOnUid} -|`;
 
+    if (isFramerCanvas()) {
+      log(logPrefix, "Framer Canvas - showing component");
+      return <Component ref={ref} {...props} />;
+    }
+
     try {
       const payload = useAuthStore((state) => state.payload);
 
@@ -138,19 +152,31 @@ export function showWhenNotAddOn(
   });
 }
 
-export function selectVariantForAddOn(
+// Variant overrides
+
+// Selects primary variant (null) when the add-on is present
+// Selects configured variant when the add-on is not present
+export function selectPrimaryVariantForAddOn(
   Component: React.ComponentType<any>,
-  addOnUid: AddOnUid,
-  { activeVariant = "Active", inactiveVariant = "Inactive" }: VariantNames = {}
+  addOnUid: AddOnUid
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `selectVariantForAddOn ${addOnUid} -|`;
+    const logPrefix = `selectPrimaryVariantForAddOn ${addOnUid} -|`;
+
+    if (isFramerCanvas()) {
+      log(logPrefix, "Framer Canvas - selecting configured variant");
+      return <Component ref={ref} {...props} variant={props.variant} />;
+    }
 
     try {
       const payload = useAuthStore((state) => state.payload);
 
       if (!payload) {
-        throw new Error("JWT payload required");
+        log(
+          logPrefix,
+          "No JWT payload available - selecting configured variant"
+        );
+        return <Component ref={ref} {...props} variant={props.variant} />;
       }
 
       const currentAddOnUids = payload["outseta:addOnUids"];
@@ -167,7 +193,7 @@ export function selectVariantForAddOn(
         resolvedValueAddOnUid,
         "includes"
       );
-      const variantName = matches ? activeVariant : inactiveVariant;
+      const variantName = matches ? null : props.variant;
 
       log(logPrefix, `Selecting variant: ${variantName}`);
       return <Component ref={ref} {...props} variant={variantName} />;

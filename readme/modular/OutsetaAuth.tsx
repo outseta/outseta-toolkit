@@ -26,3 +26,9 @@ export function showWhenAuthenticated(Component): ComponentType {
 export function selectAuthStatusVariant(Component): ComponentType {
   return auth.selectAuthStatusVariant(Component);
 }
+
+// Selects primary variant for authenticated users
+// Selects configured variant for non-authenticated users
+export function selectPrimaryVariantForAuthenticated(Component): ComponentType {
+  return auth.selectPrimaryVariantForAuthenticated(Component);
+}

@@ -5,7 +5,7 @@ import { lessons } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist
 
 /*
  ***********************************************************
- ** 🚨 REQUIRES: Create a person custom property with system name: LessonsCompleted **
+ ** 🚨 **REQUIRES** a person custom property with system name: LessonsCompleted **
  ***********************************************************
  1. Go to CRM > Custom Properties > Person > Add Property
  2. Make sure the system name is "LessonsCompleted"
@@ -20,7 +20,7 @@ export function withLessonsCompleted(Component): ComponentType {
 }
 
 /**
- * ℹ️ NOTE: The following overrides require a `slug` property on the component
+ * ℹ️ **NOTE:** The following overrides require a `slug` property on the component
  */
 
 // Component visible if lesson is completed
@@ -34,14 +34,16 @@ export function showWhenLessonNotCompleted(Component): ComponentType {
 }
 
 // Toggle lesson completion status
-// Selects variant `Completed` when lesson is completed
-// Selects variant `NotCompleted` when lesson is not completed
+// Selects primary variant when lesson is completed
+// Selects configured variant when lesson is not completed
 export function toggleLessonCompleted(Component): ComponentType {
   return lessons.toggleLessonCompleted(Component);
 }
 
-// Selects variant `Completed` when lesson is completed
-// Selects variant `NotCompleted` when lesson is not completed
-export function selectLessonCompletedVariant(Component): ComponentType {
-  return lessons.selectLessonCompletedVariant(Component);
+// Selects primary variant when lesson is completed
+// Selects configured variant when lesson is not completed
+export function selectPrimaryVariantWhenLessonCompleted(
+  Component
+): ComponentType {
+  return lessons.selectPrimaryVariantWhenLessonCompleted(Component);
 }

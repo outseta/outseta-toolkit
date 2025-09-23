@@ -1,7 +1,7 @@
 import React, { forwardRef } from "react";
 import { OutsetaLogger } from "../../outseta";
 
-import useAuthStore from "./useAuthStore";
+import useAuthStore, { isFramerCanvas } from "./useAuthStore";
 
 const log = OutsetaLogger("framer.overrides.embed");
 
@@ -11,6 +11,11 @@ export function popupEmbed(
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `triggerPopup ${embed} -|`;
+
+    if (isFramerCanvas()) {
+      log(logPrefix, "Framer Canvas - showing component");
+      return <Component ref={ref} {...props} />;
+    }
 
     try {
       const status = useAuthStore((state) => state.status);

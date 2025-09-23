@@ -12,7 +12,7 @@ export function withAddOnUids(Component): ComponentType {
 
 /*
 ***********************************************************
-** 🚨 REQUIRES: Customize the add-on overrides below **
+** 🚨 **REQUIRES** Customize the add-on overrides below **
 ***********************************************************
 To customize the add-on overrides, change the examples below:
 1. Change the add-on denomination (e.g. `PowerUp`)
@@ -33,8 +33,8 @@ export function showWhenNotPowerUpAddOn(Component): ComponentType {
   return addOns.showWhenNotAddOn(Component, "OW4pRYWg");
 }
 
-// Selects variant `Active` for users with the PowerUp add-on
-// Selects variant `Inactive` for users without the PowerUp add-on
-export function selectVariantForPowerUpAddOn(Component): ComponentType {
-  return addOns.selectVariantForAddOn(Component, "OW4pRYWg");
+// Selects primary variant for users with the PowerUp add-on
+// Selects configured variant for users without the PowerUp add-on
+export function selectPrimaryVariantForPowerUpAddOn(Component): ComponentType {
+  return addOns.selectPrimaryVariantForAddOn(Component, "OW4pRYWg");
 }

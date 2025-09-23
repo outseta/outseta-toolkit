@@ -5,7 +5,7 @@ import { bookmarks } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/di
 
 /*
  ***********************************************************
- ** 🚨 REQUIRES: Create a person custom property with system name: Bookmarks **
+ ** 🚨 **REQUIRES** a person custom property with system name: Bookmarks **
  ***********************************************************
  1. Go to CRM > Custom Properties > Person > Add Property
  2. Make sure the system name is "Bookmarks"
@@ -20,7 +20,7 @@ export function withBookmarks(Component): ComponentType {
 }
 
 /**
- * ℹ️ NOTE: The following overrides require a `slug` property on the component
+ * ℹ️ **NOTE:** The following overrides require a `slug` property on the component
  */
 
 // Component visible if item is bookmarked
@@ -34,14 +34,20 @@ export function showWhenNotBookmarked(Component): ComponentType {
 }
 
 // Toggle bookmark status
-// Selects variant `Bookmarked` when item is bookmarked
-// Selects variant `NotBookmarked` when the item is not bookmarked
+// Selects primary variant when item is bookmarked
+// Selects configured variant when the item is not bookmarked
 export function toggleBookmarked(Component): ComponentType {
   return bookmarks.toggleBookmarked(Component);
 }
 
-// Selects variant `Bookmarked` when the item is bookmarked
-// Selects variant `NotBookmarked` when the item is not bookmarked
-export function selectBookmarkedVariant(Component): ComponentType {
-  return bookmarks.selectBookmarkedVariant(Component);
+// Selects primary variant when the item is bookmarked
+// Selects configured variant when the item is not bookmarked
+export function selectPrimaryVariantForBookmarked(Component): ComponentType {
+  return bookmarks.selectPrimaryVariantForBookmarked(Component);
+}
+
+// Selects primary variant when there are bookmarks
+// Selects variant `Empty State` when there are no bookmarks
+export function selectBookmarkCollectionVariant(Component): ComponentType {
+  return bookmarks.selectBookmarkCollectionVariant(Component);
 }

@@ -2,7 +2,7 @@ import React, { forwardRef } from "react";
 import { OutsetaLogger } from "../../outseta";
 import { getNestedProperty } from "../../auth-store/utils";
 
-import useAuthStore from "./useAuthStore";
+import useAuthStore, { isFramerCanvas } from "./useAuthStore";
 
 import {
   comparePropertyValue,
@@ -21,8 +21,8 @@ type CompareOptions = {
 };
 
 type MatchVariantOptions = {
-  activeVariant?: string;
-  inactiveVariant?: string;
+  trueVariant: string | null;
+  falseVariant: string | null;
 };
 
 const log = OutsetaLogger(`framer.overrides.properties`);
@@ -31,12 +31,19 @@ function getPropertyValue(user: any, propertyName: string): any {
   return getNestedProperty(user, propertyName);
 }
 
+// Display overrides
+
 export function withTextProperty(
   Component: React.ComponentType<any>,
   property: PropertyKey
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `withTextProperty ${property} -|`;
+
+    if (isFramerCanvas()) {
+      log(logPrefix, "Framer Canvas - showing showing placeholder");
+      return <Component ref={ref} {...props} text={`{${property}}`} />;
+    }
 
     try {
       const user = useAuthStore((state) => state.user);
@@ -71,6 +78,11 @@ export function withImageProperty(
   return forwardRef((props, ref) => {
     const logPrefix = `withImageProperty ${property} -|`;
 
+    if (isFramerCanvas()) {
+      log(logPrefix, "Framer Canvas - showing image placeholder");
+      return <Component ref={ref} {...props} />;
+    }
+
     try {
       const user = useAuthStore((state) => state.user);
 
@@ -90,7 +102,7 @@ export function withImageProperty(
           return <Component ref={ref} {...props} />;
         } else {
           // Component has no image set, hide
-          log(logPrefix, "No user image and no component fallback, hiding");
+          log(logPrefix, "No user image and no component fallback");
           return null;
         }
       }
@@ -118,6 +130,8 @@ export function withImageProperty(
   });
 }
 
+// Visibility overrides
+
 export function showWhenProperty(
   Component: React.ComponentType<any>,
   property: PropertyKey,
@@ -125,6 +139,11 @@ export function showWhenProperty(
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `showForProperty ${property} -|`;
+
+    if (isFramerCanvas()) {
+      log(logPrefix, "Framer Canvas - showing component");
+      return <Component ref={ref} {...props} />;
+    }
 
     try {
       const user = useAuthStore((state) => state.user);
@@ -173,6 +192,11 @@ export function showWhenNotProperty(
   return forwardRef((props, ref) => {
     const logPrefix = `showWhenNotProperty ${property} -|`;
 
+    if (isFramerCanvas()) {
+      log(logPrefix, "Framer Canvas - showing component");
+      return <Component ref={ref} {...props} />;
+    }
+
     try {
       const user = useAuthStore((state) => state.user);
 
@@ -212,14 +236,16 @@ export function showWhenNotProperty(
   });
 }
 
+// Actions overrides
+
 export function toggleProperty(
   Component: React.ComponentType<any>,
   property: PropertyKey,
   {
     value: valueToToggle,
     flags,
-    activeVariant = "Active",
-    inactiveVariant = "Inactive",
+    trueVariant,
+    falseVariant,
   }: Pick<CompareOptions, "value" | "flags"> & MatchVariantOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
@@ -232,11 +258,14 @@ export function toggleProperty(
       );
 
       if (!user) {
-        throw new Error("User data required");
+        log(logPrefix, `No user data available - showing primary variant`);
+        return <Component ref={ref} {...props} variant={null} />;
       }
 
       // Resolve toggle value from props if needed
       const resolvedValueToToggle = resolveValue(valueToToggle, props);
+      const resolvedTrueVariant = resolveValue(trueVariant, props);
+      const resolvedFalseVariant = resolveValue(falseVariant, props);
 
       const propertyValue = getNestedProperty(user, property) || "";
 
@@ -271,7 +300,7 @@ export function toggleProperty(
         <Component
           ref={ref}
           {...props}
-          variant={matches ? activeVariant : inactiveVariant}
+          variant={matches ? resolvedTrueVariant : resolvedFalseVariant}
           onClick={handleClick}
         />
       );
@@ -286,6 +315,8 @@ export function toggleProperty(
   });
 }
 
+// Variant overrides
+
 export function selectPropertyVariant(
   Component: React.ComponentType<any>,
   property: string
@@ -297,7 +328,8 @@ export function selectPropertyVariant(
       const user = useAuthStore((state) => state.user);
 
       if (!user) {
-        throw new Error("User data required");
+        log(logPrefix, `No user data available - showing primary variant`);
+        return <Component ref={ref} {...props} variant={null} />;
       }
 
       const propertyValue = getPropertyValue(user, property);
@@ -318,41 +350,44 @@ export function selectVariantForProperty(
   Component: React.ComponentType<any>,
   property: PropertyKey,
   {
-    value,
+    value: targetValue,
     compare: compareType,
     flags,
-    activeVariant = "Active",
-    inactiveVariant = "Inactive",
+    trueVariant,
+    falseVariant,
   }: CompareOptions & MatchVariantOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `variantForProperty ${property} -|`;
+    const logPrefix = `selectVariantWhenProperty ${property} -|`;
 
     try {
       const user = useAuthStore((state) => state.user);
 
       if (!user) {
-        throw new Error("User data required");
+        log(logPrefix, `No user data available - showing primary variant`);
+        return <Component ref={ref} {...props} variant={null} />;
       }
 
       const propertyValue = getPropertyValue(user, property);
-      const resolvedValue = resolveValue(value, props);
+      const resolvedTargetValue = resolveValue(targetValue, props);
+      const resolvedTrueVariant = resolveValue(trueVariant, props);
+      const resolvedFalseVariant = resolveValue(falseVariant, props);
 
       log(logPrefix, {
         propertyValue,
-        resolvedValue,
+        resolvedTargetValue,
         compareType,
         ["props.variant"]: props.variant,
       });
 
       const matches = comparePropertyValue(
         propertyValue,
-        resolvedValue,
+        resolvedTargetValue,
         compareType,
         flags
       );
 
-      const variant = matches ? activeVariant : inactiveVariant;
+      const variant = matches ? resolvedTrueVariant : resolvedFalseVariant;
 
       log(logPrefix, { variant });
       return <Component ref={ref} {...props} variant={variant} />;

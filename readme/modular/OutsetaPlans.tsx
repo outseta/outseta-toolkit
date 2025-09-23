@@ -17,9 +17,21 @@ export function selectPlanUidVariant(Component): ComponentType {
   return plans.selectPlanUidVariant(Component);
 }
 
+// Generic function to show component when user is on a specific plan
+// ℹ️ **NOTE:** Requires a plan UID parameter
+export function showWhenPlan(Component, planUid): ComponentType {
+  return plans.showWhenPlan(Component, planUid);
+}
+
+// Generic function to show component when user is not on a specific plan
+// ℹ️ **NOTE:** Requires a plan UID parameter
+export function showWhenNotPlan(Component, planUid): ComponentType {
+  return plans.showWhenNotPlan(Component, planUid);
+}
+
 /*
 ***********************************************************
-** 🚨 REQUIRES: Customize the plan overrides below **
+** 🚨 **REQUIRES** Customize the plan overrides below **
 ***********************************************************
 To customize the plan overrides, change the examples below:
 1. Change the plan denomination (e.g. `Premium`)
@@ -40,8 +52,8 @@ export function showWhenNotPremiumPlan(Component): ComponentType {
   return plans.showWhenNotPlan(Component, "OW45KRmg");
 }
 
-// Selects variant `Active` for users on the Premium plan
-// Selects variant `Inactive` for users not on the Premium plan
-export function selectVariantForPremiumPlan(Component): ComponentType {
-  return plans.selectVariantForPlan(Component, "OW45KRmg");
+// Selects primary variant for users on the Premium plan
+// Selects configured variant for users not on the Premium plan
+export function selectPrimaryVariantForPremiumPlan(Component): ComponentType {
+  return plans.selectPrimaryVariantForPlan(Component, "OW45KRmg");
 }
