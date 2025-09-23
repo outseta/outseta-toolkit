@@ -177,7 +177,7 @@ export function selectVariantForPlan(
   { activeVariant = "Active", inactiveVariant = "Inactive" }: VariantNames = {}
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `variantForPlan ${planUid} -|`;
+    const logPrefix = `selectVariantForPlan ${planUid} -|`;
 
     try {
       const payload = useAuthStore((state) => state.payload);
