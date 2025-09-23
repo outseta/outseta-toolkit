@@ -41,7 +41,7 @@ export function withTextProperty(
     const logPrefix = `withTextProperty ${property} -|`;
 
     if (isFramerCanvas()) {
-      log(logPrefix, "Framer Canvas - showing showing placeholder");
+      log(logPrefix, "Framer Canvas - showing placeholder");
       return <Component ref={ref} {...props} text={`{${property}}`} />;
     }
 
