@@ -13,7 +13,7 @@ type VariantNames = {
 
 const log = OutsetaLogger(`framer.overrides.addOns`);
 
-export function withAddOnUids(
+export function withAddOnUidsAsText(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
@@ -138,13 +138,13 @@ export function showWhenNotAddOn(
   });
 }
 
-export function variantForAddOn(
+export function selectVariantForAddOn(
   Component: React.ComponentType<any>,
   addOnUid: AddOnUid,
   { activeVariant = "Active", inactiveVariant = "Inactive" }: VariantNames = {}
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `variantForAddOn ${addOnUid} -|`;
+    const logPrefix = `selectVariantForAddOn ${addOnUid} -|`;
 
     try {
       const payload = useAuthStore((state) => state.payload);

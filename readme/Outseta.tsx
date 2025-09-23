@@ -7,7 +7,6 @@ import {
   user,
   plans,
   addOns,
-  custom,
   bookmarks,
   lessons,
 } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist/framer/overrides.js";
@@ -15,8 +14,8 @@ import {
 //// AUTHENTICATION ////
 
 // Component triggers logout (shows for authenticated users only)
-export function auth_logout(Component): ComponentType {
-  return auth.actionLogout(Component);
+export function auth_triggerLogout(Component): ComponentType {
+  return auth.triggerLogout(Component);
 }
 
 // Component visible only for anonymous users
@@ -90,14 +89,14 @@ export function user_withAccountName(Component): ComponentType {
 
 // Display current plan UID as component text
 export function plans_withPlanUid(Component): ComponentType {
-  return plans.withPlanUid(Component);
+  return plans.withPlanUidAsText(Component);
 }
 
 // Selects `OW45KRmg` variant for a user on the OW45KRmg plan
 // Selects `amRjLEmJ` variant for a user on the amRjLEmJ plan
 // If variant not found, the component will use the primary variant
 export function plans_selectPlanUidVariant(Component): ComponentType {
-  return plans.planUidVariant(Component);
+  return plans.selectPlanUidVariant(Component);
 }
 
 /*
@@ -133,7 +132,7 @@ export function plans_selectVariantForPremiumPlan(Component): ComponentType {
 
 // Display current add-on UIDs (comma separated string) as component text
 export function addOns_withAddOnUids(Component): ComponentType {
-  return addOns.withAddOnUids(Component);
+  return addOns.withAddOnUidsAsText(Component);
 }
 
 /*
@@ -205,7 +204,7 @@ export function bookmarks_toggleBookmarked(Component): ComponentType {
 // Selects variant `Bookmarked` when the item is bookmarked
 // Selects variant `NotBookmarked` when the item is not bookmarked
 export function bookmarks_selectBookmarkedVariant(Component): ComponentType {
-  return bookmarks.bookmarkedVariant(Component);
+  return bookmarks.selectBookmarkedVariant(Component);
 }
 
 //// LESSONS ////
@@ -248,5 +247,5 @@ export function lessons_toggleLessonCompleted(Component): ComponentType {
 // Selects variant `Completed` when lesson is completed
 // Selects variant `NotCompleted` when lesson is not completed
 export function lessons_selectLessonCompletedVariant(Component): ComponentType {
-  return lessons.lessonCompletedVariant(Component);
+  return lessons.selectLessonCompletedVariant(Component);
 }

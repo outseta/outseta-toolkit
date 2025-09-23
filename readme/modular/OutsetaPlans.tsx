@@ -7,7 +7,7 @@ import { plans } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist/f
 
 // Display current plan UID as component text
 export function withPlanUid(Component): ComponentType {
-  return plans.withPlanUid(Component);
+  return plans.withPlanUidAsText(Component);
 }
 
 // Selects `OW45KRmg` variant for a user on the OW45KRmg plan

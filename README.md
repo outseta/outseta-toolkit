@@ -150,8 +150,8 @@ export function toggleSkillTag(Component): ComponentType {
 // Selects variant `OnWatchLaterList` when slug is present in watch later
 // Selects variant `NotOnWatchLaterList` when slug is not present in watch later
 // ℹ️ Requires a `slug` property on the component
-export function variantFromWatchLaterStatus(Component): ComponentType {
-  return custom.variantForProperty(Component, "WatchLater", {
+export function selectVariantFromWatchLaterStatus(Component): ComponentType {
+  return custom.selectVariantForProperty(Component, "WatchLater", {
     value: "props.slug", // e.g. one of: `video1`, `video2`, `video3` etc.
     compare: "includes",
     activeVariant: "OnWatchLaterList",

@@ -13,7 +13,7 @@ type VariantNames = {
 
 const log = OutsetaLogger(`framer.overrides.plans`);
 
-export function withPlanUid(
+export function withPlanUidAsText(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {

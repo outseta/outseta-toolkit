@@ -7,7 +7,7 @@ import { addOns } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist/
 
 // Display current add-on UIDs (comma separated string) as component text
 export function withAddOnUids(Component): ComponentType {
-  return addOns.withAddOnUids(Component);
+  return addOns.withAddOnUidsAsText(Component);
 }
 
 /*
@@ -35,6 +35,6 @@ export function showWhenNotPowerUpAddOn(Component): ComponentType {
 
 // Selects variant `Active` for users with the PowerUp add-on
 // Selects variant `Inactive` for users without the PowerUp add-on
-export function variantForPowerUpAddOn(Component): ComponentType {
-  return addOns.variantForAddOn(Component, "OW4pRYWg");
+export function selectVariantForPowerUpAddOn(Component): ComponentType {
+  return addOns.selectVariantForAddOn(Component, "OW4pRYWg");
 }
