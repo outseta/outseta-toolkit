@@ -13,7 +13,7 @@ type VariantNames = {
 
 const log = OutsetaLogger(`framer.overrides.plans`);
 
-export function withPlanUid(
+export function withPlanUidAsText(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
@@ -136,7 +136,7 @@ export function showWhenNotPlan(
   });
 }
 
-export function planUidVariant(
+export function selectPlanUidVariant(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
@@ -171,13 +171,13 @@ export function planUidVariant(
   });
 }
 
-export function variantForPlan(
+export function selectVariantForPlan(
   Component: React.ComponentType<any>,
   planUid: PlanUid,
   { activeVariant = "Active", inactiveVariant = "Inactive" }: VariantNames = {}
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `variantForPlan ${planUid} -|`;
+    const logPrefix = `selectVariantForPlan ${planUid} -|`;
 
     try {
       const payload = useAuthStore((state) => state.payload);

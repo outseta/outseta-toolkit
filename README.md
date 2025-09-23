@@ -11,263 +11,75 @@ A toolkit for integrating Outseta with Framer. Provides authentication state man
 📚 **Lesson Tracking**: Ready-made lesson completion tracking and management\
 📝 **Build Your Own**: Build overrides for any custom property, user and account properties\
 
-## Quick Start
+## Getting Started
 
-Copy/paste the following code into a code file in your Framer project named `Outseta.tsx`. This single file provides all the most common Outseta integration functions.
+Choose your approach based on your project needs:
 
-```javascript
-// File: Outseta.tsx
-import { type ComponentType } from "react";
-import {
-  auth,
-  user,
-  plans,
-  addOns,
-  custom,
-  bookmarks,
-  lessons,
-} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist/framer/overrides.js";
+### Option 1: All-in-One Override File (Recommended)
 
-//// AUTHENTICATION ////
+The all-in-one override file provides all the most common Outseta integration functions in a single file.
 
-// Opens login embed as popup (shows for anonymous users only)
-export function popupLoginEmbed(Component): ComponentType {
-  return auth.popupLoginEmbed(Component);
-}
+Copy the code from **[Outseta.tsx](./readme/Outseta.tsx)** into a code file in your Framer project.
 
-// Opens registration embed as popup (shows for anonymous users only)
-export function popupRegisterEmbed(Component): ComponentType {
-  return auth.popupRegisterEmbed(Component);
-}
+The file contains all of the functions listed in the Modular Overrides section below, prefixed with the module name for easy navigation in the override selector.
 
-// Opens profile embed as popup (shows for authenticated users only)
-export function popupProfileEmbed(Component): ComponentType {
-  return auth.popupProfileEmbed(Component);
-}
+**Benefits:** Everything in one place, comprehensive functionality, single file to manage
+**Downside:** The file is large and may be difficult to navigate
 
-// Triggers logout action (shows for authenticated users only)
-export function logout(Component): ComponentType {
-  return auth.logout(Component);
-}
+### Option 2: Modular Overrides
 
-// Show component only for anonymous users
-export function showWhenAnonymous(Component): ComponentType {
-  return auth.showWhenAnonymous(Component);
-}
+The modular overrides are a set of focused override files for specific functionality.
 
-// Show component only for authenticated users
-export function showWhenAuthenticated(Component): ComponentType {
-  return auth.showWhenAuthenticated(Component);
-}
+For each set of overrides, copy the following code into a code file in your Framer project:
 
-// Set component variant based on authentication status
-// ℹ️ The Framer component must have the variants: `Anonymous` and `Authenticated`
-export function authStatusVariant(Component): ComponentType {
-  return auth.authStatusVariant(Component);
-}
+- 🔧 **[OutsetaAuth.tsx](./readme/modular/OutsetaAuth.tsx)**
+  - `showWhenAnonymous` - Component visible only for anonymous users
+  - `showWhenAuthenticated` - Component visible only for authenticated users
+  - `selectAuthStatusVariant` - Selects variants based on auth status
+  - `triggerLogout` - Component triggers logout (shows for authenticated users only)
+- 🚀 **[OutsetaEmbeds.tsx](./readme/modular/OutsetaEmbeds.tsx)**
+  - `popupLoginEmbed` - Component opens login embed as popup
+  - `popupRegisterEmbed` - Component opens registration embed as popup
+  - `popupProfileEmbed` - Component opens profile embed as popup
+- 👤 **[OutsetaUser.tsx](./readme/modular/OutsetaUser.tsx)**
+  - `withFirstName` - Display user's first name as component text
+  - `withLastName` - Display user's last name as component text
+  - `withFullName` - Display user's full name as component text
+  - `withEmail` - Display user's email address as component text
+  - `withAvatar` - Display user's avatar/profile image as component image
+  - `withAccountName` - Display account name as component text
+- 💳 **[OutsetaPlans.tsx](./readme/modular/OutsetaPlans.tsx)**
+  - `withPlanUid` - Display current plan UID as component text
+  - `selectPlanUidVariant` - Selects variant based on plan UID
+  - `showWhenPremiumPlan` - Component visible for users on specific plan (customizable)
+  - `showWhenNotPremiumPlan` - Component visible for users not on specific plan (customizable)
+  - `selectVariantForPremiumPlan` - Selects `Active` variant for users on the Premium plan, `Inactive` variant for users not on the Premium plan (customizable)
+- 🔌 **[OutsetaAddOns.tsx](./readme/modular/OutsetaAddOns.tsx)**
+  - `withAddOnUids` - Display current add-on UIDs as component text
+  - `showWhenPowerUpAddOn` - Component visible for users with specific add-on (customizable)
+  - `showWhenNotPowerUpAddOn` - Component visible for users without specific add-on (customizable)
+  - `selectVariantForPowerUpAddOn` - Select `Active` variant for users with the PowerUp add-on, `Inactive` variant for users without the PowerUp add-on (customizable)
+- 🔖 **[OutsetaBookmarks.tsx](./readme/modular/OutsetaBookmarks.tsx)**
+  - 🚨 Requires a person custom property with system name: Bookmarks
+  - `withBookmarks` - Display bookmarks as component text
+  - `showWhenBookmarked` - Component visible if item is bookmarked
+  - `showWhenNotBookmarked` - Component visible if item is not bookmarked
+  - `toggleBookmarked` - Toggle bookmark status
+  - `selectBookmarkedVariant` - Selects `Bookmarked` variant when the item is bookmarked, `NotBookmarked` variant when the item is not bookmarked
+- 📚 **[OutsetaLessons.tsx](./readme/modular/OutsetaLessons.tsx)**
+  - 🚨 Requires a person custom property with system name: LessonsCompleted
+  - `withLessonsCompleted` - Display completed lessons as component text
+  - `showWhenLessonCompleted` - Component visible if lesson is completed
+  - `showWhenLessonNotCompleted` - Component visible if lesson is not completed
+  - `toggleLessonCompleted` - Toggle lesson completion status
+  - `selectLessonCompletedVariant` - Selects `Completed` variant when lesson is completed, `NotCompleted` variant when lesson is not completed
 
-//// USER DATA ////
-
-// Display user's first name
-export function withFirstName(Component): ComponentType {
-  return user.withFirstName(Component);
-}
-
-// Display user's last name
-export function withLastName(Component): ComponentType {
-  return user.withLastName(Component);
-}
-
-// Display user's full name
-export function withFullName(Component): ComponentType {
-  return user.withFullName(Component);
-}
-
-// Display user's email address
-export function withEmail(Component): ComponentType {
-  return user.withEmail(Component);
-}
-
-// Display user's avatar/profile image
-// ℹ️ Requires an image component
-export function withAvatar(Component): ComponentType {
-  return user.withAvatar(Component);
-}
-
-// Display account name
-export function withAccountName(Component): ComponentType {
-  return user.withAccountName(Component);
-}
-
-//// PLANS ////
-
-// Display current plan UID
-export function withPlanUid(Component): ComponentType {
-  return plans.withPlanUid(Component);
-}
-
-// Selects `OW45KRmg`variant for a user on the OW45KRmg plan
-// Selects `amRjLEmJ` variant for a user on the amRjLEmJ plan
-// If variant not found, the component will use the premium variant
-export function planUidVariant(Component): ComponentType {
-  return plans.planUidVariant(Component);
-}
-
-/*
-***********************************************************
-** 🚨 Remember to customize the plan overrides! **
-***********************************************************
-To customize the plan overrides, change the examples below:
-1. Change the plan denomination (e.g. `Premium`)
-2. Change the plan UID to match the plan denomination
-3. Update your project to use the new override
-Copy/paste and repeat for each plan needed.
-*/
-
-// Example for a "Premium" plan with UID "OW45KRmg":
-
-// Show component for users on the Premium plan
-export function showWhenPlan_Premium(Component): ComponentType {
-  return plans.showWhenPlan(Component, "OW45KRmg");
-}
-
-// Show component for users not on the Premium plan
-export function showWhenNotPlan_Premium(Component): ComponentType {
-  return plans.showWhenNotPlan(Component, "OW45KRmg");
-}
-
-// Select variant `Active` for users on the Premium plan
-// Select variant `Inactive` for users not on the Premium plan
-// ℹ️ Requires `Active`, `Inactive` component variants
-export function variantForPlan_Premium(Component): ComponentType {
-  return plans.variantForPlan(Component, "OW45KRmg");
-}
-
-//// ADD-ONS ////
-
-// Display current add-on UIDs as comma seperated string
-export function withAddOnUids(Component): ComponentType {
-  return addOns.withAddOnUids(Component);
-}
-
-/*
-***********************************************************
-** 🚨 Remember to customize the add-on overrides! **
-***********************************************************
-To customize the add-on overrides, change the examples below:
-1. Change the add-on denomination (e.g. `PowerUp`)
-2. Change the add-on UID to match the add-on denomination
-3. Update your project to use the new override
-🔁 Copy/paste and repeat for each add-on needed.
-*/
-
-// Example for a "PowerUp" add-on with UID "OW4pRYWg":
-
-// Show component for users with the PowerUp add-on
-export function showWhenAddOn_PowerUp(Component): ComponentType {
-  return addOns.showWhenAddOn(Component, "OW4pRYWg");
-}
-
-// Show component for users without the PowerUp add-on
-export function showWhenNotAddOn_PowerUp(Component): ComponentType {
-  return addOns.showWhenNotAddOn(Component, "OW4pRYWg");
-}
-
-// Select variant `Active` for users with the PowerUp add-on
-// Select variant `Inactive` for users without the PowerUp add-on
-// ℹ️ Requires `Active` and `Inactive` component variants
-export function variantForAddOn_PowerUp(Component): ComponentType {
-  return addOns.variantForAddOn(Component, "OW4pRYWg");
-}
-
-//// BOOKMARKS ////
-
-/*
- ***********************************************************
- ** 🚨 Remember to create a person custom property with system name: Bookmarks **
- ***********************************************************
- 1. Go to CRM > Custom Properties > Person > Add Property
- 2. Make sure the system name is "Bookmarks"
- 3. and the control type is "text"
- */
-
-// Display bookmarks as comma-separated list
-export function withBookmarks(Component): ComponentType {
-  return bookmarks.withBookmarksAsText(Component);
-}
-
-/**
- *  ℹ️ The following overrides require a `slug` property on the component
- */
-
-// Show component if item is bookmarked
-export function showWhenBookmarked(Component): ComponentType {
-  return bookmarks.showWhenBookmarked(Component);
-}
-
-// Show component if item is not bookmarked
-export function showWhenNotBookmarked(Component): ComponentType {
-  return bookmarks.showWhenNotBookmarked(Component);
-}
-
-// Toggle bookmark status
-export function toggleBookmarked(Component): ComponentType {
-  return bookmarks.toggleBookmarked(Component);
-}
-
-// Select variant `Bookmarked` when item is bookmarked
-// Select variant `NotBookmarked` when item is not bookmarked
-export function bookmarkedVariant(Component): ComponentType {
-  return bookmarks.bookmarkedVariant(Component);
-}
-
-//// LESSONS ////
-
-/*
- ***********************************************************
- ** 🚨 Remember to create a person custom property with system name: LessonsCompleted **
- ***********************************************************
- 1. Go to CRM > Custom Properties > Person > Add Property
- 2. Make sure the system name is "LessonsCompleted"
- 3. and the control type is "text"
- */
-
-// Display completed lessons as comma-separated list
-export function withLessonsCompleted(Component): ComponentType {
-  return lessons.withLessonsCompletedAsText(Component);
-}
-
-/**
- *  ℹ️ The following overrides require a `slug` property on the component
- */
-
-// Show component if lesson is completed
-export function showWhenLessonCompleted(Component): ComponentType {
-  return lessons.showWhenLessonCompleted(Component);
-}
-
-// Show component if lesson is not completed
-export function showWhenLessonNotCompleted(Component): ComponentType {
-  return lessons.showWhenLessonNotCompleted(Component);
-}
-
-// Toggle lesson completion status
-// Select variant `Completed` when lesson is completed
-// Select variant `NotCompleted` when lesson is not completed
-export function toggleLessonCompleted(Component): ComponentType {
-  return lessons.toggleLessonCompleted(Component);
-}
-
-// Select variant `Completed` when lesson is completed
-// Select variant `NotCompleted` when lesson is not completed
-export function lessonCompletedVariant(Component): ComponentType {
-  return lessons.lessonCompletedVariant(Component);
-}
-```
+**Benefits:** Smaller files, easier to customize, only include what you need
+**Downside:** Multiple files to manage and copy
 
 ## Create Your Own
 
-For custom properties and advanced use cases, use the `custom` module:
+For custom properties and advanced use cases, you may create your own overrides. Here are some examples:
 
 ```javascript
 import { custom } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist/framer/overrides.js";
@@ -276,15 +88,14 @@ import { custom } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist/
 
 /*
  ***********************************************************
- ** 🚨 Remember to create an account custom property with system name: Account.Mascot **
+ ** 🚨 Remember to create an account custom property with system name: Mascot **
  ***********************************************************
-// 1. Go to CRM > Custom Properties > Account > Add Property
-// 2. Make sure the system name is "Mascot"
-// 3. and the control type is "text"
-// 4. Click "Add"
+ 1. Go to CRM > Custom Properties > Account > Add Property
+ 2. Make sure the system name is "Mascot"
+ 3. and the control type is "text"
  */
 
-// Display company mascot
+// Display company mascot as component text
 export function withCompanyMascot(Component): ComponentType {
   return custom.withTextProperty(Component, "Account.Mascot");
 }
@@ -293,11 +104,12 @@ export function withCompanyMascot(Component): ComponentType {
  ***********************************************************
  ** 🚨 Remember to create a person custom property with system name: CoffeePreference **
  ***********************************************************
-// 1. Go to CRM > Custom Properties > Person > Add Property
-// 2. Make sure the system name is "CoffeePreference"
-// 3. and the control type is "text"
+ 1. Go to CRM > Custom Properties > Person > Add Property
+ 2. Make sure the system name is "CoffeePreference"
+ 3. and the control type is "text"
  */
 
+// Component visible when coffee preference is Espresso
 export function showWhenCoffeePreference_Espresso(Component): ComponentType {
   return custom.showWhenProperty(Component, "CoffeePreference", {
     value: "Espresso",
@@ -310,19 +122,19 @@ export function showWhenCoffeePreference_Espresso(Component): ComponentType {
  ***********************************************************
  ** 🚨 Remember to create a person custom property with system name: Skills **
  ***********************************************************
-// 1. Go to CRM > Custom Properties > Person > Add Property
-// 2. Make sure the system name is "Skills"
-// 3. and the control type is "select"
-// 4. Add the following options: `JavaScript`, `Design`, `Marketing`
+ 1. Go to CRM > Custom Properties > Person > Add Property
+ 2. Make sure the system name is "Skills"
+ 3. and the control type is "select"
+ 4. Add the following options: `JavaScript`, `Design`, `Marketing`
  */
 
 // Toggle skill tag
-// Select variant `Active` when slug is present in skills
-// Select variant `Inactive` when slug is not present in skills
+// Selects variant `Active` when slug is present in skills
+// Selects variant `Inactive` when slug is not present in skills
 // ℹ️ Requires a `slug` property on the component
 export function toggleSkillTag(Component): ComponentType {
   return custom.toggleProperty(Component, "Skills", {
-    value: "props.slug",
+    value: "props.slug", // e.g. one of: `JavaScript`, `Design`, `Marketing`
   });
 }
 
@@ -330,17 +142,17 @@ export function toggleSkillTag(Component): ComponentType {
  ***********************************************************
  ** 🚨 Remember to create a person custom property with system name: WatchLater **
  ***********************************************************
-// 1. Go to CRM > Custom Properties > Person > Add Property
-// 2. Make sure the system name is "WatchLater"
-// 3. and the control type is "text"
+ 1. Go to CRM > Custom Properties > Person > Add Property
+ 2. Make sure the system name is "WatchLater"
+ 3. and the control type is "text"
  */
 
-// Select variant `OnWatchLaterList` when slug is present in watch later
-// Select variant `NotOnWatchLaterList` when slug is not present in watch later
+// Selects variant `OnWatchLaterList` when slug is present in watch later
+// Selects variant `NotOnWatchLaterList` when slug is not present in watch later
 // ℹ️ Requires a `slug` property on the component
-export function variantFromWatchLaterStatus(Component): ComponentType {
-  return custom.variantForProperty(Component, "WatchLater", {
-    value: "props.slug", // e.g., one of the following: `video1`, `video2`, `video3` etc.
+export function selectVariantFromWatchLaterStatus(Component): ComponentType {
+  return custom.selectVariantForProperty(Component, "WatchLater", {
+    value: "props.slug", // e.g. one of: `video1`, `video2`, `video3` etc.
     compare: "includes",
     activeVariant: "OnWatchLaterList",
     inactiveVariant: "NotOnWatchLaterList",

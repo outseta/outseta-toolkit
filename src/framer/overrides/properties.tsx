@@ -286,7 +286,7 @@ export function toggleProperty(
   });
 }
 
-export function propertyVariant(
+export function selectPropertyVariant(
   Component: React.ComponentType<any>,
   property: string
 ): React.ComponentType<any> {
@@ -314,7 +314,7 @@ export function propertyVariant(
   });
 }
 
-export function variantForProperty(
+export function selectVariantForProperty(
   Component: React.ComponentType<any>,
   property: PropertyKey,
   {
