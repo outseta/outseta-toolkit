@@ -1,5 +1,4 @@
 import React, { forwardRef } from "react";
-import { camelCase } from "lodash";
 import { OutsetaLogger } from "../../outseta";
 
 import useAuthStore, { type AuthStatus } from "./useAuthStore";
@@ -60,9 +59,9 @@ export function selectAuthStatusVariant(
     const logPrefix = `authStatusVariant -|`;
     try {
       const status = useAuthStore((state) => state.status);
-      const camelCaseStatus = camelCase(status);
-      log(logPrefix, "Selecting variant", camelCaseStatus);
-      return <Component ref={ref} {...props} variant={camelCaseStatus} />;
+      const pascalCaseStatus = status.charAt(0).toUpperCase() + status.slice(1);
+      log(logPrefix, "Selecting variant", pascalCaseStatus);
+      return <Component ref={ref} {...props} variant={pascalCaseStatus} />;
     } catch (error) {
       if (error instanceof Error) {
         log(logPrefix, "Hiding component", error.message);
