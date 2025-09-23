@@ -94,7 +94,7 @@ export function selectAuthStatusVariant(
           log(logPrefix, "Selecting variant", "Authenticated");
           return <Component ref={ref} {...props} variant="Authenticated" />;
         default:
-          throw new Error("Invalid status (${status})");
+          throw new Error(`Invalid status (${status})`);
       }
     } catch (error) {
       if (error instanceof Error) {
