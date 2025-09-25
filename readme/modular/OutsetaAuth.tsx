@@ -1,7 +1,7 @@
 // File: OutsetaAuth.tsx
 // Authentication controls for Outseta integration
 import { type ComponentType } from "react";
-import { auth } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist/framer/overrides.js";
+import { auth } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.4/dist/framer/overrides.js";
 
 //// AUTHENTICATION CONTROLS ////
 

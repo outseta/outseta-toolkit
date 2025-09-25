@@ -1,7 +1,7 @@
 // File: OutsetaPlans.tsx
 // Subscription plan management for Outseta integration
 import { type ComponentType } from "react";
-import { plans } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist/framer/overrides.js";
+import { plans } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.4/dist/framer/overrides.js";
 
 //// PLANS ////
 
