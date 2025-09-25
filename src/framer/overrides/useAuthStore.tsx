@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { createAuthStore, AuthStore, AuthStatus } from "../../auth-store";
 
-function isFramerCanvas(): boolean {
+export function isFramerCanvas(): boolean {
   try {
     return window.location.host.includes("framercanvas.com");
   } catch (error) {

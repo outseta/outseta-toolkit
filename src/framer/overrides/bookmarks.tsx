@@ -1,25 +1,15 @@
 import React from "react";
 import {
   showWhenProperty,
-  showWhenNotProperty,
   selectVariantForProperty,
   toggleProperty,
-  withTextProperty,
 } from "./properties";
 
 const PROPERTY_BOOKMARKS = "Bookmarks";
 const PROPS_SLUG = "props.slug";
 const INCLUDES = "includes";
-const VARIANTS = {
-  activeVariant: "Bookmarked",
-  inactiveVariant: "NotBookmarked",
-};
 
-export function withBookmarksAsText(
-  Component: React.ComponentType<any>
-): React.ComponentType<any> {
-  return withTextProperty(Component, PROPERTY_BOOKMARKS);
-}
+// Visibility overrides
 
 export function showWhenBookmarked(
   Component: React.ComponentType<any>
@@ -30,30 +20,27 @@ export function showWhenBookmarked(
   });
 }
 
-export function showWhenNotBookmarked(
-  Component: React.ComponentType<any>
-): React.ComponentType<any> {
-  return showWhenNotProperty(Component, PROPERTY_BOOKMARKS, {
-    value: PROPS_SLUG,
-    compare: INCLUDES,
-  });
-}
+// Actions overrides
 
 export function toggleBookmarked(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return toggleProperty(Component, PROPERTY_BOOKMARKS, {
     value: PROPS_SLUG,
-    ...VARIANTS,
+    trueVariant: "props.variant",
+    falseVariant: null, // Use primary variant
   });
 }
 
-export function selectBookmarkedVariant(
+// Variant overrides
+
+export function selectBookmarkCollectionVariant(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return selectVariantForProperty(Component, PROPERTY_BOOKMARKS, {
-    value: PROPS_SLUG,
-    compare: INCLUDES,
-    ...VARIANTS,
+    value: "", // empty string means there are no bookmarks
+    compare: "equal",
+    trueVariant: "Empty State", // Use `Empty State` variant
+    falseVariant: null, // Use primary variant
   });
 }

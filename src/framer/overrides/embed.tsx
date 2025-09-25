@@ -1,7 +1,7 @@
 import React, { forwardRef } from "react";
 import { OutsetaLogger } from "../../outseta";
 
-import useAuthStore from "./useAuthStore";
+import useAuthStore, { isFramerCanvas } from "./useAuthStore";
 
 const log = OutsetaLogger("framer.overrides.embed");
 
@@ -10,12 +10,36 @@ export function popupEmbed(
   embed: "register" | "login" | "profile"
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `triggerPopup ${embed} -|`;
-
+    const logPrefix = `popupEmbed ${embed} -|`;
     try {
-      const status = useAuthStore((state) => state.status);
+      if (isFramerCanvas()) {
+        log(logPrefix, `Framer Canvas - show component`);
+        return <Component ref={ref} {...props} />;
+      }
 
-      log(logPrefix, { status });
+      const currentStatus = useAuthStore((state) => state.status);
+      const anonymousEmbeds = ["register", "login"];
+      const authenticatedEmbeds = ["profile"];
+
+      if (anonymousEmbeds.includes(embed)) {
+        if (currentStatus === "pending") {
+          log(logPrefix, `Pending - show anonymous component`);
+          return <Component ref={ref} {...props} />;
+        }
+      }
+
+      if (anonymousEmbeds.includes(embed) && currentStatus !== "anonymous") {
+        log(logPrefix, `Not anonymous - remove component`);
+        return null;
+      }
+
+      if (
+        authenticatedEmbeds.includes(embed) &&
+        currentStatus !== "authenticated"
+      ) {
+        log(logPrefix, `Not authenticated - remove component`);
+        return null;
+      }
 
       // Set appropriate data attributes based on embed type
       const dataAttributes: Record<string, string> = {
@@ -24,37 +48,25 @@ export function popupEmbed(
 
       switch (embed) {
         case "register":
-          if (status !== "anonymous") {
-            throw new Error("Not anonymous");
-          }
           dataAttributes["data-o-auth"] = "1";
           dataAttributes["data-widget-mode"] = "register";
           break;
         case "login":
-          if (status !== "anonymous") {
-            throw new Error("Not anonymous");
-          }
           dataAttributes["data-o-auth"] = "1";
           dataAttributes["data-widget-mode"] = "login";
           break;
         case "profile":
-          if (status !== "authenticated") {
-            throw new Error("Not authenticated");
-          }
           dataAttributes["data-o-profile"] = "1";
           break;
         default:
-          throw new Error("Invalid embed type");
+          log(logPrefix, `Invalid (${embed}) - remove component`);
+          return null;
       }
 
-      log(logPrefix, "Setting Outseta data attributes", { dataAttributes });
+      log(logPrefix, `Data attributes - show component`, { dataAttributes });
       return <Component ref={ref} {...props} {...dataAttributes} />;
     } catch (error) {
-      if (error instanceof Error) {
-        log(logPrefix, "Hiding component", error.message);
-      } else {
-        log(logPrefix, "Hiding component", error);
-      }
+      log(logPrefix, `Error - remove component`, error);
       return null;
     }
   });

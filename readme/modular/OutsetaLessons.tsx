@@ -5,7 +5,7 @@ import { lessons } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist
 
 /*
  ***********************************************************
- ** 🚨 REQUIRES: Create a person custom property with system name: LessonsCompleted **
+ ** 🚨 **REQUIRES** a person custom property with system name: LessonsCompleted **
  ***********************************************************
  1. Go to CRM > Custom Properties > Person > Add Property
  2. Make sure the system name is "LessonsCompleted"
@@ -14,34 +14,33 @@ import { lessons } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist
 
 //// LESSON TRACKING ////
 
-// Display completed lessons (comma-separated list) as component text
-export function withLessonsCompleted(Component): ComponentType {
-  return lessons.withLessonsCompletedAsText(Component);
-}
-
-/**
- * ℹ️ NOTE: The following overrides require a `slug` property on the component
+/*
+ ***********************************************************
+ ** 🚨 **REQUIRES** a person custom property with system name: LessonsCompleted **
+ ***********************************************************
+ 1. Go to CRM > Custom Properties > Person > Add Property
+ 2. Make sure the system name is "LessonsCompleted"
+ 3. and the control type is "text"
  */
 
-// Component visible if lesson is completed
-export function showWhenLessonCompleted(Component): ComponentType {
+/**
+ * ℹ️ **NOTE:** The following overrides require a `slug` property on the component
+ */
+
+// Component visible for authenticated users when lesson is completed
+export function showWhenCompleted(Component): ComponentType {
   return lessons.showWhenLessonCompleted(Component);
 }
 
-// Component visible if lesson is not completed
-export function showWhenLessonNotCompleted(Component): ComponentType {
-  return lessons.showWhenLessonNotCompleted(Component);
-}
-
 // Toggle lesson completion status
-// Selects variant `Completed` when lesson is completed
-// Selects variant `NotCompleted` when lesson is not completed
-export function toggleLessonCompleted(Component): ComponentType {
+// Selects primary variant for authenticated users when lesson is completed
+// Selects configured variant for authenticated users when lesson is not completed
+export function toggleCompleted(Component): ComponentType {
   return lessons.toggleLessonCompleted(Component);
 }
 
-// Selects variant `Completed` when lesson is completed
-// Selects variant `NotCompleted` when lesson is not completed
-export function selectLessonCompletedVariant(Component): ComponentType {
-  return lessons.selectLessonCompletedVariant(Component);
+// Selects primary variant for authenticated users when lesson is completed
+// Selects configured variant for authenticated users when lesson is not completed
+export function selectPrimaryVariantWhenCompleted(Component): ComponentType {
+  return lessons.selectPrimaryVariantWhenLessonCompleted(Component);
 }

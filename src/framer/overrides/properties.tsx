@@ -2,7 +2,7 @@ import React, { forwardRef } from "react";
 import { OutsetaLogger } from "../../outseta";
 import { getNestedProperty } from "../../auth-store/utils";
 
-import useAuthStore from "./useAuthStore";
+import useAuthStore, { isFramerCanvas } from "./useAuthStore";
 
 import {
   comparePropertyValue,
@@ -10,7 +10,7 @@ import {
   toggleValueInArray,
   type CompareType,
   type CompareFlag,
-} from "./utils";
+} from "./property-utils";
 
 type PropertyKey = string;
 
@@ -21,15 +21,17 @@ type CompareOptions = {
 };
 
 type MatchVariantOptions = {
-  activeVariant?: string;
-  inactiveVariant?: string;
+  trueVariant: string | null;
+  falseVariant: string | null;
 };
 
 const log = OutsetaLogger(`framer.overrides.properties`);
 
 function getPropertyValue(user: any, propertyName: string): any {
-  return getNestedProperty(user, propertyName);
+  return getNestedProperty(user, propertyName) || "";
 }
+
+// Display overrides
 
 export function withTextProperty(
   Component: React.ComponentType<any>,
@@ -37,28 +39,29 @@ export function withTextProperty(
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `withTextProperty ${property} -|`;
-
     try {
+      if (isFramerCanvas()) {
+        log(logPrefix, `Framer Canvas - show component with placeholder`);
+        return <Component ref={ref} {...props} text={`{${property}}`} />;
+      }
+
       const user = useAuthStore((state) => state.user);
 
       if (!user) {
-        throw new Error("User data required");
+        log(logPrefix, `No user data - remove component`);
+        return null;
       }
 
-      let propertyValue = getPropertyValue(user, property);
+      const propertyValue = getPropertyValue(user, property);
 
-      if (typeof propertyValue !== "string") {
-        throw new Error("Not a string");
+      if (!propertyValue) {
+        log(logPrefix, `Empty property value - remove component`);
+        return null;
       }
 
-      log(logPrefix, { propertyValue });
-      return <Component ref={ref} {...props} text={propertyValue} />;
+      return <Component ref={ref} {...props} text={String(propertyValue)} />;
     } catch (error) {
-      if (error instanceof Error) {
-        log(logPrefix, "Hiding component -", error.message);
-      } else {
-        log(logPrefix, "Hiding component -", error);
-      }
+      log(logPrefix, `Error - remove component`, error);
       return null;
     }
   });
@@ -70,53 +73,46 @@ export function withImageProperty(
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `withImageProperty ${property} -|`;
-
     try {
+      if (isFramerCanvas()) {
+        log(logPrefix, `Framer Canvas - show component`);
+        return <Component ref={ref} {...props} />;
+      }
+
       const user = useAuthStore((state) => state.user);
 
       if (!user) {
-        throw new Error("User data required");
+        log(logPrefix, `No user data - remove component`);
+        return null;
       }
 
-      const imageSrc = getNestedProperty(user, property) as string;
+      let imageSrc = getNestedProperty(user, property) || "";
 
-      log(logPrefix, { imageSrc });
-
-      if (!imageSrc) {
-        // If no image from user property, use component's default or hide
-        if (props.background?.src) {
-          // Component has image set, use as fallback
-          log(logPrefix, "No user image, using component fallback");
-          return <Component ref={ref} {...props} />;
-        } else {
-          // Component has no image set, hide
-          log(logPrefix, "No user image and no component fallback, hiding");
-          return null;
-        }
+      if (typeof imageSrc !== "string") {
+        log(logPrefix, `User data - ${property} is not a string`, imageSrc);
+        imageSrc = "";
       }
 
-      log(logPrefix, "Setting image from user property");
+      log(logPrefix, `User data - show component with image`, imageSrc);
       return (
         <Component
           ref={ref}
           {...props}
           background={{
             ...props.background,
-            src: imageSrc,
-            srcSet: undefined,
+            src: imageSrc || props.background.src,
+            srcSet: imageSrc ? undefined : props.background.srcSet,
           }}
         />
       );
     } catch (error) {
-      if (error instanceof Error) {
-        log(logPrefix, "Hiding component -", error.message);
-      } else {
-        log(logPrefix, "Hiding component -", error);
-      }
+      log(logPrefix, `Error - remove component`, error);
       return null;
     }
   });
 }
+
+// Visibility overrides
 
 export function showWhenProperty(
   Component: React.ComponentType<any>,
@@ -124,23 +120,26 @@ export function showWhenProperty(
   { value, compare: compareType, flags }: CompareOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `showForProperty ${property} -|`;
-
+    const logPrefix = `showForProperty ${property} ${window?.location?.href}-|`;
     try {
+      if (isFramerCanvas()) {
+        log(logPrefix, `Framer Canvas - showing component`);
+        return <Component ref={ref} {...props} />;
+      }
+
       const user = useAuthStore((state) => state.user);
 
       if (!user) {
-        throw new Error("User data required");
+        log(logPrefix, `No user data - remove component`);
+        return null;
       }
+
       const propertyValue = getPropertyValue(user, property);
       const resolvedValue = resolveValue(value, props);
-
-      log(logPrefix, {
-        propertyValue,
-        resolvedValue,
-        compareType,
-      });
-
+      log(
+        logPrefix,
+        `Compare ${resolvedValue} to ${propertyValue} using ${compareType}`
+      );
       const matches = comparePropertyValue(
         propertyValue,
         resolvedValue,
@@ -149,17 +148,14 @@ export function showWhenProperty(
       );
 
       if (!matches) {
-        throw new Error("Match not found");
+        log(logPrefix, `No match - remove component`);
+        return null;
       }
 
-      log(logPrefix, "Match found - showing component");
+      log(logPrefix, `Match - show component`);
       return <Component ref={ref} {...props} />;
     } catch (error) {
-      if (error instanceof Error) {
-        log(logPrefix, "Hiding component -", error.message);
-      } else {
-        log(logPrefix, "Hiding component -", error);
-      }
+      log(logPrefix, `Error - remove component`, error);
       return null;
     }
   });
@@ -171,23 +167,26 @@ export function showWhenNotProperty(
   { value, compare: compareType, flags }: CompareOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `showWhenNotProperty ${property} -|`;
-
+    const logPrefix = `showForNotProperty ${property} -|`;
     try {
+      if (isFramerCanvas()) {
+        log(logPrefix, `Framer Canvas - show component`);
+        return <Component ref={ref} {...props} />;
+      }
+
       const user = useAuthStore((state) => state.user);
 
       if (!user) {
-        throw new Error("User data required");
+        log(logPrefix, `No user data - remove component`);
+        return null;
       }
+
       const propertyValue = getPropertyValue(user, property);
       const resolvedValue = resolveValue(value, props);
-
-      log(logPrefix, {
-        propertyValue,
-        resolvedValue,
-        compareType,
-      });
-
+      log(
+        logPrefix,
+        `Compare ${resolvedValue} to ${propertyValue} using ${compareType}`
+      );
       const matches = comparePropertyValue(
         propertyValue,
         resolvedValue,
@@ -196,21 +195,20 @@ export function showWhenNotProperty(
       );
 
       if (matches) {
-        throw new Error("Match found");
+        log(logPrefix, `Match - remove component`);
+        return null;
       }
 
-      log(logPrefix, "Match not found - showing component");
+      log(logPrefix, `No match - show component`);
       return <Component ref={ref} {...props} />;
     } catch (error) {
-      if (error instanceof Error) {
-        log(logPrefix, "Hiding component -", error.message);
-      } else {
-        log(logPrefix, "Hiding component -", error);
-      }
+      log(logPrefix, `Error - remove component`, error);
       return null;
     }
   });
 }
+
+// Actions overrides
 
 export function toggleProperty(
   Component: React.ComponentType<any>,
@@ -218,48 +216,59 @@ export function toggleProperty(
   {
     value: valueToToggle,
     flags,
-    activeVariant = "Active",
-    inactiveVariant = "Inactive",
+    trueVariant,
+    falseVariant,
   }: Pick<CompareOptions, "value" | "flags"> & MatchVariantOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `toggleProperty ${property} -|`;
+    const resolvedTrueVariant = resolveValue(trueVariant, props);
+    const resolvedFalseVariant = resolveValue(falseVariant, props);
 
     try {
+      if (isFramerCanvas()) {
+        log(logPrefix, `Framer Canvas - show component`);
+        return <Component ref={ref} {...props} />;
+      }
+
       const user = useAuthStore((state) => state.user);
       const updateUserProperty = useAuthStore(
         (state) => state.updateUserProperty
       );
 
       if (!user) {
-        throw new Error("User data required");
+        log(logPrefix, `No user data - remove component`);
+        return null;
       }
 
-      // Resolve toggle value from props if needed
-      const resolvedValueToToggle = resolveValue(valueToToggle, props);
-
       const propertyValue = getNestedProperty(user, property) || "";
-
-      log(logPrefix, { user, valueToToggle: resolvedValueToToggle });
+      const resolvedValueToToggle = resolveValue(valueToToggle, props);
 
       const handleClick = async (event: React.MouseEvent) => {
         event.preventDefault();
 
         const ignoreCase = flags?.includes("ignore-case") || false;
+
         const newPropertyValue = toggleValueInArray(
           propertyValue,
           resolvedValueToToggle,
           ignoreCase
         );
 
+        log(logPrefix, `Update user property: ${newPropertyValue}`);
         await updateUserProperty(property, newPropertyValue);
 
         // Call original onClick if provided
         if (props.onClick) {
+          log(logPrefix, `Call original onClick`);
           props.onClick(event);
         }
       };
 
+      log(
+        logPrefix,
+        `Compare ${resolvedValueToToggle} to ${propertyValue} using includes`
+      );
       const matches = comparePropertyValue(
         propertyValue,
         resolvedValueToToggle,
@@ -267,48 +276,61 @@ export function toggleProperty(
         flags
       );
 
+      if (matches) {
+        log(logPrefix, `Match - show '${resolvedTrueVariant}' variant`);
+        return (
+          <Component
+            ref={ref}
+            {...props}
+            variant={resolvedTrueVariant}
+            onClick={handleClick}
+          />
+        );
+      }
+
+      log(logPrefix, `Mismatch - show '${resolvedFalseVariant}' variant`);
       return (
         <Component
           ref={ref}
           {...props}
-          variant={matches ? activeVariant : inactiveVariant}
+          variant={resolvedFalseVariant}
           onClick={handleClick}
         />
       );
     } catch (error) {
-      if (error instanceof Error) {
-        log(logPrefix, "Hiding component -", error.message);
-      } else {
-        log(logPrefix, "Hiding component -", error);
-      }
+      log(logPrefix, `Error - remove component`, error);
       return null;
     }
   });
 }
+
+// Variant overrides
 
 export function selectPropertyVariant(
   Component: React.ComponentType<any>,
   property: string
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `propertyVariant ${property} -|`;
+    const logPrefix = `selectPropertyVariant ${property} -|`;
 
     try {
+      if (isFramerCanvas()) {
+        log(logPrefix, `Framer Canvas - show configured variant`);
+        return <Component ref={ref} {...props} />;
+      }
+
       const user = useAuthStore((state) => state.user);
 
       if (!user) {
-        throw new Error("User data required");
+        log(logPrefix, `No user data - remove component`);
+        return null;
       }
 
-      const propertyValue = getPropertyValue(user, property);
-      log(logPrefix, { variant: propertyValue, props });
-      return <Component ref={ref} {...props} variant={propertyValue} />;
+      const variantName = getPropertyValue(user, property) || "";
+      log(logPrefix, `User data - show '${variantName}' variant`);
+      return <Component ref={ref} {...props} variant={variantName} />;
     } catch (error) {
-      if (error instanceof Error) {
-        log(logPrefix, "Hiding component -", error.message);
-      } else {
-        log(logPrefix, "Hiding component -", error);
-      }
+      log(logPrefix, `Error - remove component`, error);
       return null;
     }
   });
@@ -321,48 +343,46 @@ export function selectVariantForProperty(
     value,
     compare: compareType,
     flags,
-    activeVariant = "Active",
-    inactiveVariant = "Inactive",
+    trueVariant,
+    falseVariant,
   }: CompareOptions & MatchVariantOptions
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `variantForProperty ${property} -|`;
+    const logPrefix = `selectVariantForProperty ${property} -|`;
+    const resolvedTrueVariant = resolveValue(trueVariant, props);
+    const resolvedFalseVariant = resolveValue(falseVariant, props);
 
-    try {
-      const user = useAuthStore((state) => state.user);
+    if (isFramerCanvas()) {
+      log(logPrefix, `Framer Canvas - show configured variant`);
+      return <Component ref={ref} {...props} />;
+    }
 
-      if (!user) {
-        throw new Error("User data required");
-      }
+    const user = useAuthStore((state) => state.user);
 
-      const propertyValue = getPropertyValue(user, property);
-      const resolvedValue = resolveValue(value, props);
-
-      log(logPrefix, {
-        propertyValue,
-        resolvedValue,
-        compareType,
-        ["props.variant"]: props.variant,
-      });
-
-      const matches = comparePropertyValue(
-        propertyValue,
-        resolvedValue,
-        compareType,
-        flags
-      );
-
-      const variant = matches ? activeVariant : inactiveVariant;
-
-      log(logPrefix, { variant });
-      return <Component ref={ref} {...props} variant={variant} />;
-    } catch (error) {
-      if (error instanceof Error) {
-        log(logPrefix, "Hiding component -", error.message);
-      } else {
-        log(logPrefix, "Hiding component -", error);
-      }
+    if (!user) {
+      log(logPrefix, `No user data - remove component`);
       return null;
     }
+
+    const propertyValue = getPropertyValue(user, property);
+    const resolvedValue = resolveValue(value, props);
+    log(
+      logPrefix,
+      `Compare ${resolvedValue} to ${propertyValue} using ${compareType}`
+    );
+    const matches = comparePropertyValue(
+      propertyValue,
+      resolvedValue,
+      compareType,
+      flags
+    );
+
+    if (matches) {
+      log(logPrefix, `Match - show '${resolvedTrueVariant}' variant`);
+      return <Component ref={ref} {...props} variant={resolvedTrueVariant} />;
+    }
+
+    log(logPrefix, `Mismatch - show '${resolvedFalseVariant}' variant`);
+    return <Component ref={ref} {...props} variant={resolvedFalseVariant} />;
   });
 }

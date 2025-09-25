@@ -1,105 +1,185 @@
 import React, { forwardRef } from "react";
 import { OutsetaLogger } from "../../outseta";
 
-import useAuthStore, { type AuthStatus } from "./useAuthStore";
+import useAuthStore, { isFramerCanvas } from "./useAuthStore";
 
 const log = OutsetaLogger("framer.overrides.auth");
 
-function showWhenAuthStatus(
-  Component: React.ComponentType<any>,
-  validStatus: AuthStatus
-): React.ComponentType<any> {
-  return forwardRef((props, ref) => {
-    const logPrefix = `showWhenAuthStatus ${validStatus} -|`;
-
-    try {
-      const currentStatus = useAuthStore((state) => state.status);
-
-      log(logPrefix, { status: currentStatus, validStatus });
-
-      if (currentStatus !== validStatus) {
-        throw new Error(`Current auth status is not ${validStatus}`);
-      }
-
-      log(logPrefix, "Status match, showing component");
-      return <Component ref={ref} {...props} />;
-    } catch (error) {
-      if (error instanceof Error) {
-        log(logPrefix, "Hiding component", error.message);
-      } else {
-        log(logPrefix, "Hiding component", error);
-      }
-      return null;
-    }
-  });
-}
+/// Visibility overrides
 
 export function showWhenAnonymous(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
-  return showWhenAuthStatus(Component, "anonymous");
+  return forwardRef((props, ref) => {
+    const logPrefix = `showWhenAnonymous -|`;
+    try {
+      if (isFramerCanvas()) {
+        log(logPrefix, `Framer Canvas - show component`);
+        return <Component ref={ref} {...props} />;
+      }
+
+      const currentStatus = useAuthStore((state) => state.status);
+
+      switch (currentStatus) {
+        case "pending":
+          log(logPrefix, `Pending - show anonymous component`);
+          return <Component ref={ref} {...props} />;
+        case "anonymous":
+          log(logPrefix, `Anonymous - show anonymous component`);
+          return <Component ref={ref} {...props} />;
+        case "authenticated":
+          log(logPrefix, `Authenticated - remove anonymous component`);
+          return null;
+        default:
+          log(logPrefix, `Invalid - remove component`);
+          return null;
+      }
+    } catch (error) {
+      log(logPrefix, `Error - remove component`, error);
+      return null;
+    }
+  });
 }
 
 export function showWhenAuthenticated(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
-  return showWhenAuthStatus(Component, "authenticated");
+  return forwardRef((props, ref) => {
+    const logPrefix = `showWhenAuthenticated -|`;
+    try {
+      if (isFramerCanvas()) {
+        log(logPrefix, `Framer Canvas - show component`);
+        return <Component ref={ref} {...props} />;
+      }
+
+      const currentStatus = useAuthStore((state) => state.status);
+
+      switch (currentStatus) {
+        case "pending":
+          log(logPrefix, `Pending - remove authenticated component`);
+          return null;
+        case "anonymous":
+          log(logPrefix, `Anonymous - remove authenticated component`);
+          return null;
+        case "authenticated":
+          log(logPrefix, `Authenticated - show authenticated component`);
+          return <Component ref={ref} {...props} />;
+        default:
+          log(logPrefix, `Invalid - remove authenticated component`);
+          return null;
+      }
+    } catch (error) {
+      log(logPrefix, `Error - remove component`, error);
+      return null;
+    }
+  });
 }
 
-export function showWhenPending(
-  Component: React.ComponentType<any>
-): React.ComponentType<any> {
-  return showWhenAuthStatus(Component, "pending");
-}
+/// Variant overrides
 
 export function selectAuthStatusVariant(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `authStatusVariant -|`;
+    const logPrefix = `selectAuthStatusVariant -|`;
     try {
-      const status = useAuthStore((state) => state.status);
-      const pascalCaseStatus = status.charAt(0).toUpperCase() + status.slice(1);
-      log(logPrefix, "Selecting variant", pascalCaseStatus);
-      return <Component ref={ref} {...props} variant={pascalCaseStatus} />;
-    } catch (error) {
-      if (error instanceof Error) {
-        log(logPrefix, "Hiding component", error.message);
-      } else {
-        log(logPrefix, "Hiding component", error);
+      if (isFramerCanvas()) {
+        log(logPrefix, `Framer Canvas - show configured variant`);
+        return <Component ref={ref} {...props} />;
       }
+
+      const status = useAuthStore((state) => state.status);
+      
+      switch (status) {
+        case "pending":
+          log(logPrefix, `Pending - show 'Anonymous' variant`);
+          return <Component ref={ref} {...props} variant="Anonymous" />;
+        case "anonymous":
+          log(logPrefix, `Anonymous - show 'Anonymous' variant`);
+          return <Component ref={ref} {...props} variant="Anonymous" />;
+        case "authenticated":
+          log(logPrefix, `Authenticated - show 'Authenticated' variant`);
+          return <Component ref={ref} {...props} variant="Authenticated" />;
+        default:
+          log(logPrefix, `Invalid - remove component`);
+          return null;
+      }
+    } catch (error) {
+      log(logPrefix, `Error - remove component`, error);
       return null;
     }
   });
 }
+
+export function selectPrimaryVariantForAuthenticated(
+  Component: React.ComponentType<any>
+): React.ComponentType<any> {
+  return forwardRef((props, ref) => {
+    const logPrefix = `selectPrimaryVariantForAuthenticated -|`;
+    try {
+      if (isFramerCanvas()) {
+        log(logPrefix, `Framer Canvas - show configured variant`);
+        return <Component ref={ref} {...props} />;
+      }
+
+      const status = useAuthStore((state) => state.status);
+
+      switch (status) {
+        case "pending":
+          log(logPrefix, `Pending - show configured variant`);
+          return <Component ref={ref} {...props} style={{ ...props.style }} />;
+        case "anonymous":
+          log(logPrefix, `Anonymous - show configured variant`);
+          return <Component ref={ref} {...props} />;
+        case "authenticated":
+          log(logPrefix, `Authenticated - show primary variant`);
+          return <Component ref={ref} {...props} variant={null} />;
+        default:
+          log(logPrefix, `Invalid - remove component`);
+          return null;
+      }
+    } catch (error) {
+      log(logPrefix, `Error - remove component`, error);
+      return null;
+    }
+  });
+}
+
+// Actions overrides
 
 export function triggerLogout(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `triggerLogout -|`;
-
     try {
-      const status = useAuthStore((state) => state.status);
-
-      log(logPrefix, { status });
-
-      if (status !== "authenticated") {
-        throw new Error("Not authenticated");
-      }
-
       const dataAttributes = {
         "data-o-logout-link": "1",
       };
 
-      log(logPrefix, "Setting Outseta data attributes", { dataAttributes });
-      return <Component ref={ref} {...props} {...dataAttributes} />;
-    } catch (error) {
-      if (error instanceof Error) {
-        log(logPrefix, "Hiding component", error.message);
-      } else {
-        log(logPrefix, "Hiding component", error);
+      if (isFramerCanvas()) {
+        log(logPrefix, `Framer Canvas - show component`);
+        return <Component ref={ref} {...props} />;
       }
+
+      const currentStatus = useAuthStore((state) => state.status);
+
+      switch (currentStatus) {
+        case "pending":
+          log(logPrefix, `Pending - remove authenticated component`);
+          return null;
+        case "anonymous":
+          log(logPrefix, `Anonymous - remove authenticated component`);
+          return null;
+        case "authenticated":
+          log(logPrefix, `Authenticated - show authenticated component`);
+          return <Component ref={ref} {...props} {...dataAttributes} />;
+        default:
+          log(logPrefix, `Invalid - remove component`);
+          return null;
+      }
+    } catch (error) {
+      log(logPrefix, `Error - remove component`, error);
       return null;
     }
   });

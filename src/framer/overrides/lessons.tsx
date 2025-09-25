@@ -3,24 +3,14 @@ import React from "react";
 import {
   showWhenProperty,
   showWhenNotProperty,
-  selectVariantForProperty,
   toggleProperty,
-  withTextProperty,
 } from "./properties";
 
 const PROPERTY_LESSONS_COMPLETED = "LessonsCompleted";
 const PROPS_SLUG = "props.slug";
 const INCLUDES = "includes";
-const VARIANTS = {
-  activeVariant: "Completed",
-  inactiveVariant: "NotCompleted",
-};
 
-export function withLessonsCompletedAsText(
-  Component: React.ComponentType<any>
-): React.ComponentType<any> {
-  return withTextProperty(Component, PROPERTY_LESSONS_COMPLETED);
-}
+// Visisbility Overrides
 
 export function showWhenLessonCompleted(
   Component: React.ComponentType<any>
@@ -40,21 +30,14 @@ export function showWhenLessonNotCompleted(
   });
 }
 
+// Actions & Variant Overrides
+
 export function toggleLessonCompleted(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return toggleProperty(Component, PROPERTY_LESSONS_COMPLETED, {
     value: PROPS_SLUG,
-    ...VARIANTS,
-  });
-}
-
-export function selectLessonCompletedVariant(
-  Component: React.ComponentType<any>
-): React.ComponentType<any> {
-  return selectVariantForProperty(Component, PROPERTY_LESSONS_COMPLETED, {
-    value: PROPS_SLUG,
-    compare: INCLUDES,
-    ...VARIANTS,
+    trueVariant: "props.variant",
+    falseVariant: null, // Use primary variant
   });
 }
