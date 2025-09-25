@@ -3,7 +3,6 @@ import React from "react";
 import {
   showWhenProperty,
   showWhenNotProperty,
-  selectVariantForProperty,
   toggleProperty,
 } from "./properties";
 
@@ -33,27 +32,12 @@ export function showWhenLessonNotCompleted(
 
 // Actions & Variant Overrides
 
-const VARIANTS = {
-  trueVariant: null,
-  falseVariant: "props.variant",
-  anonVariant: "props.variant",
-};
-
 export function toggleLessonCompleted(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return toggleProperty(Component, PROPERTY_LESSONS_COMPLETED, {
     value: PROPS_SLUG,
-    ...VARIANTS,
-  });
-}
-
-export function selectPrimaryVariantWhenLessonCompleted(
-  Component: React.ComponentType<any>
-): React.ComponentType<any> {
-  return selectVariantForProperty(Component, PROPERTY_LESSONS_COMPLETED, {
-    value: PROPS_SLUG,
-    compare: INCLUDES,
-    ...VARIANTS,
+    trueVariant: "props.variant",
+    falseVariant: null, // Use primary variant
   });
 }
