@@ -89,7 +89,7 @@ export function selectAuthStatusVariant(
       }
 
       const status = useAuthStore((state) => state.status);
-
+      
       switch (status) {
         case "pending":
           log(logPrefix, `Pending - show 'Anonymous' variant`);
