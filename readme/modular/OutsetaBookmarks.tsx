@@ -12,42 +12,30 @@ import { bookmarks } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/di
  3. and the control type is "text"
  */
 
-//// BOOKMARK SYSTEM ////
-
-// Display bookmarks (comma-separated list) as component text
-export function withBookmarks(Component): ComponentType {
-  return bookmarks.withBookmarksAsText(Component);
-}
-
 /**
  * ℹ️ **NOTE:** The following overrides require a `slug` property on the component
  */
 
-// Component visible if item is bookmarked
+// Component visible for authenticated users when item is bookmarked
 export function showWhenBookmarked(Component): ComponentType {
   return bookmarks.showWhenBookmarked(Component);
 }
 
-// Component visible if item is not bookmarked
-export function showWhenNotBookmarked(Component): ComponentType {
-  return bookmarks.showWhenNotBookmarked(Component);
-}
-
 // Toggle bookmark status
-// Selects primary variant when item is bookmarked
-// Selects configured variant when the item is not bookmarked
+// Selects primary variant for authenticated users when item is bookmarked
+// Selects configured variant for authenticated users when item is not bookmarked
 export function toggleBookmarked(Component): ComponentType {
   return bookmarks.toggleBookmarked(Component);
 }
 
-// Selects primary variant when the item is bookmarked
-// Selects configured variant when the item is not bookmarked
+// Selects primary variant authenticated users when item is bookmarked
+// Selects configured variant for authenticated users when item is not bookmarked
 export function selectPrimaryVariantForBookmarked(Component): ComponentType {
   return bookmarks.selectPrimaryVariantForBookmarked(Component);
 }
 
-// Selects primary variant when there are bookmarks
 // Selects variant `Empty State` when there are no bookmarks
-export function selectBookmarkCollectionVariant(Component): ComponentType {
+// Selects primary variant when there are bookmarks
+export function selectCollectionVariant(Component): ComponentType {
   return bookmarks.selectBookmarkCollectionVariant(Component);
 }

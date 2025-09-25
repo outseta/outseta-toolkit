@@ -55,15 +55,15 @@ For each set of overrides, copy the following code into a code file in your Fram
   - `selectPlanUidVariant` - Selects variant based on plan UID
   - `showWhenPlan` - Generic function to show component when user is on a specific plan (requires plan UID parameter)
   - `showWhenNotPlan` - Generic function to show component when user is not on a specific plan (requires plan UID parameter)
-  - `showWhenPremiumPlan` - Component visible for users on specific plan (customizable)
-  - `showWhenNotPremiumPlan` - Component visible for users not on specific plan (customizable)
-  - `selectPrimaryVariantForPremiumPlan` - Selects primary variant for users on the Premium plan, keeps configured variant for users not on the Premium plan (customize to your plans)
+  - `showWhenGoldPlan` - Component visible for users on specific plan (customizable)
+  - `showWhenNotGoldPlan` - Component visible for users not on specific plan (customizable)
+  - `selectPrimaryVariantForGoldPlan` - Selects primary variant for users on the Gold plan, keeps configured variant for users not on the Gold plan (customize to your plans)
 
 - 🔌 **[OutsetaAddOns.tsx](./readme/modular/OutsetaAddOns.tsx)**
   - `withAddOnUids` - Display current add-on UIDs as component text
-  - `showWhenPowerUpAddOn` - Component visible for users with specific add-on (customizable)
-  - `showWhenNotPowerUpAddOn` - Component visible for users without specific add-on (customizable)
-  - `selectPrimaryVariantForPowerUpAddOn` - Selects primary variant for users with the PowerUp add-on, keeps configured variant for users without the PowerUp add-on (customizable)
+  - `showWhenBoostAddOn` - Component visible for users with specific add-on (customizable)
+  - `showWhenNotBoostAddOn` - Component visible for users without specific add-on (customizable)
+  - `selectPrimaryVariantForBoostAddOn` - Selects primary variant for users with the Boost add-on, keeps configured variant for users without the Boost add-on (customizable)
 - 🔖 **[OutsetaBookmarks.tsx](./readme/modular/OutsetaBookmarks.tsx)**
   - 🚨 **REQUIRES** a person custom property with system name: Bookmarks
   - `withBookmarks` - Display bookmarks as component text

@@ -1,146 +1,61 @@
-/**
- * Resolves a value from props if it starts with "props."
- * @param value - The value to resolve
- * @param props - The component props
- * @returns The resolved value
- */
-export function resolveValue(value: any, props: any) {
-  if (typeof value === "string" && value.startsWith("props.")) {
-    return props[value.replace("props.", "")];
-  }
-  return value;
-}
+import React, {
+  useEffect,
+  forwardRef,
+  useRef,
+  useImperativeHandle,
+} from "react";
+import { isFramerCanvas } from "./useAuthStore";
 
-/**
- * Performs case-insensitive string comparison
- * @param value1 - First value to compare
- * @param value2 - Second value to compare
- * @param ignoreCase - Whether to ignore case differences
- * @returns true if values are equal
- */
-export function isEqual(
-  value1: any,
-  value2: any,
-  ignoreCase: boolean = false
-): boolean {
-  if (ignoreCase && typeof value1 === "string" && typeof value2 === "string") {
-    return value1.toLowerCase() === value2.toLowerCase();
-  }
-  return value1 === value2;
-}
+export function dynamicGridHeight(
+  Component: React.ComponentType<any>
+): React.ComponentType<any> {
+  return forwardRef((props, ref) => {
+    const internalRef = useRef<HTMLElement>(null);
+    const { style, ...otherProps } = props;
 
-/**
- * Checks if an array includes a value with optional case-insensitive comparison
- * @param array - Array to search in
- * @param value - Value to search for
- * @param ignoreCase - Whether to ignore case differences
- * @returns true if array includes the value
- */
-function includesValue(
-  array: any[],
-  value: any,
-  ignoreCase: boolean = false
-): boolean {
-  if (ignoreCase && typeof value === "string") {
-    return array.some((item: any) => {
-      if (typeof item !== "string") return false;
-      return item.toLowerCase() === value.toLowerCase();
-    });
-  }
-  return array.includes(value);
-}
+    // Forward the ref to the internal ref
+    useImperativeHandle(ref, () => internalRef.current);
 
-/**
- * Normalizes a property value to an array for consistent processing
- * @param value - Property value (can be string, array, or other)
- * @returns Array representation of the value
- */
-export function normalizeAsArray(value: any): any[] {
-  if (Array.isArray(value)) {
-    return value;
-  }
+    const hideEmptyChildren = () => {
+      if (!internalRef.current) return;
 
-  if (typeof value === "string") {
-    return value
-      .split(",")
-      .map((item) => item.trim())
-      .filter((item) => item !== ""); // remove potential empty strings
-  }
+      Array.from(internalRef.current.children).forEach((child: any) => {
+        const htmlChild = child as HTMLElement;
 
-  // For non-string, non-array values, wrap in array
-  return [value];
-}
+        // Check if child is "empty"
+        const isEmpty = htmlChild.children.length === 0;
+        // Or if all of it's children are hidden
+        const hiddenChildred = Array.from(htmlChild.children).every(
+          (child) => getComputedStyle(child).display === "none"
+        );
 
-/**
- * Toggles a value in an array, preserving the original data type
- * @param originalValue - The original property value
- * @param valueToToggle - The value to toggle
- * @param ignoreCase - Whether to ignore case differences
- * @returns The new property value with the same type as original
- */
-export function toggleValueInArray(
-  originalValue: any,
-  valueToToggle: any,
-  ignoreCase: boolean = false
-): any {
-  const wasArray = Array.isArray(originalValue);
-  const arrayValue = normalizeAsArray(originalValue);
+        htmlChild.style.display = isEmpty || hiddenChildred ? "none" : "";
+      });
+    };
 
-  // Filter out the toggle value
-  const filteredArray = arrayValue.filter(
-    (item) => !isEqual(item, valueToToggle, ignoreCase)
-  );
+    useEffect(() => {
+      if (!internalRef.current) return;
+      if (isFramerCanvas()) return;
 
-  // Add toggle value if it wasn't in the original array
-  const wasIncluded = arrayValue.some((item) =>
-    isEqual(item, valueToToggle, ignoreCase)
-  );
+      // Initial check
+      hideEmptyChildren();
 
-  const newArray = wasIncluded
-    ? filteredArray
-    : [...filteredArray, valueToToggle];
+      // Watch for changes in child content
+      const observer = new MutationObserver(() => {
+        hideEmptyChildren();
+      });
 
-  // Preserve original data type
-  if (wasArray) {
-    return newArray;
-  } else if (typeof originalValue === "string") {
-    return newArray.join(", ");
-  } else {
-    // For single values, return the array or single value
-    return newArray.length === 1 ? newArray[0] : newArray;
-  }
-}
+      observer.observe(internalRef.current, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+      });
 
-export type CompareType = "equal" | "includes";
-export type CompareFlag = "ignore-case";
+      return () => {
+        observer.disconnect();
+      };
+    }, []);
 
-/**
- * Main comparison function that replaces the old compare() function
- * @param propertyValue - The property value to check
- * @param targetValue - The value to compare against
- * @param type - Comparison type: "equal" or "includes"
- * @param ignoreCase - Whether to ignore case differences
- * @returns true if the comparison matches
- */
-export function comparePropertyValue(
-  propertyValue: any,
-  targetValue: any,
-  type: CompareType,
-  flags: CompareFlag[] = []
-): boolean {
-  switch (type) {
-    case "equal":
-      return isEqual(propertyValue, targetValue, flags.includes("ignore-case"));
-    case "includes":
-      const normalizedArray = normalizeAsArray(propertyValue);
-      return includesValue(
-        normalizedArray,
-        targetValue,
-        flags.includes("ignore-case")
-      );
-    default:
-      throw new Error(
-        `Invalid comparison type: "${type}". Valid types are: "equal", "includes"`
-      );
-  }
+    return <Component {...otherProps} ref={internalRef} />;
+  });
 }

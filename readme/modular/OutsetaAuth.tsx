@@ -22,7 +22,6 @@ export function showWhenAuthenticated(Component): ComponentType {
 
 // Selects `Anonymous` variant for anonymous users
 // Selects `Authenticated` variant for authenticated users
-// Selects `Pending` variant for pending users (can be omitted and the primary variant will be used)
 export function selectAuthStatusVariant(Component): ComponentType {
   return auth.selectAuthStatusVariant(Component);
 }

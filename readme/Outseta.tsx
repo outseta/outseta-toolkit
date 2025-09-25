@@ -9,6 +9,7 @@ import {
   addOns,
   bookmarks,
   lessons,
+  utils,
 } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist/framer/overrides.js";
 
 //// AUTHENTICATION ////
@@ -99,9 +100,9 @@ export function plans_withPlanUid(Component): ComponentType {
   return plans.withPlanUidAsText(Component);
 }
 
-// Selects `OW45KRmg` variant for a user on the OW45KRmg plan
-// Selects `amRjLEmJ` variant for a user on the amRjLEmJ plan
-// If variant not found, selects the primary variant
+// Selects `OW45KRmg` variant for authenticated users on the OW45KRmg plan
+// Selects `amRjLEmJ` variant for authenticated users on the amRjLEmJ plan
+// Selects primary variant for authenticated users when no variant match
 export function plans_selectPlanUidVariant(Component): ComponentType {
   return plans.selectPlanUidVariant(Component);
 }
@@ -111,27 +112,27 @@ export function plans_selectPlanUidVariant(Component): ComponentType {
 ** 🚨 REQUIRES: Customize the plan overrides below **
 ***********************************************************
 To customize the plan overrides, change the examples below:
-1. Change the plan denomination (e.g. `Premium`)
+1. Change the plan denomination (e.g. `Gold`)
 2. Change the plan UID to match your actual plan UID
 3. Update your project to use the new override
 Copy/paste and repeat for each plan needed.
 */
 
-// Example for a "Premium" plan with UID "OW45KRmg":
+// Example for a "Gold" plan with UID "OW45KRmg":
 
-// Component visible for users on the Premium plan
-export function plans_showWhenPremiumPlan(Component): ComponentType {
+// Component visible for authenticated users on the Gold plan
+export function plans_showWhenGoldPlan(Component): ComponentType {
   return plans.showWhenPlan(Component, "OW45KRmg");
 }
 
-// Component visible for users not on the Premium plan
-export function plans_showWhenNotPremiumPlan(Component): ComponentType {
+// Component visible for authenticated users not on the Gold plan
+export function plans_showWhenNotGoldPlan(Component): ComponentType {
   return plans.showWhenNotPlan(Component, "OW45KRmg");
 }
 
-// Selects primary variant for users on the Premium plan
-// Selects configured variant for users not on the Premium plan
-export function plans_selectPrimaryVariantForPremiumPlan(
+// Selects primary variant for authenticated users on the Gold plan
+// Selects configured variant for authenticated users not on the Gold plan
+export function plans_selectPrimaryVariantForGoldPlan(
   Component
 ): ComponentType {
   return plans.selectPrimaryVariantForPlan(Component, "OW45KRmg");
@@ -149,27 +150,27 @@ export function addOns_withAddOnUids(Component): ComponentType {
 ** 🚨 REQUIRES: Customize the add-on overrides below **
 ***********************************************************
 To customize the add-on overrides, change the examples below:
-1. Change the add-on denomination (e.g. `PowerUp`)
+1. Change the add-on denomination (e.g. `Boost`)
 2. Change the add-on UID to match your actual add-on UID
 3. Update your project to use the new override
 Copy/paste and repeat for each add-on needed.
 */
 
-// Example for a "PowerUp" add-on with UID "OW4pRYWg":
+// Example for a "Boost" add-on with UID "OW4pRYWg":
 
-// Component visible for users with the PowerUp add-on
-export function addOns_showWhenPowerUpAddOn(Component): ComponentType {
+// Component visible for authenticated users with the Boost add-on
+export function addOns_showWhenBoostAddOn(Component): ComponentType {
   return addOns.showWhenAddOn(Component, "OW4pRYWg");
 }
 
-// Component visible for users without the PowerUp add-on
-export function addOns_showWhenNotPowerUpAddOn(Component): ComponentType {
+// Component visible for authenticated users without the Boost add-on
+export function addOns_showWhenNotBoostAddOn(Component): ComponentType {
   return addOns.showWhenNotAddOn(Component, "OW4pRYWg");
 }
 
-// Selects primary variant for users with the PowerUp add-on
-// Selects configured variant for users without the PowerUp add-on
-export function addOns_selectPrimaryVariantForPowerUpAddOn(
+// Selects primary variant for authenticated users with the Boost add-on
+// Selects configured variant for authenticated users without the Boost add-on
+export function addOns_selectPrimaryVariantForBoostAddOn(
   Component
 ): ComponentType {
   return addOns.selectPrimaryVariantForAddOn(Component, "OW4pRYWg");
@@ -186,34 +187,24 @@ export function addOns_selectPrimaryVariantForPowerUpAddOn(
  3. and the control type is "text"
  */
 
-// Display bookmarks (comma-separated list) as component text
-export function bookmarks_withBookmarks(Component): ComponentType {
-  return bookmarks.withBookmarksAsText(Component);
-}
-
 /**
  * ℹ️ **NOTE:** The following overrides require a `slug` property on the component
  */
 
-// Component visible if item is bookmarked
+// Component visible for authenticated users when item is bookmarked
 export function bookmarks_showWhenBookmarked(Component): ComponentType {
   return bookmarks.showWhenBookmarked(Component);
 }
 
-// Component visible if item is not bookmarked
-export function bookmarks_showWhenNotBookmarked(Component): ComponentType {
-  return bookmarks.showWhenNotBookmarked(Component);
-}
-
 // Toggle bookmark status
-// Selects primary variant when item is bookmarked
-// Selects configured variant when the item is not bookmarked
+// Selects primary variant for authenticated users when item is bookmarked
+// Selects configured variant for authenticated users when item is not bookmarked
 export function bookmarks_toggleBookmarked(Component): ComponentType {
   return bookmarks.toggleBookmarked(Component);
 }
 
-// Selects primary variant when the item is bookmarked
-// Selects configured variant when the item is not bookmarked
+// Selects primary variant authenticated users when item is bookmarked
+// Selects configured variant for authenticated users when item is not bookmarked
 export function bookmarks_selectPrimaryVariantForBookmarked(
   Component
 ): ComponentType {
@@ -237,36 +228,33 @@ export function bookmarks_selectCollectionVariant(Component): ComponentType {
  3. and the control type is "text"
  */
 
-// Display completed lessons (comma-separated list) as component text
-export function lessons_withCompleted(Component): ComponentType {
-  return lessons.withLessonsCompletedAsText(Component);
-}
-
 /**
  * ℹ️ **NOTE:** The following overrides require a `slug` property on the component
  */
 
-// Component visible if lesson is completed
+// Component visible for authenticated users when lesson is completed
 export function lessons_showWhenCompleted(Component): ComponentType {
   return lessons.showWhenLessonCompleted(Component);
 }
 
-// Component visible if lesson is not completed
-export function lessons_showWhenNotCompleted(Component): ComponentType {
-  return lessons.showWhenLessonNotCompleted(Component);
-}
-
 // Toggle lesson completion status
-// Selects primary variant when lesson is completed
-// Selects configured variant when lesson is not completed
+// Selects primary variant for authenticated users when lesson is completed
+// Selects configured variant for authenticated users when lesson is not completed
 export function lessons_toggleCompleted(Component): ComponentType {
   return lessons.toggleLessonCompleted(Component);
 }
 
-// Selects primary variant when lesson is completed
-// Selects configured variant when lesson is not completed
+// Selects primary variant for authenticated users when lesson is completed
+// Selects configured variant for authenticated users when lesson is not completed
 export function lessons_selectPrimaryVariantWhenCompleted(
   Component
 ): ComponentType {
   return lessons.selectPrimaryVariantWhenLessonCompleted(Component);
+}
+
+//// UTILS ////
+
+// Automatically hides empty grid items
+export function utils_dynamicGridHeight(Component): ComponentType {
+  return utils.dynamicGridHeight(Component);
 }

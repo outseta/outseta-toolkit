@@ -85,7 +85,10 @@ export function OutsetaLogger(scope: string) {
   const fullScope = `toolkit.${scope}`;
   return (...args: any[]): void => {
     if (shouldLog(fullScope)) {
-      console.log(`[outseta.${fullScope}]`, ...args);
+      console.log(
+        `[${window?.location?.origin} | outseta.${fullScope}]`,
+        ...args
+      );
     }
   };
 }

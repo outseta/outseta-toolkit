@@ -1,6 +1,6 @@
 import React, { forwardRef } from "react";
 import { OutsetaLogger } from "../../outseta";
-import { comparePropertyValue, resolveValue } from "./utils";
+import { comparePropertyValue, resolveValue } from "./property-utils";
 
 import useAuthStore, { isFramerCanvas } from "./useAuthStore";
 
@@ -17,143 +17,111 @@ export function withPlanUidAsText(
     const logPrefix = `withPlanUid -|`;
 
     if (isFramerCanvas()) {
-      log(logPrefix, "Framer Canvas - showing placeholder plan UID");
+      log(logPrefix, `Framer Canvas - show component with placeholder`);
       return <Component ref={ref} {...props} text={`{PlanUid}`} />;
     }
 
-    try {
-      const payload = useAuthStore((state) => state.payload);
-
-      if (!payload) {
-        throw new Error("JWT payload required");
-      }
-
-      const currentPlanUid = payload["outseta:planUid"];
-
-      log(logPrefix, { currentPlanUid });
-
-      if (!currentPlanUid) {
-        throw new Error("No plan UID available");
-      }
-
-      return <Component ref={ref} {...props} text={currentPlanUid} />;
-    } catch (error) {
-      if (error instanceof Error) {
-        log(logPrefix, "Hiding component -", error.message);
-      } else {
-        log(logPrefix, "Hiding component -", error);
-      }
+    const payload = useAuthStore((state) => state.payload);
+    if (!payload) {
+      log(logPrefix, `No payload - remove component`);
       return null;
     }
+
+    const currentPlanUid = payload["outseta:planUid"] || "";
+
+    if (!currentPlanUid) {
+      log(logPrefix, `No plan uid - remove component`);
+      return null;
+    }
+
+    log(logPrefix, `Plan uid - show component with text: ${currentPlanUid}`);
+    return <Component ref={ref} {...props} text={currentPlanUid} />;
   });
 }
 
 // Visibility overrides
 
+// Display when authenticated and plan is present
 export function showWhenPlan(
   Component: React.ComponentType<any>,
   planUid: PlanUid
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `showWhenPlan ${planUid} -|`;
+    const resolvedValuePlanUid = resolveValue(planUid, props);
+    const logPrefix = `showWhenPlan ${resolvedValuePlanUid} -|`;
 
     if (isFramerCanvas()) {
-      log(logPrefix, "Framer Canvas - showing component");
+      log(logPrefix, `Framer Canvas - show component`);
       return <Component ref={ref} {...props} />;
     }
 
-    try {
-      const payload = useAuthStore((state) => state.payload);
-
-      if (!payload) {
-        throw new Error("JWT payload required");
-      }
-
-      const currentPlanUid = payload["outseta:planUid"];
-      const resolvedValuePlanUid = resolveValue(planUid, props);
-
-      log(logPrefix, {
-        currentPlanUid,
-        resolvedValuePlanUid,
-      });
-
-      const matches = comparePropertyValue(
-        currentPlanUid,
-        resolvedValuePlanUid,
-        "equal"
-      );
-
-      if (!matches) {
-        throw new Error("Plan UID mismatch");
-      }
-
-      log(logPrefix, "Plan UID match found - showing component");
-      return <Component ref={ref} {...props} />;
-    } catch (error) {
-      if (error instanceof Error) {
-        log(logPrefix, "Hiding component -", error.message);
-      } else {
-        log(logPrefix, "Hiding component -", error);
-      }
+    const payload = useAuthStore((state) => state.payload);
+    if (!payload) {
+      log(logPrefix, `No payload - remove component`);
       return null;
     }
+
+    const currentPlanUid = payload["outseta:planUid"] || "";
+
+    const matches = comparePropertyValue(
+      currentPlanUid,
+      resolvedValuePlanUid,
+      "equal"
+    );
+
+    if (!matches) {
+      log(logPrefix, `Plan mismatch - remove component`);
+      return null;
+    }
+
+    log(logPrefix, `Plan match - show component`);
+    return <Component ref={ref} {...props} />;
   });
 }
 
+// Display when authenticated and plan is not present
 export function showWhenNotPlan(
   Component: React.ComponentType<any>,
   planUid: PlanUid
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `showWhenNotPlan ${planUid} -|`;
+    const resolvedValuePlanUid = resolveValue(planUid, props);
+    const logPrefix = `showWhenNotPlan ${resolvedValuePlanUid} -|`;
 
     if (isFramerCanvas()) {
-      log(logPrefix, "Framer Canvas - showing component");
+      log(logPrefix, `Framer Canvas - show component`);
       return <Component ref={ref} {...props} />;
     }
 
-    try {
-      const payload = useAuthStore((state) => state.payload);
-
-      if (!payload) {
-        throw new Error("JWT payload required");
-      }
-
-      const currentPlanUid = payload["outseta:planUid"];
-      const resolvedValuePlanUid = resolveValue(planUid, props);
-
-      log(logPrefix, {
-        currentPlanUid,
-        resolvedValuePlanUid,
-      });
-
-      const matches = comparePropertyValue(
-        currentPlanUid,
-        resolvedValuePlanUid,
-        "equal"
-      );
-
-      if (matches) {
-        throw new Error("Plan UID match found");
-      }
-
-      log(logPrefix, "Plan UID mismatch - showing component");
-      return <Component ref={ref} {...props} />;
-    } catch (error) {
-      if (error instanceof Error) {
-        log(logPrefix, "Hiding component -", error.message);
-      } else {
-        log(logPrefix, "Hiding component -", error);
-      }
+    const payload = useAuthStore((state) => state.payload);
+    if (!payload) {
+      log(logPrefix, `No Payload - remove component`);
       return null;
     }
+
+    const currentPlanUid = payload["outseta:planUid"] || "";
+
+    const matches = comparePropertyValue(
+      currentPlanUid,
+      resolvedValuePlanUid,
+      "equal"
+    );
+
+    if (matches) {
+      log(logPrefix, `Plan match - hide component`);
+      return null;
+    }
+
+    log(logPrefix, `Plan mismatch - show component`);
+    return <Component ref={ref} {...props} />;
   });
 }
 
 // Variant overrides
 
-// Selects variant with the same name as the current plan UID
-// Selects primary variant when no plan UID is present
+// Display when authenticated
+// Selects variant with the same name as the current plan UID,
+// if no match defaults the primary variant
 export function selectPlanUidVariant(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
@@ -161,41 +129,23 @@ export function selectPlanUidVariant(
     const logPrefix = `planUidVariant -|`;
 
     if (isFramerCanvas()) {
-      log(logPrefix, "Framer Canvas - selecting configured variant");
-      return <Component ref={ref} {...props} variant={props.variant} />;
+      log(logPrefix, `Framer Canvas - show configured variant`);
+      return <Component ref={ref} {...props} />;
     }
 
-    try {
-      const payload = useAuthStore((state) => state.payload);
-
-      if (!payload) {
-        log(logPrefix, "No JWT payload available - selecting primary variant");
-        return <Component ref={ref} {...props} variant={null} />;
-      }
-
-      const currentPlanUid = payload["outseta:planUid"];
-
-      log(logPrefix, {
-        currentPlanUid,
-      });
-
-      // Select variant with the same name as the current plan UID
-      const variantName = currentPlanUid;
-
-      log(logPrefix, `Selecting variant: ${variantName}`);
-      return <Component ref={ref} {...props} variant={variantName} />;
-    } catch (error) {
-      if (error instanceof Error) {
-        log(logPrefix, "Hiding component -", error.message);
-      } else {
-        log(logPrefix, "Hiding component -", error);
-      }
-
+    const payload = useAuthStore((state) => state.payload);
+    if (!payload) {
+      log(logPrefix, `No Payload - remove component`);
       return null;
     }
+
+    const variantName = payload["outseta:planUid"] || "";
+    log(logPrefix, `Payload - show '${variantName}' variant`);
+    return <Component ref={ref} {...props} variant={variantName} />;
   });
 }
 
+// Display when authenticated
 // Selects primary variant (null) when the plan is present
 // Selects configured variant when the plan is not present
 export function selectPrimaryVariantForPlan(
@@ -204,30 +154,24 @@ export function selectPrimaryVariantForPlan(
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const logPrefix = `selectPrimaryVariantForPlan ${planUid} -|`;
-
-    if (isFramerCanvas()) {
-      log(logPrefix, "Framer Canvas - selecting configured variant");
-      return <Component ref={ref} {...props} variant={props.variant} />;
-    }
-
     try {
-      const payload = useAuthStore((state) => state.payload);
-
-      if (!payload) {
-        log(
-          logPrefix,
-          "No JWT payload available - selecting configured variant"
-        );
-        return <Component ref={ref} {...props} variant={props.variant} />;
+      if (isFramerCanvas()) {
+        log(logPrefix, `Framer Canvas - show configured variant`);
+        return <Component ref={ref} {...props} />;
       }
 
-      const currentPlanUid = payload["outseta:planUid"];
-      const resolvedValuePlanUid = resolveValue(planUid, props);
+      const payload = useAuthStore((state) => state.payload);
+      if (!payload) {
+        log(logPrefix, `No Payload - remove component`);
+        return null;
+      }
 
-      log(logPrefix, {
-        currentPlanUid,
-        resolvedValuePlanUid,
-      });
+      const currentPlanUid = payload["outseta:planUid"] || [];
+      const resolvedValuePlanUid = resolveValue(planUid, props);
+      log(
+        logPrefix,
+        `Compare ${resolvedValuePlanUid} to ${currentPlanUid} using equal`
+      );
 
       // Select variant based on whether the plan matches
       const matches = comparePropertyValue(
@@ -236,16 +180,15 @@ export function selectPrimaryVariantForPlan(
         "equal"
       );
 
-      const variantName = matches ? null : props.variant;
-
-      log(logPrefix, `Selecting variant: ${variantName}`);
-      return <Component ref={ref} {...props} variant={variantName} />;
-    } catch (error) {
-      if (error instanceof Error) {
-        log(logPrefix, "Hiding component -", error.message);
-      } else {
-        log(logPrefix, "Hiding component -", error);
+      if (matches) {
+        log(logPrefix, `Plan match - show primary variant`);
+        return <Component ref={ref} {...props} variant={null} />;
       }
+
+      log(logPrefix, `Plan mismatch - show configured variant`);
+      return <Component ref={ref} {...props} />;
+    } catch (error) {
+      log(logPrefix, `Error - remove component`, error);
       return null;
     }
   });
