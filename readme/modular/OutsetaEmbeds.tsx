@@ -1,7 +1,7 @@
 // File: OutsetaEmbeds.tsx
 // Embed controls for Outseta integration
 import { type ComponentType } from "react";
-import { embed } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist/framer/overrides.js";
+import { embed } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.4/dist/framer/overrides.js";
 
 //// EMBED CONTROLS ////
 

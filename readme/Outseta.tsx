@@ -10,7 +10,7 @@ import {
   bookmarks,
   lessons,
   utils,
-} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist/framer/overrides.js";
+} from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.4/dist/framer/overrides.js";
 
 //// AUTHENTICATION ////
 

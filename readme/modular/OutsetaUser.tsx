@@ -1,7 +1,7 @@
 // File: OutsetaUser.tsx
 // User data display functions for Outseta integration
 import { type ComponentType } from "react";
-import { user } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.3/dist/framer/overrides.js";
+import { user } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.4/dist/framer/overrides.js";
 
 //// USER DATA DISPLAY ////
 
