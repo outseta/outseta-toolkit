@@ -166,7 +166,7 @@ export function selectPrimaryVariantForPlan(
         return null;
       }
 
-      const currentPlanUid = payload["outseta:planUid"] || [];
+      const currentPlanUid = payload["outseta:planUid"] || "";
       const resolvedValuePlanUid = resolveValue(planUid, props);
       log(
         logPrefix,
