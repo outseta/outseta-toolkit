@@ -25,11 +25,11 @@ export function dynamicGridHeight(
         // Check if child is "empty"
         const isEmpty = htmlChild.children.length === 0;
         // Or if all of it's children are hidden
-        const hiddenChildred = Array.from(htmlChild.children).every(
+        const hiddenChildren = Array.from(htmlChild.children).every(
           (child) => getComputedStyle(child).display === "none"
         );
 
-        htmlChild.style.display = isEmpty || hiddenChildred ? "none" : "";
+        htmlChild.style.display = isEmpty || hiddenChildren ? "none" : "";
       });
     };
 
