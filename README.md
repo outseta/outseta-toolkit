@@ -66,19 +66,13 @@ For each set of overrides, copy the following code into a code file in your Fram
   - `selectPrimaryVariantForBoostAddOn` - Selects primary variant for users with the Boost add-on, keeps configured variant for users without the Boost add-on (customizable)
 - 🔖 **[OutsetaBookmarks.tsx](./readme/modular/OutsetaBookmarks.tsx)**
   - 🚨 **REQUIRES** a person custom property with system name: Bookmarks
-  - `withBookmarks` - Display bookmarks as component text
   - `showWhenBookmarked` - Component visible if item is bookmarked
-  - `showWhenNotBookmarked` - Component visible if item is not bookmarked
   - `toggleBookmarked` - Toggle bookmark status
-  - `selectPrimaryVariantForBookmarked` - Selects primary variant when the item is bookmarked, keeps configured variant when the item is not bookmarked
-  - `selectBookmarkCollectionVariant` - Selects `Empty State` variant when there are no bookmarks, uses primary variant when there are bookmarks
+  - `selectCollectionVariant` - Selects `Empty State` variant when there are no bookmarks, uses primary variant when there are bookmarks
 - 📚 **[OutsetaLessons.tsx](./readme/modular/OutsetaLessons.tsx)**
   - 🚨 **REQUIRES** a person custom property with system name: LessonsCompleted
-  - `withLessonsCompleted` - Display completed lessons as component text
-  - `showWhenLessonCompleted` - Component visible if lesson is completed
-  - `showWhenLessonNotCompleted` - Component visible if lesson is not completed
-  - `toggleLessonCompleted` - Toggle lesson completion status
-  - `selectPrimaryVariantWhenLessonCompleted` - Selects primary variant when lesson is completed, keeps configured variant when lesson is not completed
+  - `showWhenCompleted` - Component visible if lesson is completed
+  - `toggleCompleted` - Toggle lesson completion status
 
 **Benefits:** Smaller files, easier to customize, only include what you need
 **Downside:** Multiple files to manage and copy
