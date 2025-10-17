@@ -38,9 +38,3 @@ export function showWhenCompleted(Component): ComponentType {
 export function toggleCompleted(Component): ComponentType {
   return lessons.toggleLessonCompleted(Component);
 }
-
-// Selects primary variant for authenticated users when lesson is completed
-// Selects configured variant for authenticated users when lesson is not completed
-export function selectPrimaryVariantWhenCompleted(Component): ComponentType {
-  return lessons.selectPrimaryVariantWhenLessonCompleted(Component);
-}
