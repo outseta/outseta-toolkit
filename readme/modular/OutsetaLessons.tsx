@@ -1,7 +1,7 @@
 // File: OutsetaLessons.tsx
 // Lesson tracking system for Outseta integration
 import { type ComponentType } from "react";
-import { lessons } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.4/dist/framer/overrides.js";
+import { lessons } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.5/dist/framer/overrides.js";
 
 /*
  ***********************************************************
