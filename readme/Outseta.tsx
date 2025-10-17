@@ -203,14 +203,6 @@ export function bookmarks_toggleBookmarked(Component): ComponentType {
   return bookmarks.toggleBookmarked(Component);
 }
 
-// Selects primary variant authenticated users when item is bookmarked
-// Selects configured variant for authenticated users when item is not bookmarked
-export function bookmarks_selectPrimaryVariantForBookmarked(
-  Component
-): ComponentType {
-  return bookmarks.selectPrimaryVariantForBookmarked(Component);
-}
-
 // Selects variant `Empty State` when there are no bookmarks
 // Selects primary variant when there are bookmarks
 export function bookmarks_selectCollectionVariant(Component): ComponentType {
@@ -242,14 +234,6 @@ export function lessons_showWhenCompleted(Component): ComponentType {
 // Selects configured variant for authenticated users when lesson is not completed
 export function lessons_toggleCompleted(Component): ComponentType {
   return lessons.toggleLessonCompleted(Component);
-}
-
-// Selects primary variant for authenticated users when lesson is completed
-// Selects configured variant for authenticated users when lesson is not completed
-export function lessons_selectPrimaryVariantWhenCompleted(
-  Component
-): ComponentType {
-  return lessons.selectPrimaryVariantWhenLessonCompleted(Component);
 }
 
 //// UTILS ////

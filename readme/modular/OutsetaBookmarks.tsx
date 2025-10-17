@@ -28,12 +28,6 @@ export function toggleBookmarked(Component): ComponentType {
   return bookmarks.toggleBookmarked(Component);
 }
 
-// Selects primary variant authenticated users when item is bookmarked
-// Selects configured variant for authenticated users when item is not bookmarked
-export function selectPrimaryVariantForBookmarked(Component): ComponentType {
-  return bookmarks.selectPrimaryVariantForBookmarked(Component);
-}
-
 // Selects variant `Empty State` when there are no bookmarks
 // Selects primary variant when there are bookmarks
 export function selectCollectionVariant(Component): ComponentType {
