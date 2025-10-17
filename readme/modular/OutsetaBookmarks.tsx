@@ -1,7 +1,7 @@
 // File: OutsetaBookmarks.tsx
 // Bookmark system for Outseta integration
 import { type ComponentType } from "react";
-import { bookmarks } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.4/dist/framer/overrides.js";
+import { bookmarks } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.5/dist/framer/overrides.js";
 
 /*
  ***********************************************************

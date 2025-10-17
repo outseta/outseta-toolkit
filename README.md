@@ -82,7 +82,7 @@ For each set of overrides, copy the following code into a code file in your Fram
 For custom properties and advanced use cases, you may create your own overrides. Here are some examples:
 
 ```javascript
-import { custom } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.4/dist/framer/overrides.js";
+import { custom } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.5/dist/framer/overrides.js";
 
 //// EXAMPLES OF CUSTOM PROPERTIES ////
 
