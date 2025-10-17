@@ -31,13 +31,13 @@ Copy/paste and repeat for each plan needed.
 // Example for a "Gold" plan with UID "OW45KRmg":
 
 // Component visible for authenticated users on the Gold plan
-export function showWhenGoldPlan(Component): ComponentType {
-  return plans.showWhenPlan(Component, "OW45KRmg");
+export function showForGoldPlan(Component): ComponentType {
+  return plans.showForPlan(Component, "OW45KRmg");
 }
 
 // Component visible for authenticated users not on the Gold plan
-export function showWhenNotGoldPlan(Component): ComponentType {
-  return plans.showWhenNotPlan(Component, "OW45KRmg");
+export function showForNotGoldPlan(Component): ComponentType {
+  return plans.showForNotPlan(Component, "OW45KRmg");
 }
 
 // Selects primary variant for authenticated users on the Gold plan

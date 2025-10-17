@@ -42,13 +42,13 @@ export function withPlanUidAsText(
 // Visibility overrides
 
 // Display when authenticated and plan is present
-export function showWhenPlan(
+export function showForPlan(
   Component: React.ComponentType<any>,
   planUid: PlanUid
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const resolvedValuePlanUid = resolveValue(planUid, props);
-    const logPrefix = `showWhenPlan ${resolvedValuePlanUid} -|`;
+    const logPrefix = `showForPlan ${resolvedValuePlanUid} -|`;
 
     if (isFramerCanvas()) {
       log(logPrefix, `Framer Canvas - show component`);
@@ -80,13 +80,13 @@ export function showWhenPlan(
 }
 
 // Display when authenticated and plan is not present
-export function showWhenNotPlan(
+export function showForNotPlan(
   Component: React.ComponentType<any>,
   planUid: PlanUid
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
     const resolvedValuePlanUid = resolveValue(planUid, props);
-    const logPrefix = `showWhenNotPlan ${resolvedValuePlanUid} -|`;
+    const logPrefix = `showForNotPlan ${resolvedValuePlanUid} -|`;
 
     if (isFramerCanvas()) {
       log(logPrefix, `Framer Canvas - show component`);
@@ -193,3 +193,7 @@ export function selectPrimaryVariantForPlan(
     }
   });
 }
+
+// Backwards compatibility aliases
+export const showWhenPlan = showForPlan;
+export const showWhenNotPlan = showForNotPlan;

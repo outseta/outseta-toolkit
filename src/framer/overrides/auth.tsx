@@ -7,11 +7,11 @@ const log = OutsetaLogger("framer.overrides.auth");
 
 /// Visibility overrides
 
-export function showWhenAnonymous(
+export function showForAnonymous(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `showWhenAnonymous -|`;
+    const logPrefix = `showForAnonymous -|`;
     try {
       if (isFramerCanvas()) {
         log(logPrefix, `Framer Canvas - show component`);
@@ -41,11 +41,11 @@ export function showWhenAnonymous(
   });
 }
 
-export function showWhenAuthenticated(
+export function showForAuthenticated(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `showWhenAuthenticated -|`;
+    const logPrefix = `showForAuthenticated -|`;
     try {
       if (isFramerCanvas()) {
         log(logPrefix, `Framer Canvas - show component`);
@@ -89,7 +89,7 @@ export function selectAuthStatusVariant(
       }
 
       const status = useAuthStore((state) => state.status);
-      
+
       switch (status) {
         case "pending":
           log(logPrefix, `Pending - show 'Anonymous' variant`);
@@ -184,3 +184,7 @@ export function triggerLogout(
     }
   });
 }
+
+// Backwards compatibility aliases
+export const showWhenAnonymous = showForAnonymous;
+export const showWhenAuthenticated = showForAuthenticated;

@@ -10,14 +10,14 @@ export function triggerLogout(Component): ComponentType {
   return auth.triggerLogout(Component);
 }
 
-// Component visible only for anonymous users
-export function showWhenAnonymous(Component): ComponentType {
-  return auth.showWhenAnonymous(Component);
+// Component visible for anonymous users
+export function showForAnonymous(Component): ComponentType {
+  return auth.showForAnonymous(Component);
 }
 
-// Component visible only for authenticated users
-export function showWhenAuthenticated(Component): ComponentType {
-  return auth.showWhenAuthenticated(Component);
+// Component visible for authenticated users
+export function showForAuthenticated(Component): ComponentType {
+  return auth.showForAuthenticated(Component);
 }
 
 // Selects `Anonymous` variant for anonymous users

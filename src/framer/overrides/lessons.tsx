@@ -1,8 +1,8 @@
 import React from "react";
 
 import {
-  showWhenProperty,
-  showWhenNotProperty,
+  showForProperty,
+  showForNotProperty,
   toggleProperty,
 } from "./properties";
 
@@ -12,19 +12,19 @@ const INCLUDES = "includes";
 
 // Visisbility Overrides
 
-export function showWhenLessonCompleted(
+export function showForLessonCompleted(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
-  return showWhenProperty(Component, PROPERTY_LESSONS_COMPLETED, {
+  return showForProperty(Component, PROPERTY_LESSONS_COMPLETED, {
     value: PROPS_SLUG,
     compare: INCLUDES,
   });
 }
 
-export function showWhenLessonNotCompleted(
+export function showForLessonNotCompleted(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
-  return showWhenNotProperty(Component, PROPERTY_LESSONS_COMPLETED, {
+  return showForNotProperty(Component, PROPERTY_LESSONS_COMPLETED, {
     value: PROPS_SLUG,
     compare: INCLUDES,
   });
@@ -41,3 +41,7 @@ export function toggleLessonCompleted(
     falseVariant: null, // Use primary variant
   });
 }
+
+// Backwards compatibility aliases
+export const showWhenLessonCompleted = showForLessonCompleted;
+export const showWhenLessonNotCompleted = showForLessonNotCompleted;
