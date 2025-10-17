@@ -19,14 +19,14 @@ export function auth_triggerLogout(Component): ComponentType {
   return auth.triggerLogout(Component);
 }
 
-// Component visible only for anonymous users
-export function auth_showWhenAnonymous(Component): ComponentType {
-  return auth.showWhenAnonymous(Component);
+// Component visible for anonymous users
+export function auth_showForAnonymous(Component): ComponentType {
+  return auth.showForAnonymous(Component);
 }
 
-// Component visible only for authenticated users
-export function auth_showWhenAuthenticated(Component): ComponentType {
-  return auth.showWhenAuthenticated(Component);
+// Component visible for authenticated users
+export function auth_showForAuthenticated(Component): ComponentType {
+  return auth.showForAuthenticated(Component);
 }
 
 // Selects `Anonymous` variant for anonymous users
@@ -121,13 +121,13 @@ Copy/paste and repeat for each plan needed.
 // Example for a "Gold" plan with UID "OW45KRmg":
 
 // Component visible for authenticated users on the Gold plan
-export function plans_showWhenGoldPlan(Component): ComponentType {
-  return plans.showWhenPlan(Component, "OW45KRmg");
+export function plans_showForGoldPlan(Component): ComponentType {
+  return plans.showForPlan(Component, "OW45KRmg");
 }
 
 // Component visible for authenticated users not on the Gold plan
-export function plans_showWhenNotGoldPlan(Component): ComponentType {
-  return plans.showWhenNotPlan(Component, "OW45KRmg");
+export function plans_showForNotGoldPlan(Component): ComponentType {
+  return plans.showForNotPlan(Component, "OW45KRmg");
 }
 
 // Selects primary variant for authenticated users on the Gold plan
@@ -159,13 +159,13 @@ Copy/paste and repeat for each add-on needed.
 // Example for a "Boost" add-on with UID "OW4pRYWg":
 
 // Component visible for authenticated users with the Boost add-on
-export function addOns_showWhenBoostAddOn(Component): ComponentType {
-  return addOns.showWhenAddOn(Component, "OW4pRYWg");
+export function addOns_showForBoostAddOn(Component): ComponentType {
+  return addOns.showForAddOn(Component, "OW4pRYWg");
 }
 
 // Component visible for authenticated users without the Boost add-on
-export function addOns_showWhenNotBoostAddOn(Component): ComponentType {
-  return addOns.showWhenNotAddOn(Component, "OW4pRYWg");
+export function addOns_showForNotBoostAddOn(Component): ComponentType {
+  return addOns.showForNotAddOn(Component, "OW4pRYWg");
 }
 
 // Selects primary variant for authenticated users with the Boost add-on
@@ -192,8 +192,8 @@ export function addOns_selectPrimaryVariantForBoostAddOn(
  */
 
 // Component visible for authenticated users when item is bookmarked
-export function bookmarks_showWhenBookmarked(Component): ComponentType {
-  return bookmarks.showWhenBookmarked(Component);
+export function bookmarks_showForBookmarked(Component): ComponentType {
+  return bookmarks.showForBookmarked(Component);
 }
 
 // Toggle bookmark status
@@ -225,8 +225,8 @@ export function bookmarks_selectCollectionVariant(Component): ComponentType {
  */
 
 // Component visible for authenticated users when lesson is completed
-export function lessons_showWhenCompleted(Component): ComponentType {
-  return lessons.showWhenLessonCompleted(Component);
+export function lessons_showForCompleted(Component): ComponentType {
+  return lessons.showForLessonCompleted(Component);
 }
 
 // Toggle lesson completion status

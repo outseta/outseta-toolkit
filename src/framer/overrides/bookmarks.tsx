@@ -1,6 +1,6 @@
 import React from "react";
 import {
-  showWhenProperty,
+  showForProperty,
   selectVariantForProperty,
   toggleProperty,
 } from "./properties";
@@ -11,10 +11,10 @@ const INCLUDES = "includes";
 
 // Visibility overrides
 
-export function showWhenBookmarked(
+export function showForBookmarked(
   Component: React.ComponentType<any>
 ): React.ComponentType<any> {
-  return showWhenProperty(Component, PROPERTY_BOOKMARKS, {
+  return showForProperty(Component, PROPERTY_BOOKMARKS, {
     value: PROPS_SLUG,
     compare: INCLUDES,
   });
@@ -44,3 +44,6 @@ export function selectBookmarkCollectionVariant(
     falseVariant: null, // Use primary variant
   });
 }
+
+// Backwards compatibility aliases
+export const showWhenBookmarked = showForBookmarked;

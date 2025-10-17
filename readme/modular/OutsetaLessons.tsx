@@ -28,8 +28,8 @@ import { lessons } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.5/dist
  */
 
 // Component visible for authenticated users when lesson is completed
-export function showWhenCompleted(Component): ComponentType {
-  return lessons.showWhenLessonCompleted(Component);
+export function showForCompleted(Component): ComponentType {
+  return lessons.showForLessonCompleted(Component);
 }
 
 // Toggle lesson completion status

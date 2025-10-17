@@ -114,7 +114,7 @@ export function withImageProperty(
 
 // Visibility overrides
 
-export function showWhenProperty(
+export function showForProperty(
   Component: React.ComponentType<any>,
   property: PropertyKey,
   { value, compare: compareType, flags }: CompareOptions
@@ -161,7 +161,7 @@ export function showWhenProperty(
   });
 }
 
-export function showWhenNotProperty(
+export function showForNotProperty(
   Component: React.ComponentType<any>,
   property: PropertyKey,
   { value, compare: compareType, flags }: CompareOptions
@@ -386,3 +386,7 @@ export function selectVariantForProperty(
     return <Component ref={ref} {...props} variant={resolvedFalseVariant} />;
   });
 }
+
+// Backwards compatibility aliases
+export const showWhenProperty = showForProperty;
+export const showWhenNotProperty = showForNotProperty;

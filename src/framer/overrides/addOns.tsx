@@ -47,12 +47,12 @@ export function withAddOnUidsAsText(
 // Visibility overrides
 
 // Display when authenticated and add-on is present
-export function showWhenAddOn(
+export function showForAddOn(
   Component: React.ComponentType<any>,
   addOnUid: AddOnUid
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `showWhenAddOn ${addOnUid} -|`;
+    const logPrefix = `showForAddOn ${addOnUid} -|`;
     try {
       const resolvedValueAddOnUid = resolveValue(addOnUid, props);
 
@@ -90,12 +90,12 @@ export function showWhenAddOn(
 }
 
 // Display when authenticated and add-on is not present
-export function showWhenNotAddOn(
+export function showForNotAddOn(
   Component: React.ComponentType<any>,
   addOnUid: AddOnUid
 ): React.ComponentType<any> {
   return forwardRef((props, ref) => {
-    const logPrefix = `showWhenNotAddOn ${addOnUid} -|`;
+    const logPrefix = `showForNotAddOn ${addOnUid} -|`;
     try {
       if (isFramerCanvas()) {
         log(logPrefix, `Framer Canvas - show component`);
@@ -185,3 +185,7 @@ export function selectPrimaryVariantForAddOn(
     }
   });
 }
+
+// Backwards compatibility aliases
+export const showWhenAddOn = showForAddOn;
+export const showWhenNotAddOn = showForNotAddOn;

@@ -24,13 +24,13 @@ Copy/paste and repeat for each add-on needed.
 // Example for a "Boost" add-on with UID "OW4pRYWg":
 
 // Component visible for authenticated users with the Boost add-on
-export function showWhenBoostAddOn(Component): ComponentType {
-  return addOns.showWhenAddOn(Component, "OW4pRYWg");
+export function showForBoostAddOn(Component): ComponentType {
+  return addOns.showForAddOn(Component, "OW4pRYWg");
 }
 
 // Component visible for authenticated users without the Boost add-on
-export function showWhenNotBoostAddOn(Component): ComponentType {
-  return addOns.showWhenNotAddOn(Component, "OW4pRYWg");
+export function showForNotBoostAddOn(Component): ComponentType {
+  return addOns.showForNotAddOn(Component, "OW4pRYWg");
 }
 
 // Selects primary variant for authenticated users with the Boost add-on

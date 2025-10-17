@@ -17,8 +17,8 @@ import { bookmarks } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.5/di
  */
 
 // Component visible for authenticated users when item is bookmarked
-export function showWhenBookmarked(Component): ComponentType {
-  return bookmarks.showWhenBookmarked(Component);
+export function showForBookmarked(Component): ComponentType {
+  return bookmarks.showForBookmarked(Component);
 }
 
 // Toggle bookmark status

@@ -33,8 +33,8 @@ The modular overrides are a set of focused override files for specific functiona
 For each set of overrides, copy the following code into a code file in your Framer project:
 
 - 🔧 **[OutsetaAuth.tsx](./readme/modular/OutsetaAuth.tsx)**
-  - `showWhenAnonymous` - Component visible only for anonymous users
-  - `showWhenAuthenticated` - Component visible only for authenticated users
+  - `showForAnonymous` - Component visible for anonymous users
+  - `showForAuthenticated` - Component visible for authenticated users
   - `selectAuthStatusVariant` - Selects variants based on auth status
   - `selectPrimaryVariantForAuthenticated` - Selects primary variant for authenticated users, keeps configured variant for non-authenticated users
   - `triggerLogout` - Component triggers logout (shows for authenticated users only)
@@ -53,25 +53,25 @@ For each set of overrides, copy the following code into a code file in your Fram
 
   - `withPlanUid` - Display current plan UID as component text
   - `selectPlanUidVariant` - Selects variant based on plan UID
-  - `showWhenPlan` - Generic function to show component when user is on a specific plan (requires plan UID parameter)
-  - `showWhenNotPlan` - Generic function to show component when user is not on a specific plan (requires plan UID parameter)
-  - `showWhenGoldPlan` - Component visible for users on specific plan (customizable)
-  - `showWhenNotGoldPlan` - Component visible for users not on specific plan (customizable)
+  - `showForPlan` - Generic function to show component when user is on a specific plan (requires plan UID parameter)
+  - `showForNotPlan` - Generic function to show component when user is not on a specific plan (requires plan UID parameter)
+  - `showForGoldPlan` - Component visible for users on specific plan (customizable)
+  - `showForNotGoldPlan` - Component visible for users not on specific plan (customizable)
   - `selectPrimaryVariantForGoldPlan` - Selects primary variant for users on the Gold plan, keeps configured variant for users not on the Gold plan (customize to your plans)
 
 - 🔌 **[OutsetaAddOns.tsx](./readme/modular/OutsetaAddOns.tsx)**
   - `withAddOnUids` - Display current add-on UIDs as component text
-  - `showWhenBoostAddOn` - Component visible for users with specific add-on (customizable)
-  - `showWhenNotBoostAddOn` - Component visible for users without specific add-on (customizable)
+  - `showForBoostAddOn` - Component visible for users with specific add-on (customizable)
+  - `showForNotBoostAddOn` - Component visible for users without specific add-on (customizable)
   - `selectPrimaryVariantForBoostAddOn` - Selects primary variant for users with the Boost add-on, keeps configured variant for users without the Boost add-on (customizable)
 - 🔖 **[OutsetaBookmarks.tsx](./readme/modular/OutsetaBookmarks.tsx)**
   - 🚨 **REQUIRES** a person custom property with system name: Bookmarks
-  - `showWhenBookmarked` - Component visible if item is bookmarked
+  - `showForBookmarked` - Component visible if item is bookmarked
   - `toggleBookmarked` - Toggle bookmark status
   - `selectCollectionVariant` - Selects `Empty State` variant when there are no bookmarks, uses primary variant when there are bookmarks
 - 📚 **[OutsetaLessons.tsx](./readme/modular/OutsetaLessons.tsx)**
   - 🚨 **REQUIRES** a person custom property with system name: LessonsCompleted
-  - `showWhenCompleted` - Component visible if lesson is completed
+  - `showForCompleted` - Component visible if lesson is completed
   - `toggleCompleted` - Toggle lesson completion status
 
 **Benefits:** Smaller files, easier to customize, only include what you need
@@ -110,8 +110,8 @@ export function withCompanyMascot(Component): ComponentType {
  */
 
 // Component visible when coffee preference is Espresso
-export function showWhenCoffeePreference_Espresso(Component): ComponentType {
-  return custom.showWhenProperty(Component, "CoffeePreference", {
+export function showForCoffeePreference_Espresso(Component): ComponentType {
+  return custom.showForProperty(Component, "CoffeePreference", {
     value: "Espresso",
     compare: "equal",
     flags: ["ignore-case"],
