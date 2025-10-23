@@ -1,6 +1,5 @@
 // File: OutsetaLessons.tsx
 // Lesson tracking system for Outseta integration
-import { type ComponentType } from "react";
 import { lessons } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.6/dist/framer/overrides.js";
 
 /*
@@ -28,13 +27,13 @@ import { lessons } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.6/dist
  */
 
 // Component visible for authenticated users when lesson is completed
-export function showForCompleted(Component): ComponentType {
+export function showForCompleted(Component): React.ComponentType {
   return lessons.showForLessonCompleted(Component);
 }
 
 // Toggle lesson completion status
 // Selects primary variant for authenticated users when lesson is completed
 // Selects configured variant for authenticated users when lesson is not completed
-export function toggleCompleted(Component): ComponentType {
+export function toggleCompleted(Component): React.ComponentType {
   return lessons.toggleLessonCompleted(Component);
 }

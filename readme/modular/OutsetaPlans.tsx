@@ -1,19 +1,18 @@
 // File: OutsetaPlans.tsx
 // Subscription plan management for Outseta integration
-import { type ComponentType } from "react";
 import { plans } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.6/dist/framer/overrides.js";
 
 //// PLANS ////
 
 // Display current plan UID as component text
-export function withPlanUid(Component): ComponentType {
+export function withPlanUid(Component): React.ComponentType {
   return plans.withPlanUidAsText(Component);
 }
 
 // Selects `OW45KRmg` variant for authenticated users on the OW45KRmg plan
 // Selects `amRjLEmJ` variant for authenticated users on the amRjLEmJ plan
 // Selects primary variant for authenticated users when no variant match
-export function selectPlanUidVariant(Component): ComponentType {
+export function selectPlanUidVariant(Component): React.ComponentType {
   return plans.selectPlanUidVariant(Component);
 }
 
@@ -31,17 +30,19 @@ Copy/paste and repeat for each plan needed.
 // Example for a "Gold" plan with UID "OW45KRmg":
 
 // Component visible for authenticated users on the Gold plan
-export function showForGoldPlan(Component): ComponentType {
+export function showForGoldPlan(Component): React.ComponentType {
   return plans.showForPlan(Component, "OW45KRmg");
 }
 
 // Component visible for authenticated users not on the Gold plan
-export function showForNotGoldPlan(Component): ComponentType {
+export function showForNotGoldPlan(Component): React.ComponentType {
   return plans.showForNotPlan(Component, "OW45KRmg");
 }
 
 // Selects primary variant for authenticated users on the Gold plan
 // Selects configured variant for authenticated users not on the Gold plan
-export function selectPrimaryVariantForGoldPlan(Component): ComponentType {
+export function selectPrimaryVariantForGoldPlan(
+  Component
+): React.ComponentType {
   return plans.selectPrimaryVariantForPlan(Component, "OW45KRmg");
 }

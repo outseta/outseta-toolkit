@@ -1,6 +1,5 @@
 // File: OutsetaBookmarks.tsx
 // Bookmark system for Outseta integration
-import { type ComponentType } from "react";
 import { bookmarks } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.6/dist/framer/overrides.js";
 
 /*
@@ -17,19 +16,19 @@ import { bookmarks } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.6/di
  */
 
 // Component visible for authenticated users when item is bookmarked
-export function showForBookmarked(Component): ComponentType {
+export function showForBookmarked(Component): React.ComponentType {
   return bookmarks.showForBookmarked(Component);
 }
 
 // Toggle bookmark status
 // Selects primary variant for authenticated users when item is bookmarked
 // Selects configured variant for authenticated users when item is not bookmarked
-export function toggleBookmarked(Component): ComponentType {
+export function toggleBookmarked(Component): React.ComponentType {
   return bookmarks.toggleBookmarked(Component);
 }
 
 // Selects variant `Empty State` when there are no bookmarks
 // Selects primary variant when there are bookmarks
-export function selectCollectionVariant(Component): ComponentType {
+export function selectCollectionVariant(Component): React.ComponentType {
   return bookmarks.selectBookmarkCollectionVariant(Component);
 }

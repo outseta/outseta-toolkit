@@ -1,6 +1,5 @@
 // File: Outseta.tsx
 // All-in-one Outseta integration with all common functions
-import { type ComponentType } from "react";
 import {
   auth,
   embed,
@@ -15,23 +14,23 @@ import {
 //// AUTHENTICATION ////
 
 // Component triggers logout (shows for authenticated users only)
-export function auth_triggerLogout(Component): ComponentType {
+export function auth_triggerLogout(Component): React.ComponentType {
   return auth.triggerLogout(Component);
 }
 
 // Component visible for anonymous users
-export function auth_showForAnonymous(Component): ComponentType {
+export function auth_showForAnonymous(Component): React.ComponentType {
   return auth.showForAnonymous(Component);
 }
 
 // Component visible for authenticated users
-export function auth_showForAuthenticated(Component): ComponentType {
+export function auth_showForAuthenticated(Component): React.ComponentType {
   return auth.showForAuthenticated(Component);
 }
 
 // Selects `Anonymous` variant for anonymous users
 // Selects `Authenticated` variant for authenticated users
-export function auth_selectAuthStatusVariant(Component): ComponentType {
+export function auth_selectAuthStatusVariant(Component): React.ComponentType {
   return auth.selectAuthStatusVariant(Component);
 }
 
@@ -39,71 +38,71 @@ export function auth_selectAuthStatusVariant(Component): ComponentType {
 // Selects configured variant for non-authenticated users
 export function auth_selectPrimaryVariantForAuthenticated(
   Component
-): ComponentType {
+): React.ComponentType {
   return auth.selectPrimaryVariantForAuthenticated(Component);
 }
 
 /// EMBED ////
 
 // Component opens login embed as popup (shows for anonymous users only)
-export function embed_popupLogin(Component): ComponentType {
+export function embed_popupLogin(Component): React.ComponentType {
   return embed.popupLoginEmbed(Component);
 }
 
 // Component opens registration embed as popup (shows for anonymous users only)
-export function embed_popupRegister(Component): ComponentType {
+export function embed_popupRegister(Component): React.ComponentType {
   return embed.popupRegisterEmbed(Component);
 }
 
 // Component opens profile embed as popup (shows for authenticated users only)
-export function embed_popupProfile(Component): ComponentType {
+export function embed_popupProfile(Component): React.ComponentType {
   return embed.popupProfileEmbed(Component);
 }
 
 //// USER DATA ////
 
 // Display user's first name as component text
-export function user_withFirstName(Component): ComponentType {
+export function user_withFirstName(Component): React.ComponentType {
   return user.withFirstName(Component);
 }
 
 // Display user's last name as component text
-export function user_withLastName(Component): ComponentType {
+export function user_withLastName(Component): React.ComponentType {
   return user.withLastName(Component);
 }
 
 // Display user's full name as component text
-export function user_withFullName(Component): ComponentType {
+export function user_withFullName(Component): React.ComponentType {
   return user.withFullName(Component);
 }
 
 // Display user's email address as component text
-export function user_withEmail(Component): ComponentType {
+export function user_withEmail(Component): React.ComponentType {
   return user.withEmail(Component);
 }
 
 // Display user's avatar/profile image as component image
 // ℹ️ **NOTE:** Requires an image component
-export function user_withAvatar(Component): ComponentType {
+export function user_withAvatar(Component): React.ComponentType {
   return user.withAvatar(Component);
 }
 
 // Display account name as component text
-export function user_withAccountName(Component): ComponentType {
+export function user_withAccountName(Component): React.ComponentType {
   return user.withAccountName(Component);
 }
 
 //// PLANS ////
 
 // Display current plan UID as component text
-export function plans_withPlanUid(Component): ComponentType {
+export function plans_withPlanUid(Component): React.ComponentType {
   return plans.withPlanUidAsText(Component);
 }
 
 // Selects `OW45KRmg` variant for authenticated users on the OW45KRmg plan
 // Selects `amRjLEmJ` variant for authenticated users on the amRjLEmJ plan
 // Selects primary variant for authenticated users when no variant match
-export function plans_selectPlanUidVariant(Component): ComponentType {
+export function plans_selectPlanUidVariant(Component): React.ComponentType {
   return plans.selectPlanUidVariant(Component);
 }
 
@@ -121,12 +120,12 @@ Copy/paste and repeat for each plan needed.
 // Example for a "Gold" plan with UID "OW45KRmg":
 
 // Component visible for authenticated users on the Gold plan
-export function plans_showForGoldPlan(Component): ComponentType {
+export function plans_showForGoldPlan(Component): React.ComponentType {
   return plans.showForPlan(Component, "OW45KRmg");
 }
 
 // Component visible for authenticated users not on the Gold plan
-export function plans_showForNotGoldPlan(Component): ComponentType {
+export function plans_showForNotGoldPlan(Component): React.ComponentType {
   return plans.showForNotPlan(Component, "OW45KRmg");
 }
 
@@ -134,14 +133,14 @@ export function plans_showForNotGoldPlan(Component): ComponentType {
 // Selects configured variant for authenticated users not on the Gold plan
 export function plans_selectPrimaryVariantForGoldPlan(
   Component
-): ComponentType {
+): React.ComponentType {
   return plans.selectPrimaryVariantForPlan(Component, "OW45KRmg");
 }
 
 //// ADD-ONS ////
 
 // Display current add-on UIDs (comma separated string) as component text
-export function addOns_withAddOnUids(Component): ComponentType {
+export function addOns_withAddOnUids(Component): React.ComponentType {
   return addOns.withAddOnUidsAsText(Component);
 }
 
@@ -159,12 +158,12 @@ Copy/paste and repeat for each add-on needed.
 // Example for a "Boost" add-on with UID "OW4pRYWg":
 
 // Component visible for authenticated users with the Boost add-on
-export function addOns_showForBoostAddOn(Component): ComponentType {
+export function addOns_showForBoostAddOn(Component): React.ComponentType {
   return addOns.showForAddOn(Component, "OW4pRYWg");
 }
 
 // Component visible for authenticated users without the Boost add-on
-export function addOns_showForNotBoostAddOn(Component): ComponentType {
+export function addOns_showForNotBoostAddOn(Component): React.ComponentType {
   return addOns.showForNotAddOn(Component, "OW4pRYWg");
 }
 
@@ -172,7 +171,7 @@ export function addOns_showForNotBoostAddOn(Component): ComponentType {
 // Selects configured variant for authenticated users without the Boost add-on
 export function addOns_selectPrimaryVariantForBoostAddOn(
   Component
-): ComponentType {
+): React.ComponentType {
   return addOns.selectPrimaryVariantForAddOn(Component, "OW4pRYWg");
 }
 
@@ -192,20 +191,22 @@ export function addOns_selectPrimaryVariantForBoostAddOn(
  */
 
 // Component visible for authenticated users when item is bookmarked
-export function bookmarks_showForBookmarked(Component): ComponentType {
+export function bookmarks_showForBookmarked(Component): React.ComponentType {
   return bookmarks.showForBookmarked(Component);
 }
 
 // Toggle bookmark status
 // Selects primary variant for authenticated users when item is bookmarked
 // Selects configured variant for authenticated users when item is not bookmarked
-export function bookmarks_toggleBookmarked(Component): ComponentType {
+export function bookmarks_toggleBookmarked(Component): React.ComponentType {
   return bookmarks.toggleBookmarked(Component);
 }
 
 // Selects variant `Empty State` when there are no bookmarks
 // Selects primary variant when there are bookmarks
-export function bookmarks_selectCollectionVariant(Component): ComponentType {
+export function bookmarks_selectCollectionVariant(
+  Component
+): React.ComponentType {
   return bookmarks.selectBookmarkCollectionVariant(Component);
 }
 
@@ -225,20 +226,20 @@ export function bookmarks_selectCollectionVariant(Component): ComponentType {
  */
 
 // Component visible for authenticated users when lesson is completed
-export function lessons_showForCompleted(Component): ComponentType {
+export function lessons_showForCompleted(Component): React.ComponentType {
   return lessons.showForLessonCompleted(Component);
 }
 
 // Toggle lesson completion status
 // Selects primary variant for authenticated users when lesson is completed
 // Selects configured variant for authenticated users when lesson is not completed
-export function lessons_toggleCompleted(Component): ComponentType {
+export function lessons_toggleCompleted(Component): React.ComponentType {
   return lessons.toggleLessonCompleted(Component);
 }
 
 //// UTILS ////
 
 // Automatically hides empty grid items
-export function utils_dynamicGridHeight(Component): ComponentType {
+export function utils_dynamicGridHeight(Component): React.ComponentType {
   return utils.dynamicGridHeight(Component);
 }

@@ -1,12 +1,11 @@
 // File: OutsetaAddOns.tsx
 // Add-on management for Outseta integration
-import { type ComponentType } from "react";
 import { addOns } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.6/dist/framer/overrides.js";
 
 //// ADD-ON  ////
 
 // Display current add-on UIDs (comma separated string) as component text
-export function withAddOnUids(Component): ComponentType {
+export function withAddOnUids(Component): React.ComponentType {
   return addOns.withAddOnUidsAsText(Component);
 }
 
@@ -24,17 +23,19 @@ Copy/paste and repeat for each add-on needed.
 // Example for a "Boost" add-on with UID "OW4pRYWg":
 
 // Component visible for authenticated users with the Boost add-on
-export function showForBoostAddOn(Component): ComponentType {
+export function showForBoostAddOn(Component): React.ComponentType {
   return addOns.showForAddOn(Component, "OW4pRYWg");
 }
 
 // Component visible for authenticated users without the Boost add-on
-export function showForNotBoostAddOn(Component): ComponentType {
+export function showForNotBoostAddOn(Component): React.ComponentType {
   return addOns.showForNotAddOn(Component, "OW4pRYWg");
 }
 
 // Selects primary variant for authenticated users with the Boost add-on
 // Selects configured variant for authenticated users without the Boost add-on
-export function selectPrimaryVariantForBoostAddOn(Component): ComponentType {
+export function selectPrimaryVariantForBoostAddOn(
+  Component
+): React.ComponentType {
   return addOns.selectPrimaryVariantForAddOn(Component, "OW4pRYWg");
 }

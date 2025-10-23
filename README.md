@@ -96,7 +96,7 @@ import { custom } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.6/dist/
  */
 
 // Display company mascot as component text
-export function withCompanyMascot(Component): ComponentType {
+export function withCompanyMascot(Component): React.ComponentType {
   return custom.withTextProperty(Component, "Account.Mascot");
 }
 
@@ -110,7 +110,9 @@ export function withCompanyMascot(Component): ComponentType {
  */
 
 // Component visible when coffee preference is Espresso
-export function showForCoffeePreference_Espresso(Component): ComponentType {
+export function showForCoffeePreference_Espresso(
+  Component
+): React.ComponentType {
   return custom.showForProperty(Component, "CoffeePreference", {
     value: "Espresso",
     compare: "equal",
@@ -132,7 +134,7 @@ export function showForCoffeePreference_Espresso(Component): ComponentType {
 // Selects variant `Active` when slug is present in skills
 // Selects variant `Inactive` when slug is not present in skills
 // ℹ️ **NOTE:** Requires a `slug` property on the component
-export function toggleSkillTag(Component): ComponentType {
+export function toggleSkillTag(Component): React.ComponentType {
   return custom.toggleProperty(Component, "Skills", {
     value: "props.slug", // e.g. one of: `JavaScript`, `Design`, `Marketing`,
     trueVariant: "Active",
@@ -152,7 +154,9 @@ export function toggleSkillTag(Component): ComponentType {
 // Selects variant `OnWatchLaterList` when slug is present in watch later
 // Selects variant `NotOnWatchLaterList` when slug is not present in watch later
 // ℹ️ **NOTE:** Requires a `slug` property on the component
-export function selectVariantFromWatchLaterStatus(Component): ComponentType {
+export function selectVariantFromWatchLaterStatus(
+  Component
+): React.ComponentType {
   return custom.selectVariantForProperty(Component, "WatchLater", {
     value: "props.slug", // e.g. one of: `video1`, `video2`, `video3` etc.
     compare: "includes",
