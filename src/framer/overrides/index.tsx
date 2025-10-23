@@ -12,6 +12,3 @@ export * as lessons from "./lessons";
 
 // Framer utilities
 export * as utils from "./utils";
-
-// To test if overrides are available at the correct url
-export * from "./test";
