@@ -111,7 +111,7 @@ export function toggleValueInArray(
   }
 }
 
-export type CompareType = "equal" | "includes" | "not-equal";
+export type CompareType = "equal" | "includes" | "not-equal" | "not-includes";
 export type CompareFlag = "ignore-case";
 
 /**
@@ -138,15 +138,20 @@ export function comparePropertyValue(
         flags.includes("ignore-case")
       );
     case "includes":
-      const normalizedArray = normalizeAsArray(propertyValue);
       return includesValue(
-        normalizedArray,
+        normalizeAsArray(propertyValue),
+        targetValue,
+        flags.includes("ignore-case")
+      );
+    case "not-includes":
+      return !includesValue(
+        normalizeAsArray(propertyValue),
         targetValue,
         flags.includes("ignore-case")
       );
     default:
       throw new Error(
-        `Invalid comparison type: "${type}". Valid types are: "equal", "includes", "not-equal"`
+        `Invalid comparison type: "${type}". Valid types are: "equal", "includes", "not-equal", "not-includes"`
       );
   }
 }
