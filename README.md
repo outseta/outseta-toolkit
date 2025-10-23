@@ -81,6 +81,17 @@ For each set of overrides, copy the following code into a code file in your Fram
 
 For custom properties and advanced use cases, you may create your own overrides. Here are some examples:
 
+### Available Comparison Operators
+
+The toolkit supports four comparison operators for custom properties:
+
+- `equal` - Exact match (case-sensitive by default)
+- `not-equal` - Not an exact match (case-sensitive by default)
+- `includes` - Value is present in an array or string
+- `not-includes` - Value is not present in an array or string
+
+ℹ️ **NOTE:** Use the `flags: ["ignore-case"]` option to make comparisons case-insensitive.
+
 ```javascript
 import { custom } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.6/dist/framer/overrides.js";
 
@@ -120,6 +131,17 @@ export function showForCoffeePreference_Espresso(
   });
 }
 
+// Component visible when coffee preference is NOT Espresso
+export function showForCoffeePreference_NotEspresso(
+  Component
+): React.ComponentType {
+  return custom.showForProperty(Component, "CoffeePreference", {
+    value: "Espresso",
+    compare: "not-equal",
+    flags: ["ignore-case"],
+  });
+}
+
 /*
  ***********************************************************
  ** 🚨 **REQUIRES** a person custom property with system name: Skills **
@@ -139,6 +161,14 @@ export function toggleSkillTag(Component): React.ComponentType {
     value: "props.slug", // e.g. one of: `JavaScript`, `Design`, `Marketing`,
     trueVariant: "Active",
     falseVariant: "Inactive",
+  });
+}
+
+// Component visible when user does NOT have JavaScript skill
+export function showForNotJavaScriptSkill(Component): React.ComponentType {
+  return custom.showForProperty(Component, "Skills", {
+    value: "JavaScript",
+    compare: "not-includes",
   });
 }
 
