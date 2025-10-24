@@ -1,6 +1,6 @@
 // File: OutsetaLessons.tsx
 // Lesson tracking system for Outseta integration
-import { lessons } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.6/dist/framer/overrides.js";
+import { lessons } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.7/dist/framer/overrides.js";
 
 /*
  ***********************************************************

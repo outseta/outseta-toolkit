@@ -93,7 +93,7 @@ The toolkit supports four comparison operators for custom properties:
 ℹ️ **NOTE:** Use the `flags: ["ignore-case"]` option to make comparisons case-insensitive.
 
 ```javascript
-import { custom } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.6/dist/framer/overrides.js";
+import { custom } from "https://cdn.jsdelivr.net/npm/@outseta/toolkit@v0.7/dist/framer/overrides.js";
 
 //// EXAMPLES OF CUSTOM PROPERTIES ////
 
