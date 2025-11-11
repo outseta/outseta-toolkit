@@ -24,7 +24,7 @@ export function dynamicGridHeight(
 
       // If no children, check if it has text content
       if (element.children.length === 0) {
-        return element.textContent?.trim().length > 0;
+        return (element.textContent?.trim().length ?? 0) > 0;
       }
 
       // Recursively check if any child has visible content
