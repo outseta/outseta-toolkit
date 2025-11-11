@@ -16,20 +16,33 @@ export function dynamicGridHeight(
     // Forward the ref to the internal ref
     useImperativeHandle(ref, () => internalRef.current);
 
+    const hasVisibleContent = (element: HTMLElement): boolean => {
+      // Check if element itself is hidden
+      if (getComputedStyle(element).display === "none") {
+        return false;
+      }
+
+      // If no children, check if it has text content
+      if (element.children.length === 0) {
+        return (element.textContent?.trim().length ?? 0) > 0;
+      }
+
+      // Recursively check if any child has visible content
+      return Array.from(element.children).some((child) =>
+        hasVisibleContent(child as HTMLElement)
+      );
+    };
+
     const hideEmptyChildren = () => {
       if (!internalRef.current) return;
 
       Array.from(internalRef.current.children).forEach((child: any) => {
         const htmlChild = child as HTMLElement;
 
-        // Check if child is "empty"
-        const isEmpty = htmlChild.children.length === 0;
-        // Or if all of it's children are hidden
-        const hiddenChildren = Array.from(htmlChild.children).every(
-          (child) => getComputedStyle(child).display === "none"
-        );
+        // Check if child has any visible content recursively
+        const hasContent = hasVisibleContent(htmlChild);
 
-        htmlChild.style.display = isEmpty || hiddenChildren ? "none" : "";
+        htmlChild.style.display = hasContent ? "" : "none";
       });
     };
 

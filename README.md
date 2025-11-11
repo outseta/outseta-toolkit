@@ -73,6 +73,9 @@ For each set of overrides, copy the following code into a code file in your Fram
   - 🚨 **REQUIRES** a person custom property with system name: LessonsCompleted
   - `showForCompleted` - Component visible if lesson is completed
   - `toggleCompleted` - Toggle lesson completion status
+- 🛠️ **[OutsetaUtils.tsx](./readme/modular/OutsetaUtils.tsx)**
+  - `dynamicGridHeight` - Automatically hides empty grid items
+  - ℹ️ **NOTE:** Use for grids containing items conditionally rendered with `showForBookmarked` or `showForCompleted`
 
 **Benefits:** Smaller files, easier to customize, only include what you need
 **Downside:** Multiple files to manage and copy
