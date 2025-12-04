@@ -1,3 +1,6 @@
+// The store
+export { default as useOutsetaAuthStore } from "./useAuthStore";
+
 // Native functionality
 export * as auth from "./auth";
 export * as embed from "./embed";
