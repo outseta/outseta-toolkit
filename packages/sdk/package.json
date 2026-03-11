@@ -1,0 +1,40 @@
+{
+  "name": "@outseta/sdk",
+  "version": "0.1.0",
+  "description": "Framework-agnostic Outseta SDK with nanostores",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "outseta",
+    "sdk",
+    "authentication",
+    "nanostores",
+    "saas"
+  ],
+  "author": "Outseta",
+  "license": "MIT",
+  "dependencies": {
+    "lodash-es": "^4.17.21",
+    "nanostores": "^0.11.3"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "^4.17.12",
+    "tsup": "^8.3.6",
+    "typescript": "^5.0.0"
+  }
+}

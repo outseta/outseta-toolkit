@@ -1,0 +1,43 @@
+{
+  "name": "@outseta/react",
+  "version": "0.1.0",
+  "description": "React hooks for Outseta SDK",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "outseta",
+    "react",
+    "hooks",
+    "authentication",
+    "saas"
+  ],
+  "author": "Outseta",
+  "license": "MIT",
+  "dependencies": {
+    "@nanostores/react": "^0.8.4",
+    "@outseta/sdk": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "tsup": "^8.3.6",
+    "typescript": "^5.0.0"
+  }
+}
