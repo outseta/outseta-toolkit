@@ -26,29 +26,29 @@ function globalsPlugin(globals: Record<string, string>): Plugin {
 export default defineConfig([
   // ESM build for npm / bundlers
   {
-    entry: ["src/index.ts"],
+    entry: ["src/framer/overrides/index.tsx"],
     format: ["esm"],
     dts: true,
     sourcemap: false,
     clean: true,
     target: "es2020",
-    external: ["react", "react-dom", "@outseta/sdk"],
+    external: ["react", "react-dom"],
   },
   // IIFE build for CDN / script tags
   {
-    entry: ["src/index.ts"],
+    entry: ["src/framer/overrides/index.tsx"],
     format: ["iife"],
-    globalName: "OutsetaReact",
+    globalName: "OutsetaToolkit",
     sourcemap: false,
     clean: false,
     target: "es2020",
+    noExternal: [/@outseta\/sdk/, /@outseta\/react/, /@nanostores\/react/],
     minify: true,
     outExtension: () => ({ js: ".iife.js" }),
     esbuildPlugins: [
       globalsPlugin({
         react: "window.React",
         "react-dom": "window.ReactDOM",
-        "@outseta/sdk": "window.OutsetaSdk",
       }),
     ],
   },

@@ -3,22 +3,19 @@
   "version": "0.8.0",
   "description": "Outseta's toolkit for visual website builders",
   "type": "module",
+  "unpkg": "./dist/index.iife.js",
+  "jsdelivr": "./dist/index.iife.js",
   "exports": {
     "./framer/overrides": {
-      "import": "./dist/framer/overrides.js",
+      "import": "./dist/framer/overrides/index.js",
       "types": "./dist/framer/overrides/index.d.ts"
-    },
-    "./framer/test": {
-      "import": "./dist/framer/test.js",
-      "types": "./dist/framer/test/index.d.ts"
     }
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "vite build && tsc --project tsconfig.build.json && npm run clean-types",
-    "clean-types": "rm -rf dist/outseta dist/auth-store",
+    "build": "tsup",
     "type-check": "tsc --noEmit"
   },
   "keywords": [
@@ -38,8 +35,7 @@
   },
   "devDependencies": {
     "@types/react": "^18.2.0",
-    "@vitejs/plugin-react": "^4.2.0",
-    "typescript": "^5.0.0",
-    "vite": "^5.0.0"
+    "tsup": "^8.3.6",
+    "typescript": "^5.0.0"
   }
 }

@@ -6,6 +6,8 @@
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "unpkg": "./dist/index.iife.js",
+  "jsdelivr": "./dist/index.iife.js",
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -29,10 +31,10 @@
   "author": "Outseta",
   "license": "MIT",
   "dependencies": {
-    "@nanostores/react": "^0.8.4",
-    "@outseta/sdk": "workspace:*"
+    "@nanostores/react": "^0.8.4"
   },
   "peerDependencies": {
+    "@outseta/sdk": "workspace:*",
     "react": ">=18.0.0"
   },
   "devDependencies": {
